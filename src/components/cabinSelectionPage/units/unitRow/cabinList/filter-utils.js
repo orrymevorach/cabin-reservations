@@ -35,7 +35,7 @@ export const sortByLeastAvailability = ({ cabins }) => {
 
 export const filterOutClosedCabins = ({ cabins }) => {
   return cabins.filter(({ availability }) => {
-    if (availability === 'Closed') return false;
+    if (availability !== 'Open') return false;
     return true;
   });
 };
