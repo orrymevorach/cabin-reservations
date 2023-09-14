@@ -31,11 +31,15 @@ export const filterByAvailableBeds = ({ cabins, selectedFilters }) => {
 };
 
 export const sortByLeastAvailability = ({ cabins }) => {
-  return cabins.sort((a, b) => {
+  const sortedByOpenBeds = cabins.sort((a, b) => {
     const aOpenBeds = parseFloat(a.openBeds);
     const bOpenBeds = parseFloat(b.openBeds);
-    if (aOpenBeds > bOpenBeds) return 1;
-    return -1;
+    if (aOpenBeds > bOpenBeds) return -1;
+    return 1;
+  });
+  return sortedByOpenBeds.sort((a, b) => {
+    if (a.availability === 'Open' && a.status !== 'Full') return -1;
+    return 1;
   });
 };
 
