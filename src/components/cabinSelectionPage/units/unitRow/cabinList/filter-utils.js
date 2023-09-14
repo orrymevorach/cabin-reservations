@@ -18,8 +18,14 @@ export const filterByGender = ({ cabins, selectedFilters }) => {
 
 export const filterByAvailableBeds = ({ cabins, selectedFilters }) => {
   const availableBedsFilter = selectedFilters[AVAILABLE_BEDS];
-  return cabins.filter(({ openBeds }) => {
-    if (openBeds >= availableBedsFilter) return true;
+  return cabins.filter(({ openBeds, availability }) => {
+    if (
+      availableBedsFilter &&
+      openBeds >= availableBedsFilter &&
+      availability === 'Open'
+    )
+      return true;
+    if (!availableBedsFilter && openBeds >= availableBedsFilter) return true;
     return false;
   });
 };

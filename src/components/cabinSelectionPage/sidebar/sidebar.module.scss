@@ -51,6 +51,14 @@
   margin-bottom: 20px;
 }
 
+a.link {
+  color: variables.$charcoal;
+  text-decoration: underline;
+  &:active {
+    color: variables.$charcoal;
+  }
+}
+
 @media screen and (max-width: variables.$mobile) {
   .sidebar {
     margin-top: 50px;

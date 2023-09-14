@@ -8,6 +8,7 @@ import ReservationSummary from '@/components/shared/reservationSummary';
 import VerifiedUsers from '@/components/shared/verifiedUsers/verifiedUsers';
 import { useUser } from '@/context/user-context';
 import Loader from '@/components/shared/loader/loader';
+import Link from 'next/link';
 
 export default function Sidebar({ cabinData }) {
   const {
@@ -28,7 +29,9 @@ export default function Sidebar({ cabinData }) {
   const isConfirmationStage =
     currentStage !== CABIN_SELECTION_STAGES.CONFIRMATION;
   const cabinHasEnoughBeds = cabin.openBeds >= members.length;
-  const showReservationButton = isConfirmationStage && cabinHasEnoughBeds;
+  const cabinIsOpen = cabin.availability === 'Open';
+  const showReservationButton =
+    isConfirmationStage && cabinHasEnoughBeds && cabinIsOpen;
 
   return (
     <div className={styles.sidebar}>
@@ -42,7 +45,20 @@ export default function Sidebar({ cabinData }) {
       />
       {!cabinHasEnoughBeds && (
         <p className={styles.notEnoughBedsText}>
-          There are not enough beds in this cabin for your entire group.
+          There are not enough beds in this cabin for your entire group. Please
+          select a different cabin on the{' '}
+          <Link href="/cabin-selection" className={styles.link}>
+            cabin selection page.
+          </Link>
+        </p>
+      )}
+      {!cabinIsOpen && (
+        <p className={styles.notEnoughBedsText}>
+          This cabin is not available for booking. Please select a different
+          cabin on the{' '}
+          <Link href="/cabin-selection" className={styles.link}>
+            cabin selection page.
+          </Link>
         </p>
       )}
       {showReservationButton && <ReserveButton cabin={cabinData?.cabin} />}

@@ -3,17 +3,21 @@ import styles from './cabinSelectionTile.module.scss';
 import clsx from 'clsx';
 
 export default function CabinSelectionTile({ cabin, handleSelectCabin }) {
-  const { name, status, openBeds, totalBeds, additionalInformation } = cabin;
+  const { name, status, openBeds, totalBeds, availability } = cabin;
+  const isAvailable = status !== 'Full' && availability === 'Open';
   return (
     <li key={name} className={styles.cabinContainer}>
       <div className={styles.topRow}>
         <p className={styles.nameContainer}>
           Cabin Name: <span className={styles.name}>{name}</span>
         </p>
-        <p>
-          Available Beds: {openBeds} of {totalBeds}
-        </p>
-        {status !== 'Full' ? (
+        {isAvailable && (
+          <p>
+            Available Beds: {openBeds} of {totalBeds}
+          </p>
+        )}
+
+        {isAvailable ? (
           <Button
             classNames={styles.button}
             handleClick={() => handleSelectCabin(cabin)}
