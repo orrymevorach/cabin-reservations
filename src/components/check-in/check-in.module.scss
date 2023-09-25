@@ -1,0 +1,15 @@
+@use '@mixins' as mixins;
+
+.textContainer {
+  text-align: center;
+  margin: 50px 0 70px;
+}
+
+.title {
+  @include mixins.fontPrimaryBold;
+  margin-bottom: 10px;
+}
+
+.text {
+  @include mixins.fontPrimary;
+}

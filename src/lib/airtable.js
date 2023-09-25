@@ -8,6 +8,7 @@ import {
   CLEAR_CURRENT_BED_SELECTION,
   CREATE_GROUP,
   UPDATE_GROUP,
+  CHECK_IN,
 } from '@/graphql/queries';
 import { client } from '@/graphql/apollo-config';
 
@@ -156,6 +157,23 @@ export const updateGroup = async ({ groupId, members }) => {
       },
     });
     return data.update_groups[0];
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const checkIn = async ({ id, arrivalDay, arrivalTime, name }) => {
+  try {
+    const { data } = await client.mutate({
+      mutation: CHECK_IN,
+      variables: {
+        id,
+        name,
+        arrivalDay,
+        arrivalTime,
+      },
+    });
+    return data;
   } catch (error) {
     console.log(error);
   }

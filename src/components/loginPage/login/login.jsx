@@ -1,23 +1,10 @@
 import { getUserByEmail } from '@/lib/airtable';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styles from './login.module.scss';
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/router';
-import { COOKIES, ROUTES } from '@/utils/constants';
 import Button from '../../shared/button/button';
 import Input from '@/components/shared/input';
-
-const useLoginExistingUserOnPageLoad = () => {
-  const router = useRouter();
-  useEffect(() => {
-    const userRecordCookie = Cookies.get(COOKIES.USER_RECORD);
-    if (userRecordCookie) {
-      router.push({
-        pathname: ROUTES.CABIN_SELECTION,
-      });
-    }
-  }, [router]);
-};
+import Cookies from 'js-cookie';
+import { COOKIES } from '@/utils/constants';
 
 const errors = {
   USER_NOT_FOUND:
@@ -28,13 +15,11 @@ const errors = {
     "We're sorry, an unknown error has occured. Please contact info@highlandsmusicfestival.ca.",
 };
 
-export default function Login() {
+export default function Login({ handleSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  useLoginExistingUserOnPageLoad();
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -47,9 +32,8 @@ export default function Login() {
       user?.id && user?.paymentIntent === password;
     if (userExistsAndPasswordMatches) {
       Cookies.set(COOKIES.USER_RECORD, user.id);
-      const hasCabin = user.cabin && user.cabin[0];
-      if (hasCabin) router.push(ROUTES.SUMMARY);
-      else router.push(ROUTES.CABIN_SELECTION);
+      setIsLoading(false);
+      handleSuccess({ user });
       return;
     } else if (passwordDoesNotMatch) {
       setIsLoading(false);

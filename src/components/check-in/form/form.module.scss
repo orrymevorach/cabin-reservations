@@ -1,0 +1,12 @@
+@use '@mixins' as mixins;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dropdown {
+  width: 100%;
+  margin-bottom: 50px;
+}

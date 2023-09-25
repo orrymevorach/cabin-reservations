@@ -12,6 +12,7 @@ export default function Takeover({
   classNames = '',
   modalClassNames = '',
   queryParam = '',
+  hideCloseButton = false,
 }) {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const closeModal = () => {
@@ -94,7 +95,7 @@ export default function Takeover({
         >
           <div className={clsx(style.modal, modalClassNames)} ref={modalRef}>
             {children}
-            <CloseButton handleClick={closeModal} />
+            {!hideCloseButton && <CloseButton handleClick={closeModal} />}
           </div>
         </div>
       )}

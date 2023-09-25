@@ -139,3 +139,21 @@ export const UPDATE_GROUP = gql`
     }
   }
 `;
+
+export const CHECK_IN = gql`
+  mutation CheckIn(
+    $id: String
+    $arrivalDay: String
+    $arrivalTime: String
+    $name: String
+  ) {
+    insert_checkIn(
+      name: $name
+      arrivalDay: $arrivalDay
+      arrivalTime: $arrivalTime
+      profile: [$id]
+    ) {
+      id
+    }
+  }
+`;
