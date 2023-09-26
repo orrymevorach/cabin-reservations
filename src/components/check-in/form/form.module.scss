@@ -1,12 +1,30 @@
 @use '@mixins' as mixins;
+@use '@variables' as variables;
 
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-bottom: 80px;
 }
 
 .dropdown {
   width: 100%;
   margin-bottom: 50px;
+}
+
+label.inputLabel {
+  @include mixins.fontPrimary;
+  color: black;
+  margin-bottom: 7px;
+}
+
+.submitButton {
+  margin-top: 30px;
+}
+
+@media screen and (max-width: variables.$mobile) {
+  .container {
+    width: 100%;
+  }
 }

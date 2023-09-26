@@ -146,12 +146,14 @@ export const CHECK_IN = gql`
     $arrivalDay: String
     $arrivalTime: String
     $name: String
+    $questions: String
   ) {
     insert_checkIn(
       name: $name
       arrivalDay: $arrivalDay
       arrivalTime: $arrivalTime
       profile: [$id]
+      questions: $questions
     ) {
       id
     }

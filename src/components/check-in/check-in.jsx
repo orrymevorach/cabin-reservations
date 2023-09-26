@@ -71,9 +71,13 @@ export default function CheckIn() {
           <CheckInForm />
         </Layout>
       )}
-      {stage === stages.SIGN_WAIVER && (
+      {stage === stages.CONFIRMATION && (
         <Layout>
-          <p>Waiver</p>
+          <div className={styles.confirmationContainer}>
+            <p className={styles.confirmationText}>
+              Thank you! See you at Highlands!
+            </p>
+          </div>
         </Layout>
       )}
     </main>

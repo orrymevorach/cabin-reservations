@@ -5,6 +5,7 @@ import styles from './form.module.scss';
 import { checkIn } from '@/lib/airtable';
 import { useUser } from '@/context/user-context';
 import { useState } from 'react';
+import { Textarea } from '@mui/joy';
 
 const arrivalTimes = [
   '4PM - 7PM',
@@ -29,17 +30,20 @@ export default function CheckInForm() {
       name: user.name,
       arrivalDay: state.arrivalDay,
       arrivalTime: state.arrivalTime,
+      questions: state.questions,
     });
     setIsFormSubmitting(false);
     dispatch({
       type: actions.SET_STAGE,
-      stage: stages.SIGN_WAIVER,
+      stage: stages.CONFIRMATION,
     });
   };
   return (
     <form action="#" className={styles.container} onSubmit={handleSubmit}>
       <div className={styles.formFieldContainer}>
-        <InputLabel id="day-label">What day do you plan to arrive?</InputLabel>
+        <InputLabel className={styles.inputLabel} id="day-label">
+          What day do you plan to arrive?
+        </InputLabel>
         <Select
           labelId="day-label"
           id="day"
@@ -62,7 +66,7 @@ export default function CheckInForm() {
         </Select>
       </div>
       <div className={styles.formFieldContainer}>
-        <InputLabel id="time-label">
+        <InputLabel className={styles.inputLabel} id="time-label">
           What time do you plan to arrive?
         </InputLabel>
         <Select
@@ -86,7 +90,21 @@ export default function CheckInForm() {
           })}
         </Select>
       </div>
-      <Button isLoading={isFormSubmitting}>Continue</Button>
+      <div className={styles.formFieldContainer}>
+        <InputLabel className={styles.inputLabel} id="time-label">
+          Do you have any questions for us? Or are you just straight up psyched
+          to get here?
+        </InputLabel>
+        <Textarea
+          value={state.questions}
+          onChange={e =>
+            dispatch({ type: actions.SET_QUESTIONS, questions: e.target.value })
+          }
+        />
+      </div>
+      <Button classNames={styles.submitButton} isLoading={isFormSubmitting}>
+        Continue
+      </Button>
     </form>
   );
 }

@@ -4,6 +4,7 @@ const actions = {
   SET_ARRIVAL_TIME: 'SET_ARRIVAL_TIME',
   SET_ARRIVAL_DAY: 'SET_ARRIVAL_DAY',
   SET_STAGE: 'SET_STAGE',
+  SET_QUESTIONS: 'SET_QUESTIONS',
 };
 
 const stages = {
@@ -11,16 +12,19 @@ const stages = {
   LOG_IN: 'LOG_IN',
   FILL_OUT_FORM: 'FILL_OUT_FORM',
   SIGN_WAIVER: 'SIGN_WAIVER',
+  CONFIRMATION: 'CONFIRMATION',
 };
 
 const initialState = {
   arrivalTime: '',
   arrivalDay: '',
   stage: stages.PAGE_LOAD,
+  questions: '',
 };
 
 const reducer = (state, action) => {
-  const { SET_ARRIVAL_TIME, SET_ARRIVAL_DAY, SET_STAGE } = actions;
+  const { SET_ARRIVAL_TIME, SET_ARRIVAL_DAY, SET_STAGE, SET_QUESTIONS } =
+    actions;
   switch (action.type) {
     case SET_ARRIVAL_TIME:
       return {
@@ -31,6 +35,11 @@ const reducer = (state, action) => {
       return {
         ...state,
         arrivalDay: action.arrivalDay,
+      };
+    case SET_QUESTIONS:
+      return {
+        ...state,
+        questions: action.questions,
       };
     case SET_STAGE:
       return {

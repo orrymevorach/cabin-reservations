@@ -13,3 +13,13 @@
 .text {
   @include mixins.fontPrimary;
 }
+
+.confirmationContainer {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.confirmationText {
+  @include mixins.fontPrimary;
+  font-size: 18px;
+}
