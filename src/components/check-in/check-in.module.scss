@@ -23,3 +23,10 @@
   @include mixins.fontPrimary;
   font-size: 18px;
 }
+
+.iframe {
+  width: 90%;
+  display: block;
+  margin: 0 auto;
+  min-height: 800px;
+}

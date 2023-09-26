@@ -71,6 +71,17 @@ export default function CheckIn() {
           <CheckInForm />
         </Layout>
       )}
+      {stage === stages.SIGN_WAIVER && (
+        <Layout>
+          <div>
+            <iframe
+              src="https://docs.google.com/forms/d/e/1FAIpQLScgMu0FynbVLhvjh6EmTsTh0X9je7Gl6t5HUAz9VWezoN4vYw/viewform"
+              frameborder="0"
+              className={styles.iframe}
+            ></iframe>
+          </div>
+        </Layout>
+      )}
       {stage === stages.CONFIRMATION && (
         <Layout>
           <div className={styles.confirmationContainer}>

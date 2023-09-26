@@ -100,6 +100,7 @@ export default function CheckInForm() {
           onChange={e =>
             dispatch({ type: actions.SET_QUESTIONS, questions: e.target.value })
           }
+          minRows={3}
         />
       </div>
       <Button classNames={styles.submitButton} isLoading={isFormSubmitting}>
