@@ -35,7 +35,7 @@ export default function CheckInForm() {
     setIsFormSubmitting(false);
     dispatch({
       type: actions.SET_STAGE,
-      stage: stages.CONFIRMATION,
+      stage: stages.SIGN_WAIVER,
     });
   };
   return (
