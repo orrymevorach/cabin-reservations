@@ -17,6 +17,7 @@ label.inputLabel {
   @include mixins.fontPrimary;
   color: black;
   margin-bottom: 7px;
+  text-wrap: wrap;
 }
 
 .submitButton {
@@ -26,5 +27,9 @@ label.inputLabel {
 @media screen and (max-width: variables.$mobile) {
   .container {
     width: 100%;
+  }
+  label.inputLabel {
+    font-size: 18px;
+    width: 300px;
   }
 }
