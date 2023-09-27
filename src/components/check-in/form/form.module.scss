@@ -38,8 +38,9 @@ label.inputLabel {
   .container {
     width: 100%;
   }
+  .input,
   label.inputLabel {
     font-size: 18px;
-    width: 300px;
+    width: 300px !important;
   }
 }
