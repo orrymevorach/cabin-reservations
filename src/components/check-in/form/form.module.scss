@@ -10,18 +10,28 @@
 
 .dropdown {
   width: 100%;
-  margin-bottom: 50px;
 }
 
+.input,
 label.inputLabel {
   @include mixins.fontPrimary;
   color: black;
   margin-bottom: 7px;
   text-wrap: wrap;
+  text-align: center;
+  width: 400px;
+}
+
+.input::placeholder {
+  text-align: center;
 }
 
 .submitButton {
   margin-top: 30px;
+}
+
+.formFieldContainer {
+  margin-bottom: 50px;
 }
 
 @media screen and (max-width: variables.$mobile) {

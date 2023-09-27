@@ -168,6 +168,9 @@ export const checkIn = async ({
   arrivalTime,
   name,
   questions,
+  city,
+  birthday,
+  howDidYouHearAboutHighlands,
 }) => {
   try {
     const { data } = await client.mutate({
@@ -178,6 +181,9 @@ export const checkIn = async ({
         arrivalDay,
         arrivalTime,
         questions,
+        city,
+        birthday,
+        howDidYouHearAboutHighlands,
       },
     });
     return data;
