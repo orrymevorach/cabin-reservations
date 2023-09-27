@@ -58,17 +58,23 @@ export default function CheckIn() {
       )}
       {stage === stages.FILL_OUT_FORM && (
         <Layout>
-          <div className={styles.textContainer}>
-            {user?.name && (
-              <h2 className={styles.title}>Welcome, {user.name}</h2>
-            )}
+          {!user ? (
+            <Loader />
+          ) : (
+            <>
+              <div className={styles.textContainer}>
+                {user?.name && (
+                  <h2 className={styles.title}>Welcome, {user.name}</h2>
+                )}
 
-            <p className={styles.text}>
-              Please fill out the form below to help us prepare for your
-              arrival. Thank you!
-            </p>
-          </div>
-          <CheckInForm />
+                <p className={styles.text}>
+                  Please fill out the form below to help us prepare for your
+                  arrival. Thank you!
+                </p>
+              </div>
+              <CheckInForm />
+            </>
+          )}
         </Layout>
       )}
       {stage === stages.SIGN_WAIVER && (
