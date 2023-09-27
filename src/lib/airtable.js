@@ -163,10 +163,9 @@ export const updateGroup = async ({ groupId, members }) => {
 };
 
 export const checkIn = async ({
-  id,
+  name,
   arrivalDay,
   arrivalTime,
-  name,
   questions,
   city,
   birthday,
@@ -176,7 +175,6 @@ export const checkIn = async ({
     const { data } = await client.mutate({
       mutation: CHECK_IN,
       variables: {
-        id,
         name,
         arrivalDay,
         arrivalTime,

@@ -1,6 +1,7 @@
 const { useReducer } = require('react');
 
 const actions = {
+  SET_NAME: 'SET_NAME',
   SET_ARRIVAL_TIME: 'SET_ARRIVAL_TIME',
   SET_ARRIVAL_DAY: 'SET_ARRIVAL_DAY',
   SET_STAGE: 'SET_STAGE',
@@ -19,6 +20,7 @@ const stages = {
 };
 
 const initialState = {
+  name: '',
   arrivalTime: '',
   arrivalDay: '',
   stage: stages.FILL_OUT_FORM,
@@ -30,6 +32,7 @@ const initialState = {
 
 const reducer = (state, action) => {
   const {
+    SET_NAME,
     SET_ARRIVAL_TIME,
     SET_ARRIVAL_DAY,
     SET_STAGE,
@@ -39,6 +42,11 @@ const reducer = (state, action) => {
     HOW_DID_YOU_HEAR_ABOUT_HIGHLANDS,
   } = actions;
   switch (action.type) {
+    case SET_NAME:
+      return {
+        ...state,
+        name: action.name,
+      };
     case SET_ARRIVAL_TIME:
       return {
         ...state,

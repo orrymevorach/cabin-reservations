@@ -1,16 +1,12 @@
 import Layout from '../shared/layout/layout';
 import CheckInForm from './form/form';
 import styles from './check-in.module.scss';
-import { useEffect, useState } from 'react';
-import Loader from '../shared/loader/loader';
 import { useCheckIn } from '@/context/check-in-context';
 
 export default function CheckIn() {
   const {
     state: { stage },
     stages,
-    dispatch,
-    actions,
   } = useCheckIn();
 
   return (

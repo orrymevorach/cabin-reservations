@@ -142,7 +142,6 @@ export const UPDATE_GROUP = gql`
 
 export const CHECK_IN = gql`
   mutation CheckIn(
-    $id: String
     $arrivalDay: String
     $arrivalTime: String
     $name: String
@@ -155,7 +154,6 @@ export const CHECK_IN = gql`
       name: $name
       arrivalDay: $arrivalDay
       arrivalTime: $arrivalTime
-      profile: [$id]
       questions: $questions
       city: $city
       howDidYouHearAboutHighlands: $howDidYouHearAboutHighlands

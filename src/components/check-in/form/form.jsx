@@ -3,7 +3,6 @@ import Button from '@/components/shared/button/button';
 import { useCheckIn } from '@/context/check-in-context';
 import styles from './form.module.scss';
 import { checkIn } from '@/lib/airtable';
-import { useUser } from '@/context/user-context';
 import { useState } from 'react';
 import { Textarea } from '@mui/joy';
 import Input from '@/components/shared/input/input';
@@ -27,15 +26,13 @@ const arrivalDays = ['Thursday', 'Friday', 'Saturday'];
 
 export default function CheckInForm() {
   const { state, dispatch, actions, stages } = useCheckIn();
-  const { user } = useUser();
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
   const handleSubmit = async e => {
     e.preventDefault();
     setIsFormSubmitting(true);
     await checkIn({
-      id: user.id,
-      name: user.name,
+      name: state.name,
       arrivalDay: state.arrivalDay,
       arrivalTime: state.arrivalTime,
       questions: state.questions,
@@ -55,6 +52,18 @@ export default function CheckInForm() {
 
   return (
     <form action="#" className={styles.container} onSubmit={handleSubmit}>
+      <div className={styles.formFieldContainer}>
+        <InputLabel className={styles.inputLabel} id="name-label">
+          Your name
+        </InputLabel>
+        <Input
+          handleChange={e =>
+            dispatch({ type: actions.SET_NAME, name: e.target.value })
+          }
+          value={state.name}
+          classNames={styles.input}
+        />
+      </div>
       <div className={styles.formFieldContainer}>
         <InputLabel className={styles.inputLabel} id="day-label">
           What day do you plan to arrive?
