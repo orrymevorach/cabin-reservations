@@ -19,7 +19,7 @@ label.inputLabel {
   margin-bottom: 7px;
   text-wrap: wrap;
   text-align: center;
-  width: 400px;
+  width: 400px !important;
 }
 
 .input::placeholder {

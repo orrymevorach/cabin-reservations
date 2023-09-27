@@ -11,8 +11,8 @@ const actions = {
 };
 
 const stages = {
-  PAGE_LOAD: 'PAGE_LOAD',
-  LOG_IN: 'LOG_IN',
+  // PAGE_LOAD: 'PAGE_LOAD',
+  // LOG_IN: 'LOG_IN',
   FILL_OUT_FORM: 'FILL_OUT_FORM',
   SIGN_WAIVER: 'SIGN_WAIVER',
   CONFIRMATION: 'CONFIRMATION',
@@ -21,7 +21,7 @@ const stages = {
 const initialState = {
   arrivalTime: '',
   arrivalDay: '',
-  stage: stages.PAGE_LOAD,
+  stage: stages.FILL_OUT_FORM,
   questions: '',
   city: '',
   birthday: '',
