@@ -22,11 +22,9 @@ export default function ReserveButton({ children, cabin, classNames = '' }) {
     try {
       for (let i = 0; i < groupMembers.length; i++) {
         const groupMember = groupMembers[i];
-        const userHasNoPrevioulsyReservedCabin = groupMember.cabin.length === 0;
+        const userHasNoPrevioulsyReservedCabin = !groupMember.cabin;
         const usersExistingCabinIsDifferentThenCurrentCabin =
-          groupMember.cabin &&
-          groupMember.cabin.length &&
-          groupMember.cabin[0].id !== cabinId;
+          groupMember.cabin && groupMember.cabin.id !== cabinId;
         // Reserving a spot in a cabin clears your existing bed selection.
         // Setting these conditions so as not to affect the reservation of people already in this cabin.
         if (
@@ -49,7 +47,7 @@ export default function ReserveButton({ children, cabin, classNames = '' }) {
         type: actions.SET_SELECTION_STAGE,
         currentStage: CABIN_SELECTION_STAGES.CONFIRMATION,
       });
-      await sendConfirmationEmail({ groupMembers, cabin, selectedBeds });
+      // await sendConfirmationEmail({ groupMembers, cabin, selectedBeds });
 
       router.push({
         query: {

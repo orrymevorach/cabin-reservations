@@ -1,165 +1,240 @@
-import {
-  GET_CABINS,
-  GET_USER_BY_EMAIL,
-  RESERVE_SPOT_IN_CABIN,
-  GET_USER_BY_ID,
-  GET_CABIN,
-  RESERVE_BED,
-  CLEAR_CURRENT_BED_SELECTION,
-  CREATE_GROUP,
-  UPDATE_GROUP,
-  CHECK_IN,
-} from '@/graphql/queries';
-import { client } from '@/graphql/apollo-config';
+import { toCamelCase } from '@/utils/string-utils';
+import { BEDS } from '@/utils/constants';
+
+export const createRecord = async ({
+  tableId,
+  newFields,
+  endpoint = '/create-record',
+}) => {
+  try {
+    const response = await fetch(`/api/airtable${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tableId, newFields }),
+    }).then(res => res.json());
+    return response;
+  } catch (error) {
+    console.log('error', error);
+  }
+};
+
+export async function getRecords({ tableId, endpoint = '/get-records' }) {
+  try {
+    const response = await fetch(`/api/airtable${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tableId }),
+    }).then(res => res.json());
+    return response;
+  } catch (error) {
+    console.log('error', error);
+  }
+}
+
+export async function getRecord({
+  tableId,
+  field,
+  fieldValue,
+  endpoint = '/get-record',
+}) {
+  try {
+    const response = await fetch(`/api/airtable${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tableId, field, fieldValue }),
+    }).then(res => res.json());
+    return response;
+  } catch (error) {
+    console.log('error', error);
+  }
+}
+
+export async function getRecordById({
+  tableId,
+  recordId,
+  endpoint = '/get-record-by-id',
+}) {
+  try {
+    const response = await fetch(`/api/airtable${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tableId, recordId }),
+    }).then(res => res.json());
+    return response;
+  } catch (error) {
+    console.log('error', error);
+  }
+}
+
+export const updateRecord = async ({
+  tableId,
+  recordId,
+  newFields,
+  endpoint = '/update-record',
+}) => {
+  try {
+    const response = await fetch(`/api/airtable${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tableId, newFields, recordId }),
+    }).then(res => res.json());
+    return response;
+  } catch (error) {
+    console.log('error', error);
+  }
+};
+
+export const transformFields = ({ record }) => {
+  let transformedFieldsObj = {};
+  const entries = Object.entries(record.fields);
+  for (let i = 0; i < entries.length; i++) {
+    const [key, value] = entries[i];
+    const transformedKey = toCamelCase(key);
+    transformedFieldsObj[transformedKey] = value;
+    transformedFieldsObj.id = record.id;
+  }
+  return transformedFieldsObj;
+};
 
 export const getCabins = async () => {
-  try {
-    const { data } = await client.query({
-      query: GET_CABINS,
-    });
-    return data.cabins;
-  } catch (error) {
-    console.log(error);
-  }
+  const { records: cabins } = await getRecords({
+    tableId: 'Cabins',
+    endpoint: '/get-cabins',
+  });
+  return cabins;
 };
 
 export const getCabin = async ({ cabinName }) => {
-  try {
-    const { data } = await client.query({
-      query: GET_CABIN,
-      variables: {
-        cabinName,
-      },
-    });
-    return data.cabins[0];
-  } catch (error) {
-    console.log(error);
-  }
+  const { record: cabin } = await getRecord({
+    tableId: 'Cabins',
+    field: 'Name',
+    fieldValue: cabinName,
+    endpoint: '/get-cabin',
+  });
+  return cabin;
+};
+
+export const getCabinById = async ({ cabinId }) => {
+  const { record: cabin } = await getRecordById({
+    tableId: 'Cabins',
+    recordId: cabinId,
+    endpoint: '/get-cabin-by-id',
+  });
+  return cabin;
 };
 
 export const reserveSpotInCabin = async ({ cabinId = '', attendeeId }) => {
-  try {
-    const { data } = await client.mutate({
-      mutation: RESERVE_SPOT_IN_CABIN,
-      variables: {
-        cabinId,
-        attendeeId,
-      },
-    });
-    return data.update_ticketPurchases;
-  } catch (error) {
-    console.log(error);
-  }
+  const { record } = await updateRecord({
+    tableId: 'Ticket Purchases 2024',
+    recordId: attendeeId,
+    newFields: { Cabin: [cabinId] },
+    endpoint: '/reserve-spot-in-cabin',
+  });
+  return record;
 };
 
 export const getUserByEmail = async ({ email }) => {
-  try {
-    const { data } = await client.query({
-      query: GET_USER_BY_EMAIL,
-      variables: { email },
-      fetchPolicy: 'no-cache',
-    });
-    return data.ticketPurchases[0];
-  } catch (error) {
-    console.log(error);
-  }
+  const { record: user } = await getRecord({
+    tableId: 'Ticket Purchases 2024',
+    field: 'Email Address',
+    fieldValue: email,
+    endpoint: '/get-user-by-email',
+  });
+  return user;
 };
 
 export const getUserByRecordId = async ({ id }) => {
-  try {
-    const { data } = await client.query({
-      query: GET_USER_BY_ID,
-      variables: { id },
-      fetchPolicy: 'no-cache',
-    });
-    return data.ticketPurchases[0];
-  } catch (error) {
-    console.log(error);
-  }
+  const { record: user } = await getRecordById({
+    tableId: 'Ticket Purchases 2024',
+    recordId: id,
+    endpoint: '/get-user-by-record-id',
+  });
+  return user;
 };
 
-export const reserveBed = async ({
-  userId,
-  frontBunkLeft,
-  frontCotLeft,
-  backCotLeft,
-  frontLoftLeft,
-  backLoftLeft,
-  backBunkLeft,
-  frontBunkRight,
-  frontCotRight,
-  backCotRight,
-  frontLoftRight,
-  backLoftRight,
-  backBunkRight,
-}) => {
-  try {
-    const { data } = await client.mutate({
-      mutation: RESERVE_BED,
-      variables: {
-        userId,
-        frontBunkLeft,
-        frontCotLeft,
-        backCotLeft,
-        frontLoftLeft,
-        backLoftLeft,
-        backBunkLeft,
-        frontBunkRight,
-        frontCotRight,
-        backCotRight,
-        frontLoftRight,
-        backLoftRight,
-        backBunkRight,
-      },
-    });
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
+export const reserveBed = async ({ userId, bedName, cabinId }) => {
+  const { record: cabin } = await updateRecord({
+    tableId: 'Cabins',
+    recordId: cabinId,
+    newFields: {
+      [bedName]: [userId],
+    },
+    endpoint: '/reserve-bed',
+  });
+  return cabin;
+};
+
+export const getBedOccupant = async ({ userId }) => {
+  const { record: currentBedOccupant } = await getRecordById({
+    tableId: 'Ticket Purchases 2024',
+    recordId: userId,
+    endpoint: '/get-bed-occupant',
+  });
+  return currentBedOccupant;
 };
 
 export const clearCurrentBedSelection = async ({ userId }) => {
-  try {
-    const { data } = await client.mutate({
-      mutation: CLEAR_CURRENT_BED_SELECTION,
-      variables: {
-        userId,
-      },
-    });
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
+  const { record: user } = await updateRecord({
+    tableId: 'Ticket Purchases 2024',
+    recordId: userId,
+    newFields: {
+      [BEDS.frontBunkLeft]: [],
+      [BEDS.backBunkLeft]: [],
+      [BEDS.frontCotLeft]: [],
+      [BEDS.backCotLeft]: [],
+      [BEDS.frontLoftLeft]: [],
+      [BEDS.backLoftLeft]: [],
+      [BEDS.frontBunkRight]: [],
+      [BEDS.backBunkRight]: [],
+      [BEDS.frontCotRight]: [],
+      [BEDS.backCotRight]: [],
+      [BEDS.frontLoftRight]: [],
+      [BEDS.backLoftRight]: [],
+    },
+    endpoint: '/clear-current-bed-selection',
+  });
+  return user;
 };
 
 export const createGroup = async ({ groupName, members }) => {
-  try {
-    const { data } = await client.mutate({
-      mutation: CREATE_GROUP,
-      variables: {
-        groupName,
-        members,
-      },
-    });
-    return data.insert_groups[0];
-  } catch (error) {
-    console.log(error);
-  }
+  const { record: group } = await createRecord({
+    tableId: 'Groups',
+    newFields: {
+      'Group Name': groupName,
+      Members: members,
+    },
+    endpoint: '/create-group',
+  });
+  return group;
 };
 
 export const updateGroup = async ({ groupId, members }) => {
-  try {
-    const { data } = await client.mutate({
-      mutation: UPDATE_GROUP,
-      variables: {
-        id: groupId,
-        members,
-      },
-    });
-    return data.update_groups[0];
-  } catch (error) {
-    console.log(error);
-  }
+  const { record: groupData } = await updateRecord({
+    tableId: 'Groups',
+    recordId: groupId,
+    newFields: { Members: members },
+    endpoint: '/update-group',
+  });
+  return groupData;
+};
+
+export const getGroup = async ({ groupId }) => {
+  const { record: groupData } = await getRecordById({
+    tableId: 'Groups',
+    recordId: groupId,
+    endpoint: '/get-group',
+  });
+  return groupData;
 };
 
 export const checkIn = async ({
@@ -171,21 +246,13 @@ export const checkIn = async ({
   birthday,
   howDidYouHearAboutHighlands,
 }) => {
-  try {
-    const { data } = await client.mutate({
-      mutation: CHECK_IN,
-      variables: {
-        name,
-        arrivalDay,
-        arrivalTime,
-        questions,
-        city,
-        birthday,
-        howDidYouHearAboutHighlands,
-      },
-    });
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
+  const { record: user } = await createRecord({
+    tableId: 'Check In',
+    newFields: {
+      Name: name,
+      City: city,
+      Birthday: birthday,
+    },
+  });
+  return user;
 };

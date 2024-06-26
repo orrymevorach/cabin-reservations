@@ -14,7 +14,7 @@ import { updateGroup } from '@/lib/airtable';
 export default function AddGuestsTakeover() {
   const { dispatch, actions, groupData } = useReservation();
   const { user } = useUser();
-  const cabin = user.cabin && user.cabin[0];
+  const cabin = user.cabin;
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();

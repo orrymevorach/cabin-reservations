@@ -27,11 +27,7 @@ const filterOutUsersWithSelectedBeds = ({ members, selectedBeds }) => {
 
 const getIsBedOccupiedByMemberOfGroup = ({ members, bedName, cabin }) => {
   return members.find(({ name }) => {
-    if (
-      cabin[bedName] &&
-      cabin[bedName].length &&
-      cabin[bedName][0].name === name
-    ) {
+    if (cabin[bedName] && cabin[bedName].name === name) {
       return true;
     }
     return false;
@@ -86,7 +82,7 @@ export default function Bed({
 
   // Set bed status on page load
   useEffect(() => {
-    const isBedSelected = cabin[bedName].length > 0;
+    const isBedSelected = cabin[bedName];
     if (currentBedOccupantInCurrentGroup) {
       // If bed is selected by a person in this group
       setCurrentUser(currentBedOccupantInCurrentGroup.name);

@@ -1,6 +1,6 @@
-import { bedList } from '@/components/shared/bedSelection/cabin/cabin';
 import { useUser } from '@/context/user-context';
-import { getCabin } from '@/lib/airtable';
+import { getBedOccupant, getCabin } from '@/lib/airtable';
+import { BEDS } from '@/utils/constants';
 import { useRouter } from 'next/router';
 import { useReducer, useEffect, useState } from 'react';
 
@@ -74,12 +74,12 @@ const useGetCabinData = () => {
   // Used on summary page
   useEffect(() => {
     const getCabinData = async () => {
-      const cabinData = await getCabin({ cabinName: user.cabin[0].name });
+      const cabinData = await getCabin({ cabinName: user.cabin.name });
       setCabin(cabinData);
       setIsLoading(false);
       return;
     };
-    const hasCabin = user?.cabin && user?.cabin[0];
+    const hasCabin = user?.cabin;
     if (!cabinQuery && !cabin && hasCabin) {
       getCabinData();
     }
@@ -95,16 +95,17 @@ const useGetBeds = ({ cabinData, dispatch, actions }) => {
   const [isGetting, setIsGetting] = useState(true);
 
   useEffect(() => {
-    const getBeds = () => {
+    const getBeds = async () => {
       const selectedBeds = [];
-      for (let i = 0; i < bedList.length; i++) {
-        const bedName = bedList[i];
-        const cabinBed = cabinData.cabin[bedName];
-        if (cabinBed.length) {
-          const bedData = cabinBed[0];
+      const bedsArray = Object.keys(BEDS);
+      for (let bed of bedsArray) {
+        if (cabinData.cabin[bed]) {
+          const currentBedOccupant = await getBedOccupant({
+            userId: cabinData.cabin[bed][0],
+          });
           selectedBeds.push({
-            bedName,
-            ...bedData,
+            bedName: bed,
+            ...currentBedOccupant,
           });
         }
       }
@@ -125,16 +126,16 @@ export const useReservationReducer = () => {
   useEffect(() => {
     if (user && !state.groupData.members.length && cabinData.cabin) {
       // Add group data on page load
-      const hasGroup = user?.group && user.group[0];
-      const groupData = hasGroup ? user.group[0] : { members: [user] };
+      const hasGroup = !!user?.group;
+      const groupData = hasGroup ? user.group : { members: [user] };
 
       // numberOfMembersNotConfirmedInCurrentCabin helps with add guest logic.
       // Specfically in the scenario where members of the group are confirmed in a cabin, and others are added later to the same cabin as the rest of the group.
       const numberOfMembersNotConfirmedInCurrentCabin =
-        groupData.members.filter(({ cabin }) => {
-          const hasCabin = cabin.length > 0;
+        groupData?.members?.filter(({ cabin }) => {
+          const hasCabin = cabin?.length;
           const hasDifferentCabin = hasCabin
-            ? cabin[0].name !== cabinData.cabin.name
+            ? cabin.name !== cabinData.cabin.name
             : false;
           if (!hasCabin || hasDifferentCabin) return true;
           return false;

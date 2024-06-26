@@ -1,5 +1,10 @@
-import { getUserByRecordId } from '@/lib/airtable';
-import { COOKIES } from '@/utils/constants';
+import {
+  getBedOccupant,
+  getCabinById,
+  getGroup,
+  getUserByRecordId,
+} from '@/lib/airtable';
+import { BEDS, COOKIES } from '@/utils/constants';
 import Cookies from 'js-cookie';
 import { useEffect, useReducer } from 'react';
 
@@ -45,6 +50,42 @@ export default function useUserReducer() {
     const loadUser = async () => {
       dispatch({ type: actions.INIT_LOGIN });
       const userData = await getUserByRecordId({ id: userRecordCookie });
+
+      // Get cabin data from reference record
+      const cabinId = (userData.cabin && userData.cabin[0]) || '';
+      if (cabinId) {
+        const cabinData = await getCabinById({
+          tableId: 'Cabins',
+          cabinId: cabinId,
+        });
+        // Get reference record for occupant of each bed
+        const bedsArray = Object.keys(BEDS);
+        for (let bed of bedsArray) {
+          if (cabinData[bed]) {
+            const currentBedOccupant = await getBedOccupant({
+              userId: cabinData[bed][0],
+            });
+            cabinData[bed] = currentBedOccupant;
+          }
+        }
+        userData.cabin = cabinData;
+      }
+      // Get group data from reference record
+      const groupId = (userData.group && userData.group[0]) || '';
+      if (groupId) {
+        const groupData = await getGroup({
+          groupId,
+        });
+
+        const members = await Promise.all(
+          groupData.members.map(async memberId => {
+            const memberData = await getUserByRecordId({ id: memberId });
+            return memberData;
+          })
+        );
+        groupData.members = members;
+        userData.group = groupData;
+      }
       dispatch({ type: actions.LOG_IN, userData });
     };
     if (userRecordCookie) {

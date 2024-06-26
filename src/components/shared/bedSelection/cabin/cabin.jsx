@@ -16,21 +16,6 @@ const rightBeds = [
   ['frontBunkRight'],
 ];
 
-export const bedList = [
-  'backBunkLeft',
-  'backLoftLeft',
-  'frontLoftLeft',
-  'backCotLeft',
-  'frontCotLeft',
-  'frontBunkLeft',
-  'backBunkRight',
-  'backLoftRight',
-  'frontLoftRight',
-  'backCotRight',
-  'frontCotRight',
-  'frontBunkRight',
-];
-
 export default function Cabin({ readOnly, cabin }) {
   const { isMobile } = useWindowSize();
   return (

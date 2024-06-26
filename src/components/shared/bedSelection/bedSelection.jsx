@@ -7,6 +7,7 @@ import { clearCurrentBedSelection, reserveBed } from '@/lib/airtable';
 import Legend from './legend/legend';
 import { useWindowSize } from '@/context/window-size-context';
 import { sendConfirmationEmail } from '@/lib/mailgun';
+import { BEDS } from '@/utils/constants';
 
 const HeadStaffCabinInformation = () => {
   return (
@@ -42,17 +43,19 @@ export default function BedSelection({ readOnly = false, cabin }) {
     });
     for (let i = 0; i < usersToBeUpdated.length; i++) {
       const { bedName, id } = usersToBeUpdated[i];
+      const bedField = BEDS[bedName];
       await clearCurrentBedSelection({ userId: id });
       const response = await reserveBed({
         userId: id,
-        [bedName]: cabin.id,
+        bedName: bedField,
+        cabinId: cabin.id,
       });
     }
-    await sendConfirmationEmail({
-      groupMembers: usersToBeUpdated,
-      cabin,
-      selectedBeds,
-    });
+    // await sendConfirmationEmail({
+    //   groupMembers: usersToBeUpdated,
+    //   cabin,
+    //   selectedBeds,
+    // });
     setIsLoading(false);
     window.location = '/summary?stage=BED_SELECTION';
   };

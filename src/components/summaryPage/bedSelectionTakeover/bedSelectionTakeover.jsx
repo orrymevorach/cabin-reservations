@@ -10,7 +10,7 @@ export default function BedSelectionTakeover() {
   const { dispatch, actions } = useReservation();
   const router = useRouter();
   const { user } = useUser();
-  const cabin = user.cabin[0];
+  const cabin = user.cabin;
 
   const handleClose = () => {
     dispatch({ type: actions.SET_SELECTION_STAGE });

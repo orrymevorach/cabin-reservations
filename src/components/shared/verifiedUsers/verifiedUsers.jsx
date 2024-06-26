@@ -69,10 +69,12 @@ export default function VerifiedUsers({ hideRemoveButton }) {
   const { groupData } = useReservation();
   const { user } = useUser();
 
+  const members = groupData?.members || [];
+
   return (
     <div className={styles.container}>
       <p className={styles.title}>Names on Reservation</p>
-      {groupData.members
+      {members
         // add current user to top of list
         .sort((a, b) => {
           if (a.name === user.name) {

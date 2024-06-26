@@ -28,7 +28,7 @@ export default function Sidebar({ cabinData }) {
 
   const isConfirmationStage =
     currentStage !== CABIN_SELECTION_STAGES.CONFIRMATION;
-  const cabinHasEnoughBeds = cabin.openBeds >= members.length;
+  const cabinHasEnoughBeds = cabin.openBeds >= members?.length;
   const cabinIsOpen = cabin.availability === 'Open';
   const showReservationButton =
     isConfirmationStage && cabinHasEnoughBeds && cabinIsOpen;

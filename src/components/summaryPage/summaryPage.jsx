@@ -29,9 +29,8 @@ export default function SummaryPage() {
   }, [stageQuery, dispatch, actions]);
 
   if (isUserDataLoading || !user) return <Loader isDotted />;
-
   const cabinData = {
-    cabin: user.cabin[0],
+    cabin: user.cabin,
     isLoading: isUserDataLoading,
   };
 
