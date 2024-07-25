@@ -1,0 +1,61 @@
+@import '@variables';
+@import '@mixins';
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+  // width: 500px;
+}
+
+.button {
+  margin-top: 20px;
+}
+
+.heading,
+.text,
+.label,
+.error,
+.instructions {
+  color: $charcoal;
+  @include fontPrimary;
+}
+
+.heading {
+  @include fontSecondary;
+  font-size: 24px;
+  margin: 20px 0;
+}
+
+.text {
+  margin-bottom: 15px;
+}
+
+.error {
+  color: red;
+  width: 100%;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.instructions {
+  margin-bottom: 40px;
+}
+
+.label {
+  color: $charcoal;
+}
+
+.inputContainer {
+  margin-bottom: 30px !important;
+}
+
+@media screen and (max-width: $mobile) {
+  .form {
+    width: 100%;
+  }
+  .error {
+    padding: 0 40px 30px;
+  }
+}

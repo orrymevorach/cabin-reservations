@@ -1,5 +1,5 @@
 export const COOKIES = {
-  USER_RECORD: 'userRecord',
+  USER_RECORD: 'user_record_id',
 };
 
 export const ROUTES = {
@@ -7,6 +7,7 @@ export const ROUTES = {
   CABIN_SELECTION: '/cabin-selection',
   RESERVE: '/reserve',
   SUMMARY: '/summary',
+  CREATE_ACCOUNT: '/create-account',
 };
 
 export const BEDS = {

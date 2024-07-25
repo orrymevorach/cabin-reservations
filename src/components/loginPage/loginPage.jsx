@@ -22,7 +22,7 @@ export default function LoginPageContainer() {
   useLoginExistingUserOnPageLoad();
   const router = useRouter();
   const handleSuccess = ({ user }) => {
-    const hasCabin = user.cabin;
+    const hasCabin = user?.cabin;
     if (hasCabin) router.push(ROUTES.SUMMARY);
     else router.push(ROUTES.CABIN_SELECTION);
   };
