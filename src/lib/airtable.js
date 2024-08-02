@@ -20,14 +20,18 @@ export const createRecord = async ({
   }
 };
 
-export async function getRecords({ tableId, endpoint = '/get-records' }) {
+export async function getRecords({
+  tableId,
+  endpoint = '/get-records',
+  view = 'Grid view',
+}) {
   try {
     const response = await fetch(`/api/airtable${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ tableId }),
+      body: JSON.stringify({ tableId, view }),
     }).then(res => res.json());
     return response;
   } catch (error) {
@@ -118,6 +122,7 @@ export const getUnits = async () => {
   const { records: units } = await getRecords({
     tableId: 'Units',
     endpoint: '/get-units',
+    view: 'List view',
   });
   return units;
 };

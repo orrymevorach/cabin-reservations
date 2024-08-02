@@ -8,11 +8,11 @@ var airtableBase = new Airtable({
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { tableId } = req.body;
+    const { tableId, view } = req.body;
     try {
       const recordsArray = [];
       const response = await airtableBase(tableId)
-        .select()
+        .select({ view })
         .eachPage((records, fetchNextPage) => {
           records.forEach(record => {
             const fields = transformFields({ record });
