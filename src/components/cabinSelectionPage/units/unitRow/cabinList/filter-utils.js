@@ -3,8 +3,9 @@ import { FILTERS } from '../../../filters/filters-context';
 const { AVAILABLE_BEDS } = FILTERS;
 
 export const filterByCategory = ({ cabins, selectedFilters }) => {
+  const categoryFilterSelection = selectedFilters[FILTERS.CATEGORY];
+  if (!categoryFilterSelection) return cabins;
   return cabins.filter(({ category }) => {
-    const categoryFilterSelection = selectedFilters[FILTERS.CATEGORY];
     if (!categoryFilterSelection) return true;
     if (category && category[0] && categoryFilterSelection === category[0])
       return true;
@@ -14,6 +15,7 @@ export const filterByCategory = ({ cabins, selectedFilters }) => {
 
 export const filterByAvailableBeds = ({ cabins, selectedFilters }) => {
   const availableBedsFilter = selectedFilters[AVAILABLE_BEDS];
+  if (!availableBedsFilter) return cabins;
   return cabins.filter(({ openBeds, availability }) => {
     if (
       availableBedsFilter &&
