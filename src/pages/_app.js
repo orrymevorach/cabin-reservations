@@ -1,6 +1,6 @@
 import { UserProvider } from '@/context/user-context';
 import '@/styles/globals.css';
-import Head from '@/components/shared/head';
+import Head from '@/components/shared/head/head';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import { WindowSizeProvider } from '@/context/window-size-context';
