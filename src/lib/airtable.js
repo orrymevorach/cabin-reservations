@@ -114,6 +114,14 @@ export const getCabins = async () => {
   return cabins;
 };
 
+export const getUnits = async () => {
+  const { records: units } = await getRecords({
+    tableId: 'Units',
+    endpoint: '/get-units',
+  });
+  return units;
+};
+
 export const getCabin = async ({ cabinName }) => {
   const { record: cabin } = await getRecord({
     tableId: 'Cabins',

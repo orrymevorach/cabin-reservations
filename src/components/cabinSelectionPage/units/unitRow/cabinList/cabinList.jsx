@@ -17,7 +17,7 @@ export default function CabinList({ unitData, setHasAvailability }) {
   const [scrollValue, setScrollValue] = useState(0);
   const { selectedFilters } = useFilters();
 
-  const [_, { cabins = [] }] = unitData;
+  const cabins = unitData.cabins;
 
   const handleSubmit = selectedCabin => {
     dispatch({
@@ -30,7 +30,6 @@ export default function CabinList({ unitData, setHasAvailability }) {
   const handleScrollDown = () => {
     cabinListRef.current.scrollTop = scrollValue + 150;
   };
-
   let filteredCabins = [];
   filteredCabins = filterByAvailableBeds({ cabins, selectedFilters });
   filteredCabins = filterByCategory({

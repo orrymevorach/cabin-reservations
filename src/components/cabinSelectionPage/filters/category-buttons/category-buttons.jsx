@@ -4,7 +4,7 @@ import { getFilterCategories } from '../../units/unitRow/cabinList/filter-utils'
 import styles from './category-buttons.module.scss';
 import { FILTERS } from '../filters-context';
 
-export default function CategoryButtons() {
+export default function CategoryButtons({ handleChange }) {
   const { units } = useGetCabinAndUnitData();
   const filterCategories = getFilterCategories({ unitData: units });
   return (

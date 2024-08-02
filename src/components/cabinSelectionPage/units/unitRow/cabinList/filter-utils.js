@@ -49,7 +49,7 @@ export const filterOutClosedCabins = ({ cabins }) => {
 export const getFilterCategories = ({ unitData }) => {
   const categories = [];
   for (let unit of unitData) {
-    const [_, { cabins = [] }] = unit;
+    const cabins = unit.cabins;
     for (let cabin of cabins) {
       const category = cabin.category && cabin.category[0];
       if (category && !categories.includes(category)) {

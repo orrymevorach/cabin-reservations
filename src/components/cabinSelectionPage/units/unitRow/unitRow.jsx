@@ -1,32 +1,16 @@
 import styles from './unitRow.module.scss';
 import Image from 'next/image';
-import Colours from 'public/Colours-NoBkgd.jpg';
-import Comics from 'public/Comics-NoBkgd.jpg';
-import Zodiacs from 'public/Zodiacs-NoBkgd.jpg';
-import Seekers from 'public/Seekers-NoBkgd.jpg';
-import CITS from 'public/cits.jpg';
-import lteam from 'public/l-team-NoBkgd.jpg';
 import CabinList from './cabinList/cabinList';
 import { useWindowSize } from '@/context/window-size-context';
 import Takeover from '@/components/shared/takeover/takeover';
 import { useState } from 'react';
 import Button from '@/components/shared/button/button';
-import { UNITS } from '@/utils/constants';
-
-const unitImages = {
-  [UNITS.COLOURS]: Colours,
-  [UNITS.COMICS]: Comics,
-  [UNITS.ZODIACS]: Zodiacs,
-  [UNITS.SEEKERS]: Seekers,
-  [UNITS.CITS]: CITS,
-  [UNITS.LTEAM]: lteam,
-};
 
 export default function UnitRow({ unitData }) {
   const [showTakeover, setShowTakeover] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(true);
-  const [unitName] = unitData;
-  const unitImage = unitImages[unitName];
+  const unitName = unitData.name;
+  const unitImage = unitData.image && unitData.image[0];
   const { isDesktop } = useWindowSize();
 
   return (
@@ -45,11 +29,15 @@ export default function UnitRow({ unitData }) {
               </Button>
               {showTakeover && (
                 <Takeover handleClose={() => setShowTakeover(false)}>
-                  <Image
-                    src={unitImage}
-                    alt={`${unitName} unit`}
-                    className={styles.takeoverUnitImage}
-                  />
+                  {unitImage && (
+                    <Image
+                      src={unitImage.url}
+                      width={unitImage.width}
+                      height={unitImage.height}
+                      alt={`${unitName} unit`}
+                      className={styles.takeoverUnitImage}
+                    />
+                  )}
                 </Takeover>
               )}
             </>
@@ -60,9 +48,11 @@ export default function UnitRow({ unitData }) {
             unitData={unitData}
             setHasAvailability={setHasAvailability}
           />
-          {isDesktop && hasAvailability ? (
+          {isDesktop && hasAvailability && unitImage ? (
             <Image
-              src={unitImage}
+              src={unitImage.url}
+              width={unitImage.width}
+              height={unitImage.height}
               alt={`${unitName} unit`}
               className={styles.unitImage}
             />

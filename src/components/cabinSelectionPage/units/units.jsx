@@ -11,14 +11,12 @@ export default function Units() {
     <>
       {units
         .filter(unitData => {
-          const [unitName] = unitData;
           if (!unitFilter) return true;
-          if (unitName === unitFilter || unitFilter === 'All') return true;
+          if (unitData.name === unitFilter || unitFilter === 'All') return true;
           return false;
         })
         .map(unitData => {
-          const [unitName] = unitData;
-          return <UnitRow key={unitName} unitData={unitData} />;
+          return <UnitRow key={unitData.name} unitData={unitData} />;
         })}
     </>
   );

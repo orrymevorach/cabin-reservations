@@ -22,6 +22,10 @@ const nextConfig = {
         destination: '/api/airtable/get-records',
       },
       {
+        source: '/api/airtable/get-units',
+        destination: '/api/airtable/get-records',
+      },
+      {
         source: '/api/airtable/reserve-spot-in-cabin',
         destination: '/api/airtable/update-record',
       },

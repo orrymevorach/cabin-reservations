@@ -24,12 +24,3 @@ export const BEDS = {
   frontLoftRight: 'Front Loft Right',
   backLoftRight: 'Back Loft Right',
 };
-
-export const UNITS = {
-  COLOURS: 'Colour Unit',
-  COMICS: 'Comic Unit',
-  ZODIACS: 'Zodiac Unit',
-  SEEKERS: 'Seeker Unit',
-  CITS: 'CIT Unit',
-  LTEAM: 'L-Team Village',
-};
