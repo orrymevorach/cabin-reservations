@@ -1,8 +1,8 @@
 import styles from './cabinSelectionTakeover.module.scss';
 import { useCabinSelection } from '@/context/cabin-selection-context';
-import BottomRow from './bottomRow';
-import ImageCarousel from '@/components/shared/imageCarousel';
-import CabinSummary from './cabinSummary';
+import BottomRow from './bottomRow/bottomRow';
+import ImageCarousel from '@/components/shared/imageCarousel/imageCarousel';
+import CabinSummary from './cabinSummary/cabinSummary';
 import Takeover from '@/components/shared/takeover/takeover';
 import { useWindowSize } from '@/context/window-size-context';
 import { useState } from 'react';

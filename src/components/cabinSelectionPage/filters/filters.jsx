@@ -1,4 +1,4 @@
-import Dropdown from '@/components/shared/dropdown';
+import Dropdown from '@/components/shared/dropdown/dropdown';
 import styles from './filters.module.scss';
 import { useCabinAndUnitData } from '@/context/cabin-and-unit-data-context';
 import clsx from 'clsx';

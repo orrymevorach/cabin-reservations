@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styles from './nav.module.scss';
 import Link from 'next/link';
-import HamburgerMenu from './hamburger-menu';
+import HamburgerMenu from './hamburger-menu/hamburger-menu';
 import clsx from 'clsx';
-import Button from '@/components/shared/button';
+import Button from '@/components/shared/button/button';
 import { useWindowSize } from '@/context/window-size-context';
 
 export default function Nav({ hamburgerMenuColor = '', navData = [] }) {

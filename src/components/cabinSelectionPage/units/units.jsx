@@ -1,5 +1,5 @@
 import { useCabinAndUnitData } from '@/context/cabin-and-unit-data-context';
-import UnitRow from './unitRow';
+import UnitRow from './unitRow/unitRow';
 import { FILTERS, useFilters } from '../filters/filters-context';
 
 export default function Units() {

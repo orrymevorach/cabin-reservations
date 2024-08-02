@@ -1,4 +1,4 @@
-import useCheckInReducer from '@/components/check-in/useCheckInReducer';
+import useCheckInReducer from '@/components/checkIn/useCheckInReducer';
 import { createContext, useContext } from 'react';
 
 const CheckInContext = createContext();

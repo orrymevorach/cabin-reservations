@@ -1,4 +1,4 @@
-import Bed from '../bed';
+import Bed from '../bed/bed';
 import styles from './bedColumn.module.scss';
 import clsx from 'clsx';
 

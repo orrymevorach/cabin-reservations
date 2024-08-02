@@ -2,12 +2,12 @@ import Takeover from '@/components/shared/takeover/takeover';
 import styles from './addGuestsTakeover.module.scss';
 import AddGuests from '@/components/shared/addGuests/addGuests';
 import Button from '@/components/shared/button/button';
-import ReserveButton from '@/components/shared/reserveButton';
+import ReserveButton from '@/components/shared/reserveButton/reserveButton';
 import { useReservation } from '@/context/reservation-context';
 import { useRouter } from 'next/router';
 import { useUser } from '@/context/user-context';
 import { ROUTES } from '@/utils/constants';
-import VerifiedUsers from '@/components/shared/verifiedUsers';
+import VerifiedUsers from '@/components/shared/verifiedUsers/verifiedUsers';
 import { useState } from 'react';
 import { updateGroup } from '@/lib/airtable';
 

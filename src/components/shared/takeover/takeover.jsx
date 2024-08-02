@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import style from './takeover.module.scss';
-import CloseButton from '@/components/shared/closeButton';
+import CloseButton from '@/components/shared/closeButton/closeButton';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
 

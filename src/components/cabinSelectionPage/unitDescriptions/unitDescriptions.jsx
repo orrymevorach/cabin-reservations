@@ -1,4 +1,4 @@
-import Takeover from '@/components/shared/takeover';
+import Takeover from '@/components/shared/takeover/takeover';
 import styles from './unitDescriptions.module.scss';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';

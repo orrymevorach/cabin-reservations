@@ -7,9 +7,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import Image from 'next/image';
 import styles from './imageCarousel.module.scss';
-import Takeover from '../takeover';
-import Thumbnails from './thumbnails';
-import Video from './video';
+import Takeover from '../takeover/takeover';
+import Thumbnails from './thumbnails/thumbnails';
+import Video from './video/video';
 
 export default function ImageCarousel({
   images = [],

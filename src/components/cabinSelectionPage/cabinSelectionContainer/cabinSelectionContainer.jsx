@@ -1,5 +1,5 @@
-import CabinSelectionTakeover from '../cabinSelectionTakeover';
-import Units from '../units';
+import CabinSelectionTakeover from '../cabinSelectionTakeover/cabinSelectionTakeover';
+import Units from '../units/units';
 import { useCabinSelection } from '@/context/cabin-selection-context';
 import { useCabinAndUnitData } from '@/context/cabin-and-unit-data-context';
 import Filters from '../filters/filters';
@@ -9,7 +9,7 @@ import Button from '@/components/shared/button/button';
 import { useRef, useState } from 'react';
 import useShowOnScroll from '@/hooks/useShowOnScroll';
 import MapOfCamp from '../mapOfCamp/mapOfCamp';
-import UnitDescriptions from '../unitDescriptions';
+import UnitDescriptions from '../unitDescriptions/unitDescriptions';
 
 export default function CabinSelectionContainer() {
   const [showBackToTopButton, setShowBackToTopButton] = useState(false);

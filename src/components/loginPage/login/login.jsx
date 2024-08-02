@@ -2,7 +2,7 @@ import { getUserByEmail } from '@/lib/airtable';
 import { useState } from 'react';
 import styles from './login.module.scss';
 import Button from '../../shared/button/button';
-import Input from '@/components/shared/input';
+import Input from '@/components/shared/input/input';
 import Cookies from 'js-cookie';
 import { COOKIES, ROUTES } from '@/utils/constants';
 import { signInWithFirebaseEmailAndPassword } from './firebase-utils';

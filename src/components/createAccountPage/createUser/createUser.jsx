@@ -1,5 +1,5 @@
 import Input from '@/components/shared/input/input';
-import styles from './create-user.module.scss';
+import styles from './createUser.module.scss';
 import { useState } from 'react';
 import Button from '@/components/shared/button/button';
 import {

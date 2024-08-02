@@ -1,6 +1,6 @@
 import Layout from '../shared/layout/layout';
 import CheckInForm from './form/form';
-import styles from './check-in.module.scss';
+import styles from './checkIn.module.scss';
 import { useCheckIn } from '@/context/check-in-context';
 
 export default function CheckIn() {

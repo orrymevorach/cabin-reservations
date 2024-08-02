@@ -1,4 +1,4 @@
-import AddGuests from '@/components/shared/addGuests';
+import AddGuests from '@/components/shared/addGuests/addGuests';
 import Button from '@/components/shared/button/button';
 import { ROUTES } from '@/utils/constants';
 import styles from './addGuestsReservePage.module.scss';

@@ -1,4 +1,4 @@
-import CreateUser from '@/components/createAccountPage/create-user';
+import CreateUser from '@/components/createAccountPage/createUser';
 import Layout from '@/components/shared/layout';
 
 export default function Home() {

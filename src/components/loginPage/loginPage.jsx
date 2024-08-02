@@ -1,6 +1,6 @@
 import styles from './loginPage.module.scss';
-import Login from '@/components/loginPage/login';
-import Information from '@/components/loginPage/information';
+import Login from '@/components/loginPage/login/login';
+import Information from '@/components/loginPage/information/information';
 import { useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';

@@ -1,4 +1,4 @@
-import Button from '@/components/shared/button';
+import Button from '@/components/shared/button/button';
 import styles from './cabinSelectionTile.module.scss';
 import clsx from 'clsx';
 
