@@ -8,25 +8,25 @@ const unitDescriptions = [
     unit: 'Colour Unit',
     description:
       'With cabin names based on the colours of the rainbow, the Colour Unit is close by to the Main Stage, Omni Stage, and the Dining Hall. Cabins in the Colour Unit have washrooms on the porches of the cabin and shared shower facilities nearby!',
-    anchor: 'Colours',
+    anchor: 'Colour Unit',
   },
   {
     unit: 'Comic Unit',
     description:
       'With cabin names based on comic characters, the Comic Unit is a short walk away from the Amphitheatre stage and the beautiful waterfront. Cabins in the Comic Unit have washrooms on the porches of the cabins and shared shower facilities nearby!',
-    anchor: 'Comics',
+    anchor: 'Comic Unit',
   },
   {
     unit: 'Zodiac Unit',
     description:
       'With cabin names based on the Astrological Star, the Zodiac Unit is close by to the Amphitheatre Stage and the beautiful waterfront. Shared washhouses, with stalls, sinks, and showers are a short walk away from the cabins in the Zodiac Unit! ',
-    anchor: 'Zodiacs',
+    anchor: 'Zodiac Unit',
   },
   {
     unit: 'Seeker Unit',
     description:
       'With cabin names not related to the unit name, the Seeker Unit is a short walk away from the Main Stage, Omni Stage, and the Dining Hall. Shared washhouses, with stalls, sinks, and showers are a short walk away from the cabins in the Seeker Unit!',
-    anchor: 'Seekers',
+    anchor: 'Seeker Unit',
   },
 ];
 

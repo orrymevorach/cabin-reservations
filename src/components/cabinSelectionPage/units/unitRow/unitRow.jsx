@@ -11,14 +11,15 @@ import { useWindowSize } from '@/context/window-size-context';
 import Takeover from '@/components/shared/takeover/takeover';
 import { useState } from 'react';
 import Button from '@/components/shared/button/button';
+import { UNITS } from '@/utils/constants';
 
 const unitImages = {
-  Colours,
-  Comics,
-  Zodiacs,
-  Seekers,
-  CITS,
-  ['L-Team']: lteam,
+  [UNITS.COLOURS]: Colours,
+  [UNITS.COMICS]: Comics,
+  [UNITS.ZODIACS]: Zodiacs,
+  [UNITS.SEEKERS]: Seekers,
+  [UNITS.CITS]: CITS,
+  [UNITS.LTEAM]: lteam,
 };
 
 export default function UnitRow({ unitData }) {
@@ -27,13 +28,12 @@ export default function UnitRow({ unitData }) {
   const [unitName] = unitData;
   const unitImage = unitImages[unitName];
   const { isDesktop } = useWindowSize();
-  const unitNameWithoutTrailingS = unitName.slice(0, -1);
 
   return (
     <div id={unitName} className={styles.outerContainer}>
       <div className={styles.innerContainer}>
         <div className={styles.unitTitleContainer}>
-          <p className={styles.unitName}>{unitNameWithoutTrailingS} Unit</p>
+          <p className={styles.unitName}>{unitName}</p>
           {!isDesktop && (
             <>
               <Button

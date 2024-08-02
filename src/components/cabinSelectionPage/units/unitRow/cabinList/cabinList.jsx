@@ -8,7 +8,7 @@ import { useFilters } from '../../../filters/filters-context';
 import clsx from 'clsx';
 import {
   filterByAvailableBeds,
-  filterByGender,
+  filterByCategory,
   sortByLeastAvailability,
 } from './filter-utils';
 
@@ -33,7 +33,10 @@ export default function CabinList({ unitData, setHasAvailability }) {
 
   let filteredCabins = [];
   filteredCabins = filterByAvailableBeds({ cabins, selectedFilters });
-  filteredCabins = filterByGender({ cabins: filteredCabins, selectedFilters });
+  filteredCabins = filterByCategory({
+    cabins: filteredCabins,
+    selectedFilters,
+  });
   filteredCabins = sortByLeastAvailability({ cabins: filteredCabins });
 
   const hasCabins = !!filteredCabins.length;

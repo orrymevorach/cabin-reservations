@@ -1,17 +1,13 @@
-import { GENDER_LABELS, FILTERS } from '../../../filters/filters-context';
+import { FILTERS } from '../../../filters/filters-context';
 
-const { AVAILABLE_BEDS, GENDER } = FILTERS;
+const { AVAILABLE_BEDS } = FILTERS;
 
-export const filterByGender = ({ cabins, selectedFilters }) => {
-  const genderFilter = selectedFilters[GENDER];
-  const { MALE, FEMALE, MIXED } = GENDER_LABELS;
-  return cabins.filter(({ additionalInformation }) => {
-    if (!additionalInformation || !genderFilter || genderFilter === MIXED)
+export const filterByCategory = ({ cabins, selectedFilters }) => {
+  return cabins.filter(({ category }) => {
+    const categoryFilterSelection = selectedFilters[FILTERS.CATEGORY];
+    if (!categoryFilterSelection) return true;
+    if (category && category[0] && categoryFilterSelection === category[0])
       return true;
-    const isMaleCabin = additionalInformation.includes(MALE);
-    const isFemaleCabin = additionalInformation.includes(FEMALE);
-    if (isMaleCabin && genderFilter === MALE) return true;
-    if (isFemaleCabin && genderFilter === FEMALE) return true;
     return false;
   });
 };
@@ -48,4 +44,18 @@ export const filterOutClosedCabins = ({ cabins }) => {
     if (availability !== 'Open') return false;
     return true;
   });
+};
+
+export const getFilterCategories = ({ unitData }) => {
+  const categories = [];
+  for (let unit of unitData) {
+    const [_, { cabins = [] }] = unit;
+    for (let cabin of cabins) {
+      const category = cabin.category && cabin.category[0];
+      if (category && !categories.includes(category)) {
+        categories.push(category);
+      }
+    }
+  }
+  return categories;
 };

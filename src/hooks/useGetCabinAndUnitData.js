@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react';
 import { getCabins } from '@/lib/airtable';
+import { UNITS } from '@/utils/constants';
 
 const initialUnitsData = {
-  Colours: {
+  [UNITS.COLOURS]: {
     cabins: [],
   },
-  Comics: {
+  [UNITS.COMICS]: {
     cabins: [],
   },
-  Zodiacs: {
+  [UNITS.ZODIACS]: {
     cabins: [],
   },
-  Seekers: {
+  [UNITS.SEEKERS]: {
+    cabins: [],
+  },
+  Tenting: {
     cabins: [],
   },
   // CITS: {
@@ -35,6 +39,24 @@ const sortCabinsIntoUnits = (cabinList, initialUnitsData) => {
   return initialUnitsData;
 };
 
+// This is really ugly - we do it because for some reason every cabin renders twice
+const removeDuplicateCabins = unitsWithAllCabins => {
+  function removeDuplicatesByKey(array, key) {
+    const map = new Map();
+    array.forEach(item => {
+      if (!map.has(item[key])) {
+        map.set(item[key], item);
+      }
+    });
+    return Array.from(map.values());
+  }
+
+  const asArray = Object.entries(unitsWithAllCabins);
+  return asArray.map(([unitName, { cabins }]) => {
+    return [unitName, { cabins: removeDuplicatesByKey(cabins, 'name') }];
+  });
+};
+
 export default function useGetCabinAndUnitData() {
   const [units, setUnits] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +69,9 @@ export default function useGetCabinAndUnitData() {
           cabinResponse,
           initialUnitsData
         );
-        setUnits(Object.entries(unitsWithAllCabins));
+        const unitsWithoutDuplicateCabins =
+          removeDuplicateCabins(unitsWithAllCabins);
+        setUnits(unitsWithoutDuplicateCabins);
       }
       setIsLoading(false);
     };

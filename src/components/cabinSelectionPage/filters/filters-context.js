@@ -10,21 +10,15 @@ const useFilters = () => {
 const FILTERS = {
   AVAILABLE_BEDS: 'Available beds',
   UNIT: 'Unit',
-  GENDER: 'Gender',
+  CATEGORY: 'Category',
 };
 
-const GENDER_LABELS = {
-  MALE: 'Male only',
-  FEMALE: 'Female only',
-  MIXED: 'Mixed',
-};
-
-const { AVAILABLE_BEDS, UNIT, GENDER } = FILTERS;
+const { AVAILABLE_BEDS, UNIT, CATEGORY } = FILTERS;
 
 const initialState = {
   [AVAILABLE_BEDS]: null,
   [UNIT]: null,
-  [GENDER]: null,
+  [CATEGORY]: null,
 };
 
 const FiltersProvider = ({ children }) => {
@@ -32,10 +26,11 @@ const FiltersProvider = ({ children }) => {
   const value = {
     selectedFilters,
     setSelectedFilters,
+    initialState,
   };
   return (
     <FiltersContext.Provider value={value}>{children}</FiltersContext.Provider>
   );
 };
 
-export { FiltersProvider, useFilters, FILTERS, GENDER_LABELS };
+export { FiltersProvider, useFilters, FILTERS, initialState };
