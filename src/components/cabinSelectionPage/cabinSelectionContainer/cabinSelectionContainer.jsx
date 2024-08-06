@@ -10,10 +10,11 @@ import { useRef, useState } from 'react';
 import useShowOnScroll from '@/hooks/useShowOnScroll';
 import MapOfCamp from '../mapOfCamp/mapOfCamp';
 import UnitDescriptions from '../unitDescriptions/unitDescriptions';
+import BookingAssistant from '../bookingAssistant/bookingAssistant';
 
 export default function CabinSelectionContainer() {
   const [showBackToTopButton, setShowBackToTopButton] = useState(false);
-  const { showTakeover } = useCabinSelection();
+  const { showTakeover, showBookingAssistant } = useCabinSelection();
   const { isLoading, units } = useCabinAndUnitData();
   const headerRef = useRef();
   useShowOnScroll({ ref: headerRef, setIsShowing: setShowBackToTopButton });
@@ -24,6 +25,7 @@ export default function CabinSelectionContainer() {
 
   return (
     <>
+      {showBookingAssistant && <BookingAssistant />}
       <div className={styles.outerContainer}>
         <div className={styles.headerContainer} ref={headerRef}>
           <UnitDescriptions />

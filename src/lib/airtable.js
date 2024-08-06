@@ -269,3 +269,11 @@ export const checkIn = async ({
   });
   return user;
 };
+
+export const getCabinCategories = async () => {
+  const { records: cabins } = await getRecords({
+    tableId: 'Cabin Categories',
+    endpoint: '/get-cabin-categories',
+  });
+  return cabins;
+};

@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { createContext, useState, useContext } from 'react';
 
 const FiltersContext = createContext('');
@@ -23,9 +24,23 @@ const initialState = {
 
 const FiltersProvider = ({ children }) => {
   const [selectedFilters, setSelectedFilters] = useState(initialState);
+  const router = useRouter();
+
+  const handleSetFilters = selectedFilters => {
+    setSelectedFilters(selectedFilters);
+    router.push(
+      {
+        pathname: '/cabin-selection',
+        query: selectedFilters,
+      },
+      undefined,
+      { shallow: true }
+    );
+  };
+
   const value = {
     selectedFilters,
-    setSelectedFilters,
+    setSelectedFilters: handleSetFilters,
     initialState,
   };
   return (

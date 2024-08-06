@@ -47,17 +47,3 @@ export const filterOutClosedCabins = ({ cabins }) => {
     return true;
   });
 };
-
-export const getFilterCategories = ({ unitData }) => {
-  const categories = [];
-  for (let unit of unitData) {
-    const cabins = unit.cabins;
-    for (let cabin of cabins) {
-      const category = cabin.category && cabin.category[0];
-      if (category && !categories.includes(category)) {
-        categories.push(category);
-      }
-    }
-  }
-  return categories;
-};

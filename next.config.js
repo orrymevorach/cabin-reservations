@@ -65,6 +65,10 @@ const nextConfig = {
         source: '/api/airtable/get-group',
         destination: '/api/airtable/get-record-by-id',
       },
+      {
+        source: '/api/airtable/get-cabin-categories',
+        destination: '/api/airtable/get-records',
+      },
     ];
   },
 };
