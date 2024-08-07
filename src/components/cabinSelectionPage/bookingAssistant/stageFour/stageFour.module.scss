@@ -1,0 +1,22 @@
+@use '@mixins' as mixins;
+
+.categoryName {
+  text-transform: capitalize;
+}
+
+.title {
+  font-size: 16px;
+}
+
+.description {
+  @include mixins.fontPrimary;
+  margin: 10px 0 20px;
+}
+
+.buttonsContainer {
+  display: flex;
+}
+
+.button {
+  margin-right: 15px;
+}

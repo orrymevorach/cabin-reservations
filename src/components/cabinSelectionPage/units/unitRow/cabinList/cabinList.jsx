@@ -62,7 +62,7 @@ export default function CabinList({ unitData, setHasAvailability }) {
             );
           })
         ) : (
-          <p>There are currently no cabins available in this unit</p>
+          <p>There are no cabins in this unit that match your selection.</p>
         )}
       </ul>
       {hasCabins && (

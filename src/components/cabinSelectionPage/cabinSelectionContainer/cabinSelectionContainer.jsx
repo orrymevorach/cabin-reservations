@@ -25,20 +25,25 @@ export default function CabinSelectionContainer() {
 
   return (
     <>
-      {showBookingAssistant && <BookingAssistant />}
-      <div className={styles.outerContainer}>
-        <div className={styles.headerContainer} ref={headerRef}>
-          <UnitDescriptions />
-          <Filters />
-          <MapOfCamp />
-        </div>
-      </div>
-      <Units />
-      {showTakeover && <CabinSelectionTakeover />}
-      {showBackToTopButton && (
-        <Button handleClick={scrollToTop} classNames={styles.backToTop}>
-          Back to top
-        </Button>
+      {showBookingAssistant ? (
+        <BookingAssistant />
+      ) : (
+        <>
+          <div className={styles.outerContainer}>
+            <div className={styles.headerContainer} ref={headerRef}>
+              <UnitDescriptions />
+              <Filters />
+              <MapOfCamp />
+            </div>
+          </div>
+          <Units />
+          {showTakeover && <CabinSelectionTakeover />}
+          {showBackToTopButton && (
+            <Button handleClick={scrollToTop} classNames={styles.backToTop}>
+              Back to top
+            </Button>
+          )}
+        </>
       )}
     </>
   );

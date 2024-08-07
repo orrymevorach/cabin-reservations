@@ -1,24 +1,20 @@
 import Button from '@/components/shared/button/button';
 import Radio from '@/components/shared/radio/radio';
-import { useState } from 'react';
 import styles from './stageThree.module.scss';
 import { useFilters } from '../../filters/filters-context';
 import { useCabinCategories } from '@/context/cabin-categories';
 
 const CabinCategory = ({ category, handleChange }) => {
-  const [showReadMore, setShowReadMore] = useState(false);
-  const buttonText = showReadMore ? 'Read less' : 'Read more';
   return (
-    <div>
+    <div className={styles.radioContainer}>
       <Radio
         id={category.name}
         label={category.name}
         handleChange={() => handleChange({ value: category.name })}
+        classNames={styles.radio}
+        name="cabinCategory"
       />
-      <button onClick={() => setShowReadMore(!showReadMore)}>
-        {buttonText}
-      </button>
-      {showReadMore && <p>{category.description}</p>}
+      <p className={styles.description}>- {category.shortDescription}</p>
     </div>
   );
 };
@@ -29,12 +25,12 @@ export default function StageThree({ setStage }) {
 
   const handleAddFilter = ({ value }) => {
     const selectedFiltersCopy = Object.assign({}, selectedFilters);
-    selectedFiltersCopy.category = value;
+    selectedFiltersCopy.Category = value;
     setSelectedFilters(selectedFiltersCopy);
   };
   return (
     <>
-      <p>Click the box that most applies</p>
+      <p>Select the box that most applies</p>
       <form action="#" className={styles.stageThree}>
         {cabinCategories.map(category => (
           <CabinCategory
@@ -43,12 +39,6 @@ export default function StageThree({ setStage }) {
             handleChange={handleAddFilter}
           />
         ))}
-        <Radio
-          key={`checkbox-none`}
-          id="none"
-          label="None"
-          handleChange={() => {}}
-        />
 
         <Button handleClick={() => setStage(4)}>Continue</Button>
       </form>

@@ -40,18 +40,21 @@ export default function Filters({ classNames = '' }) {
         label={FILTERS.AVAILABLE_BEDS}
         variant="standard"
         handleChange={event => handleChange({ event, label: 'Available beds' })}
+        defaultValue={router.query[FILTERS.AVAILABLE_BEDS]}
       />
       <Dropdown
         options={['All', ...unitNames]}
         label={FILTERS.UNIT}
         variant="standard"
         handleChange={event => handleChange({ event, label: 'Unit' })}
+        defaultValue={router.query[FILTERS.UNIT]}
       />
       <Dropdown
         options={['All', ...categoryNames]}
         label={FILTERS.CATEGORY}
         variant="standard"
         handleChange={event => handleChange({ event, label: 'Category' })}
+        defaultValue={router.query[FILTERS.CATEGORY]}
       />
     </div>
   );

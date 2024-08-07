@@ -1,0 +1,12 @@
+@use '@mixins' as mixins;
+
+.radioContainer {
+  //   display: flex;
+  margin-bottom: 15px;
+}
+
+.description {
+  font-size: 14px;
+  @include mixins.fontPrimary;
+  margin-left: 20px;
+}

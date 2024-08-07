@@ -9,8 +9,8 @@ export default function Takeover({
   styles,
   handleClose,
   showTakeover,
-  classNames = '',
-  modalClassNames = '',
+  classNames,
+  modalClassNames,
   queryParam = '',
   hideCloseButton = false,
 }) {
