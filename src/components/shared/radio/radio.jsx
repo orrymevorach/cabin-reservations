@@ -7,6 +7,7 @@ export default function Radio({
   id = '',
   handleChange,
   classNames,
+  inputClassNames,
   name = '',
 }) {
   const [isChecked, setIsChecked] = useState(false);
@@ -22,6 +23,7 @@ export default function Radio({
         id={id}
         onChange={handleRadioCheck}
         checked={isChecked}
+        className={inputClassNames}
       />
       {label}
     </label>

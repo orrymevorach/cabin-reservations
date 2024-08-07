@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './closeButton.module.scss';
 import clsx from 'clsx';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 export default function CloseButton({ handleClick, classNames = '' }) {
   return (
@@ -9,7 +9,7 @@ export default function CloseButton({ handleClick, classNames = '' }) {
       onClick={handleClick}
       className={clsx(styles.closeButton, classNames)}
     >
-      <FontAwesomeIcon icon={faTimes} size="xl" />
+      <FontAwesomeIcon icon={faTimesCircle} size="2xl" />
     </button>
   );
 }

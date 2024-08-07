@@ -14,7 +14,8 @@ export default function StageFour({ setStage }) {
   return (
     <div>
       <p className={styles.title}>
-        About <span className={styles.categoryName}>{category}</span> cabins:
+        A note about <span className={styles.categoryName}>{category}</span>{' '}
+        options:
       </p>
       {cabinCategories.map(({ name, fullDescription }) => {
         if (category === name)
@@ -33,7 +34,8 @@ export default function StageFour({ setStage }) {
             dispatch({ type: actions.CLOSE_BOOKING_ASSISTANT })
           }
         >
-          Show me <span className={styles.categoryName}>{category}</span> cabins
+          Show me <span className={styles.categoryName}>{category}</span>{' '}
+          options
         </Button>
       </div>
     </div>

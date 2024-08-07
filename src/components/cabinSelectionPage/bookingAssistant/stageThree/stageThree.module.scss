@@ -1,12 +1,27 @@
 @use '@mixins' as mixins;
 
+.title {
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+
 .radioContainer {
-  //   display: flex;
   margin-bottom: 15px;
+  @include mixins.fontPrimaryBold;
 }
 
 .description {
   font-size: 14px;
   @include mixins.fontPrimary;
-  margin-left: 20px;
+  margin-left: 23px;
+}
+
+.radio {
+  font-size: 16px;
+}
+
+.new {
+  color: red;
+  font-style: italic;
+  font-size: 13px;
 }

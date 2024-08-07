@@ -5,16 +5,23 @@ import { useFilters } from '../../filters/filters-context';
 import { useCabinCategories } from '@/context/cabin-categories';
 
 const CabinCategory = ({ category, handleChange }) => {
+  const label = category.new ? (
+    <>
+      {category.name} <span className={styles.new}>New this year!</span>
+    </>
+  ) : (
+    category.name
+  );
   return (
     <div className={styles.radioContainer}>
       <Radio
         id={category.name}
-        label={category.name}
+        label={label}
         handleChange={() => handleChange({ value: category.name })}
         classNames={styles.radio}
         name="cabinCategory"
       />
-      <p className={styles.description}>- {category.shortDescription}</p>
+      <p className={styles.description}>{category.shortDescription}</p>
     </div>
   );
 };
@@ -27,10 +34,11 @@ export default function StageThree({ setStage }) {
     const selectedFiltersCopy = Object.assign({}, selectedFilters);
     selectedFiltersCopy.Category = value;
     setSelectedFilters(selectedFiltersCopy);
+    setStage(4);
   };
   return (
     <>
-      <p>Select the box that most applies</p>
+      <p className={styles.title}>I want to live in a cabin that is...</p>
       <form action="#" className={styles.stageThree}>
         {cabinCategories.map(category => (
           <CabinCategory
@@ -39,8 +47,6 @@ export default function StageThree({ setStage }) {
             handleChange={handleAddFilter}
           />
         ))}
-
-        <Button handleClick={() => setStage(4)}>Continue</Button>
       </form>
     </>
   );
