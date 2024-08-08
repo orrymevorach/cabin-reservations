@@ -32,6 +32,14 @@ ul.additionalInformationList {
   @include mixins.fontPrimary;
 }
 
+p.pill {
+  background-color: rgb(231, 192, 255);
+  display: inline;
+  padding: 4px 8px;
+  border-radius: 10px;
+  @include mixins.fontPrimaryBold;
+}
+
 @media screen and (max-width: variables.$tablet) {
   .summaryContainer {
     width: 100%;

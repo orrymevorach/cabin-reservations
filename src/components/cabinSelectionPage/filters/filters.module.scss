@@ -13,4 +13,9 @@
 
 .title {
   @include mixins.fontPrimaryBold;
+  margin-bottom: 5px;
+}
+
+div.dropdown {
+  margin-right: 10px;
 }

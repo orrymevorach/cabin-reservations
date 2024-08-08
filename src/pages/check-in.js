@@ -1,4 +1,4 @@
-import CheckIn from '@/components/checkIn/check-in';
+import CheckIn from '@/components/checkIn/checkIn';
 import { CheckInProvider } from '@/context/check-in-context';
 
 export default function CheckInPage() {
