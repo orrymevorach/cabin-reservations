@@ -1,5 +1,5 @@
 import { toCamelCase } from '@/utils/string-utils';
-import { BEDS } from '@/utils/constants';
+import { BEDS, AIRTABLE_BASES } from '@/utils/constants';
 
 export const createRecord = async ({
   tableId,
@@ -148,7 +148,7 @@ export const getCabinById = async ({ cabinId }) => {
 
 export const reserveSpotInCabin = async ({ cabinId = '', attendeeId }) => {
   const { record } = await updateRecord({
-    tableId: 'Ticket Purchases 2024',
+    tableId: AIRTABLE_BASES.TICKET_PURCHASES,
     recordId: attendeeId,
     newFields: { Cabin: [cabinId] },
     endpoint: '/reserve-spot-in-cabin',
@@ -158,7 +158,7 @@ export const reserveSpotInCabin = async ({ cabinId = '', attendeeId }) => {
 
 export const getUserByEmail = async ({ email }) => {
   const { record: user } = await getRecord({
-    tableId: 'Ticket Purchases 2024',
+    tableId: AIRTABLE_BASES.TICKET_PURCHASES,
     field: 'Email Address',
     fieldValue: email,
     endpoint: '/get-user-by-email',
@@ -168,7 +168,7 @@ export const getUserByEmail = async ({ email }) => {
 
 export const getUserByRecordId = async ({ id }) => {
   const { record: user } = await getRecordById({
-    tableId: 'Ticket Purchases 2024',
+    tableId: AIRTABLE_BASES.TICKET_PURCHASES,
     recordId: id,
     endpoint: '/get-user-by-record-id',
   });
@@ -189,7 +189,7 @@ export const reserveBed = async ({ userId, bedName, cabinId }) => {
 
 export const getBedOccupant = async ({ userId }) => {
   const { record: currentBedOccupant } = await getRecordById({
-    tableId: 'Ticket Purchases 2024',
+    tableId: AIRTABLE_BASES.TICKET_PURCHASES,
     recordId: userId,
     endpoint: '/get-bed-occupant',
   });
@@ -198,7 +198,7 @@ export const getBedOccupant = async ({ userId }) => {
 
 export const clearCurrentBedSelection = async ({ userId }) => {
   const { record: user } = await updateRecord({
-    tableId: 'Ticket Purchases 2024',
+    tableId: AIRTABLE_BASES.TICKET_PURCHASES,
     recordId: userId,
     newFields: {
       [BEDS.frontBunkLeft]: [],

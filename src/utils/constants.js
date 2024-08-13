@@ -24,3 +24,7 @@ export const BEDS = {
   frontLoftRight: 'Front Loft Right',
   backLoftRight: 'Back Loft Right',
 };
+
+export const AIRTABLE_BASES = {
+  TICKET_PURCHASES: 'Ticket Purchases 2024',
+};

@@ -7,9 +7,9 @@ import {
   errors,
 } from '../../loginPage/login/firebase-utils';
 import { useRouter } from 'next/router';
-import { COOKIES, ROUTES } from '@/utils/constants';
+import { AIRTABLE_BASES, COOKIES, ROUTES } from '@/utils/constants';
 import Cookies from 'js-cookie';
-import { getUserByEmail } from '@/lib/airtable';
+import { getUserByEmail, updateRecord } from '@/lib/airtable';
 
 export default function CreateUser() {
   const [emailInput, setEmailInput] = useState('');
@@ -56,6 +56,14 @@ export default function CreateUser() {
       }
 
       const user = await getUserByEmail({ email: emailInput });
+
+      await updateRecord({
+        tableId: AIRTABLE_BASES.TICKET_PURCHASES,
+        recordId: user.id,
+        newFields: {
+          'Firebase UID': response.user.uid,
+        },
+      });
       Cookies.set(COOKIES.USER_RECORD, user.id);
       setIsLoading(false);
       router.push(ROUTES.CABIN_SELECTION);

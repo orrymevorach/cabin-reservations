@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 import { COOKIES, ROUTES } from '@/utils/constants';
 import { signInWithFirebaseEmailAndPassword } from './firebase-utils';
 import { useRouter } from 'next/router';
+import { errors as firebaseErrors } from './firebase-utils';
 
 const errors = {
   USER_NOT_FOUND:
@@ -27,14 +28,10 @@ export default function Login({ handleSuccess }) {
     setIsLoading(true);
 
     // Step 1: Try to log in with firebase
-    const res = await signInWithFirebaseEmailAndPassword({ email, password });
-
-    if (res.error) {
-      setIsLoading(false);
-      const firebaseError = errors[res.error.code] || errors.GENERIC;
-      setError(firebaseError);
-      return;
-    }
+    const firebaseResponse = await signInWithFirebaseEmailAndPassword({
+      email,
+      password,
+    });
 
     let user = null;
     try {
@@ -43,12 +40,27 @@ export default function Login({ handleSuccess }) {
       console.error(error);
     }
 
-    // Step 1a: If user has firebase account, log them in using firebase auth
-    if (res.user?.uid) {
+    const isFirebaseLoginSuccessful = firebaseResponse.user?.uid;
+    const hasFirebaseAccount = user?.firebaseUID;
+
+    // Step 1a: If firebase login is successful, handle success
+    if (isFirebaseLoginSuccessful) {
       Cookies.set(COOKIES.USER_RECORD, user.id);
       handleSuccess({ email, user });
     }
-    // Step 1b: If user does not have a firebase account, check to see if they have a ticket
+    // Step 1ab: If login attempt was unsuccessful but user has firebase account, show error (likely incorrect password)
+    else if (
+      !isFirebaseLoginSuccessful &&
+      firebaseResponse.error &&
+      hasFirebaseAccount
+    ) {
+      setIsLoading(false);
+      const firebaseError =
+        firebaseErrors[firebaseResponse.error.code]?.message || errors.GENERIC;
+      setError(firebaseError);
+      return;
+    }
+    // Step 1c: If user does not have a firebase account, check to see if they have a ticket
     else {
       const userHasTicket = user?.id;
       // Step 2a: If user has ticket, redirect them to create account page
