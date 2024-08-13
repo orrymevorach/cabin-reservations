@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import styles from './cabinSummary.module.scss';
 import CabinCategoryDescriptionTakeover from './cabinCategoryDescriptionTakeover/cabinCategoryDescriptionTakeover';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 export default function CabinSummary({
   name,
@@ -29,6 +31,12 @@ export default function CabinSummary({
                 onClick={() => setShowCategoryDescription(true)}
                 className={styles.pill}
               >
+                <FontAwesomeIcon
+                  icon={faInfoCircle}
+                  className={styles.infoIcon}
+                  color="#2f2f2f"
+                  size="lg"
+                />
                 {categoryName}
               </button>
             </div>

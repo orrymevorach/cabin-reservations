@@ -3,9 +3,11 @@ import Button from '@/components/shared/button/button';
 import { ROUTES } from '@/utils/constants';
 import BedSelectionQuestionModal from './bedSelectionQuestionModal/bedSelectionQuestionModal';
 import { useState } from 'react';
+import useAllowBedSelection from '@/hooks/useAllowBedSelection';
 
 export default function Confirmation() {
   const [showQuestionModal, setShowQuestionModal] = useState(true);
+  const allowBedSelection = useAllowBedSelection();
   return (
     <>
       <div className={styles.container}>
@@ -26,7 +28,7 @@ export default function Confirmation() {
           </Button>
         </div>
       </div>
-      {showQuestionModal && (
+      {showQuestionModal && allowBedSelection && (
         <BedSelectionQuestionModal
           handleClose={() => setShowQuestionModal(false)}
         />

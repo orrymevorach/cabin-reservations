@@ -29,10 +29,19 @@
   font-size: 14px;
   border: 2px solid variables.$charcoal;
   transition: 0.1s;
+  position: relative;
   &:hover {
     background-color: rgb(188, 132, 224);
     transition: 0.2s;
   }
+}
+
+.infoIcon {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: white;
+  border-radius: 50%;
 }
 
 .additionalInformationTitle {
