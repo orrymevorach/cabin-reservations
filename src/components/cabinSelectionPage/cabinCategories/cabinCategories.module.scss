@@ -14,10 +14,14 @@
   font-size: 14px;
   @include mixins.fontPrimary;
   margin-left: 23px;
+  &.descriptionNoRadio {
+    margin-left: 0;
+  }
 }
 
 .radio {
   font-size: 16px;
+  @include mixins.fontPrimaryBold;
 }
 
 .new {

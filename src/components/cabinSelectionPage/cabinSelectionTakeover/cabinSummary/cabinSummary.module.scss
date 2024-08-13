@@ -1,43 +1,55 @@
 @use '@mixins' as mixins;
 @use '@variables' as variables;
 
-.summaryContainer {
-  p {
-    @include mixins.fontPrimary;
-  }
-}
-
-p.name {
+.name {
   font-size: 40px;
   @include mixins.fontPrimaryBold;
 }
 
 .description {
-  margin: 30px 0;
+  margin: 30px 0 15px;
+  @include mixins.fontPrimary;
   .unit {
     @include mixins.fontPrimaryBold;
   }
 }
 
-.additionalInformationTitle {
-  margin-bottom: 5px;
+.pillsContainer {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
 }
 
-ul.additionalInformationList {
-  list-style: disc;
-  margin-left: 15px;
-}
-
-.additionalInformationItem {
-  @include mixins.fontPrimary;
-}
-
-p.pill {
+.pill {
   background-color: rgb(231, 192, 255);
   display: inline;
   padding: 4px 8px;
   border-radius: 10px;
   @include mixins.fontPrimaryBold;
+  font-size: 14px;
+  border: 2px solid variables.$charcoal;
+  transition: 0.1s;
+  &:hover {
+    background-color: rgb(188, 132, 224);
+    transition: 0.2s;
+  }
+}
+
+.additionalInformationTitle {
+  margin-bottom: 5px;
+  @include mixins.fontPrimary;
+}
+
+ul.additionalInformationList {
+  list-style: disc;
+  margin-left: 15px;
+  li {
+    font-size: 14px;
+  }
+}
+
+.additionalInformationItem {
+  @include mixins.fontPrimary;
 }
 
 @media screen and (max-width: variables.$tablet) {
