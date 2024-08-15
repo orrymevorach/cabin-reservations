@@ -1,4 +1,5 @@
 @use '@variables' as variables;
+@use '@mixins' as mixins;
 
 .bedSelectionContainer {
   display: flex;
@@ -26,15 +27,46 @@
 @media screen and (max-width: variables.$mobile) {
   .bedSelectionContainer {
     flex-direction: column;
+    margin-bottom: 100px;
   }
   .sidePanel {
     margin-left: 0;
   }
+  .buttonContainer {
+    position: fixed;
+    bottom: 0;
+    background-color: white;
+    width: 100%;
+    left: 50%;
+    height: 80px;
+    transform: translate(-50%, 0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: slideUp 0.3s linear forwards;
+  }
   .button {
     order: 3;
-    margin-top: 50px;
+    margin: 0;
+    width: 95%;
+    height: 65%;
+    @include mixins.fontPrimaryMedium;
+    font-size: 18px;
+    line-height: 0;
+    letter-spacing: 0.8px;
+    background-color: variables.$orange;
+    border: 1px solid variables.$orange;
   }
   .readOnlyText {
     margin: 10px 0 20px;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translate(-50%, 100px);
+  }
+  100% {
+    transform: translate(-50%, 0px);
   }
 }

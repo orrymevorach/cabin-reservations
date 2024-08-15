@@ -84,7 +84,13 @@ export default function BedSelection({ readOnly = false, cabin }) {
           {!isMobile && !readOnly ? <ConfirmButton /> : ''}
           <Legend readOnly={readOnly} />
         </div>
-        {isMobile && !readOnly ? <ConfirmButton /> : ''}
+        {isMobile && !readOnly ? (
+          <div className={styles.buttonContainer}>
+            <ConfirmButton />
+          </div>
+        ) : (
+          ''
+        )}
       </div>
     </div>
   );
