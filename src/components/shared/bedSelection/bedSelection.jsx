@@ -45,10 +45,11 @@ export default function BedSelection({ readOnly = false, cabin }) {
       const { bedName, id } = usersToBeUpdated[i];
       const bedField = BEDS[bedName];
       await clearCurrentBedSelection({ userId: id });
+
       const response = await reserveBed({
         userId: id,
         bedName: bedField,
-        cabinId: cabin.id,
+        cabinId: cabin.id || cabin[0], // After a bed is selected and then removed, the cabin data is removed and we only get the record id inside of the array
       });
     }
     // await sendConfirmationEmail({

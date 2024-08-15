@@ -1,19 +1,17 @@
 import styles from './reserveButton.module.scss';
 import Button from '@/components/shared/button/button';
 import { useReservation } from '@/context/reservation-context';
-import { useUser } from '@/context/user-context';
 import { CABIN_SELECTION_STAGES } from '@/hooks/useReservation';
-import { getUserByRecordId, reserveSpotInCabin } from '@/lib/airtable';
+import { reserveSpotInCabin } from '@/lib/airtable';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import clsx from 'clsx';
 import { sendConfirmationEmail } from '@/lib/mailgun';
 
 export default function ReserveButton({ children, cabin, classNames = '' }) {
-  const { groupData, dispatch, actions, selectedBeds } = useReservation();
+  const { groupData, dispatch, actions } = useReservation();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { user, dispatch: dispatchUser, actions: userActions } = useUser();
   const groupMembers = groupData.members;
   const cabinId = cabin.id;
 
@@ -37,10 +35,6 @@ export default function ReserveButton({ children, cabin, classNames = '' }) {
           });
         }
       }
-
-      // Get latest user data, with cabin
-      const userData = await getUserByRecordId({ id: user.id });
-      dispatchUser({ type: userActions.LOG_IN, userData });
 
       setIsLoading(false);
       dispatch({

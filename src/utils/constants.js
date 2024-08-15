@@ -27,4 +27,5 @@ export const BEDS = {
 
 export const AIRTABLE_BASES = {
   TICKET_PURCHASES: 'Ticket Purchases 2024',
+  CABINS: 'Cabins',
 };
