@@ -15,25 +15,29 @@ const useSetStageBasedOnQuery = () => {
   const { actions, dispatch } = useReservation();
   const { ADD_GUESTS } = CABIN_SELECTION_STAGES;
   const router = useRouter();
-  useEffect(() => {
-    // If no cabin query, prompt redirect to cabin selection page
-    if (!router.query.cabin) {
-      setShowSelectCabinTakeover(true);
-    }
 
-    // If no stage query, set as "add guests" stage
-    if (!router.query.stage) {
-      dispatch({
-        type: actions.SET_SELECTION_STAGE,
-        currentStage: ADD_GUESTS,
-      });
-    }
-    // If stage query exists, set stage based on query
-    else {
-      dispatch({
-        type: actions.SET_SELECTION_STAGE,
-        currentStage: router.query.stage,
-      });
+  useEffect(() => {
+    if (router.isReady) {
+      const { cabin, stage } = router.query;
+      // If no cabin query, prompt redirect to cabin selection page
+      if (!cabin && stage === ADD_GUESTS) {
+        setShowSelectCabinTakeover(true);
+      }
+
+      // If no stage query, set as "add guests" stage
+      if (!stage) {
+        dispatch({
+          type: actions.SET_SELECTION_STAGE,
+          currentStage: ADD_GUESTS,
+        });
+      }
+      // If stage query exists, set stage based on query
+      else {
+        dispatch({
+          type: actions.SET_SELECTION_STAGE,
+          currentStage: stage,
+        });
+      }
     }
   }, [router, ADD_GUESTS, actions, dispatch]);
 
