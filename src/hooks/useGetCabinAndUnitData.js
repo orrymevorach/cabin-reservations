@@ -24,9 +24,8 @@ const sortCabinsIntoUnits = ({ units, cabins }) => {
 
 export default function useGetCabinAndUnitData() {
   const [units, setUnits] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    setIsLoading(true);
     const getData = async () => {
       const cabinResponse = await getCabins({});
       const unitResponse = await getUnits({});
