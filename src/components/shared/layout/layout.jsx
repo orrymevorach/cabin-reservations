@@ -23,7 +23,7 @@ export default function Layout({ children }) {
   };
 
   const isSummaryPage = router.pathname === ROUTES.SUMMARY;
-  const hasCabin = user?.cabin && user.cabin.length > 0;
+  const hasCabin = !!user?.cabin && user.cabin.length > 0;
 
   return (
     <div className={styles.container}>
