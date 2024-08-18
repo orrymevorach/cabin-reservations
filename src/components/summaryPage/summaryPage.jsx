@@ -10,6 +10,7 @@ import { useReservation } from '@/context/reservation-context';
 import ReservationSummary from '../shared/reservationSummary/reservationSummary';
 import VerifiedUsers from '../shared/verifiedUsers/verifiedUsers';
 import AddGuestsTakeover from './addGuestsTakeover/addGuestsTakeover';
+import SelectCabinTakeover from '../reservePage/selectCabinTakeover/selectCabinTakeover';
 
 export default function SummaryPage() {
   const { user, isLoading: isUserDataLoading } = useUser();
@@ -33,6 +34,9 @@ export default function SummaryPage() {
     cabin: user.cabin,
     isLoading: isUserDataLoading,
   };
+
+  const hasCabin = !!user.cabin;
+  if (user && !hasCabin) return <SelectCabinTakeover />;
 
   return (
     <div className={styles.container}>
