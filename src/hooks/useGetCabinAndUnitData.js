@@ -35,13 +35,17 @@ export default function useGetCabinAndUnitData() {
         cabins: cabinResponse,
       });
       setUnits(unitsWithAllCabins);
+      console.log('setting is loading to false');
       setIsLoading(false);
     };
 
     if (!units.length) {
+      console.log('level 1');
       getData();
     }
   }, [units.length]);
+
+  console.log('isLoading', isLoading);
 
   return {
     units,
