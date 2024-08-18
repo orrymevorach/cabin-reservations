@@ -30,15 +30,8 @@ export default function CabinList({ unitData, setHasAvailability }) {
   const handleScrollDown = () => {
     cabinListRef.current.scrollTop = scrollValue + 150;
   };
-  let filteredCabins = [];
-  filteredCabins = filterByAvailableBeds({ cabins, selectedFilters });
-  filteredCabins = filterByCategory({
-    cabins: filteredCabins,
-    selectedFilters,
-  });
-  filteredCabins = sortByLeastAvailability({ cabins: filteredCabins });
-
-  const hasCabins = !!filteredCabins.length;
+  // console.log('cabins', cabins);
+  const hasCabins = !!cabins.length;
   setHasAvailability(hasCabins);
 
   return (
@@ -52,7 +45,7 @@ export default function CabinList({ unitData, setHasAvailability }) {
         onScroll={e => setScrollValue(e.target.scrollTop)}
       >
         {hasCabins ? (
-          filteredCabins.map(cabin => {
+          cabins.map(cabin => {
             return (
               <CabinSelectionTile
                 cabin={cabin}

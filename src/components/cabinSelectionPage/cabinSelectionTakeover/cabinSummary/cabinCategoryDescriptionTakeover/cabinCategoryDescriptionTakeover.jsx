@@ -13,7 +13,7 @@ export default function CabinCategoryDescriptionTakeover({
       <CabinCategories
         hideRadioButtons
         fullDescription
-        title="Cabin Categories:"
+        title="Information about Cabin Categories:"
       />
     </Takeover>
   );

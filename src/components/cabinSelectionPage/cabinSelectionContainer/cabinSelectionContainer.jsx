@@ -14,8 +14,7 @@ import BookingAssistant from '../bookingAssistant/bookingAssistant';
 
 export default function CabinSelectionContainer() {
   const [showBackToTopButton, setShowBackToTopButton] = useState(false);
-  const { showTakeover, showBookingAssistant, dispatch, actions } =
-    useCabinSelection();
+  const { showTakeover, showBookingAssistant } = useCabinSelection();
   const { isLoading, units } = useCabinAndUnitData();
   const headerRef = useRef();
   useShowOnScroll({ ref: headerRef, setIsShowing: setShowBackToTopButton });
