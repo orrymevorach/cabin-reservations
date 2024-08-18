@@ -19,6 +19,10 @@ export default function CabinSelectionContainer() {
   const headerRef = useRef();
   useShowOnScroll({ ref: headerRef, setIsShowing: setShowBackToTopButton });
 
+  console.log('units', units);
+  console.log('isLoading', isLoading);
+  console.log('showBookingAssistant', showBookingAssistant);
+
   if (isLoading || !units.length) return <Loader isDotted />;
 
   const scrollToTop = () => window.scrollTo(0, 0);

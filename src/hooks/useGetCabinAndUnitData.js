@@ -30,13 +30,10 @@ export default function useGetCabinAndUnitData() {
     const getData = async () => {
       const cabinResponse = await getCabins({});
       const unitResponse = await getUnits({});
-      console.log('unitResponse', unitResponse);
-      console.log('cabinResponse', cabinResponse);
       const unitsWithAllCabins = sortCabinsIntoUnits({
         units: unitResponse,
         cabins: cabinResponse,
       });
-      console.log('unitsWithAllCabins', unitsWithAllCabins);
       setUnits(unitsWithAllCabins);
       setIsLoading(false);
     };
