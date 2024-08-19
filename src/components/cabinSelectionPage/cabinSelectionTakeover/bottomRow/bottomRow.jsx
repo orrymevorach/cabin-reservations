@@ -46,7 +46,9 @@ export default function BottomRow({ showBedSelection, setShowBedSelection }) {
           handleClick={() => setShowBedSelection(!showBedSelection)}
           classNames={styles.viewBedSelectionButton}
         >
-          {showBedSelection ? 'View cabin information' : 'View available beds'}
+          {showBedSelection
+            ? 'Back to cabin information'
+            : 'View available beds'}
         </Button>
       </div>
       <Button handleClick={handleClick}>Continue</Button>
