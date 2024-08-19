@@ -1,11 +1,10 @@
 import { useCabinCategories } from '@/context/cabin-categories';
-import { useRouter } from 'next/router';
 import { useFilters } from '../../filters/filters-context';
 import Button from '@/components/shared/button/button';
 import styles from './stageFour.module.scss';
 import { useCabinSelection } from '@/context/cabin-selection-context';
 
-export default function StageFour({ setStage }) {
+export default function StageFour({ setStage, headerRef }) {
   const { cabinCategories } = useCabinCategories();
   const { selectedFilters } = useFilters();
   const { Category: category } = selectedFilters;
@@ -30,9 +29,12 @@ export default function StageFour({ setStage }) {
           Back
         </Button>
         <Button
-          handleClick={() =>
-            dispatch({ type: actions.CLOSE_BOOKING_ASSISTANT })
-          }
+          handleClick={() => {
+            dispatch({ type: actions.CLOSE_BOOKING_ASSISTANT });
+            setTimeout(() => {
+              headerRef.current.scrollIntoView();
+            }, 500);
+          }}
         >
           Show me <span className={styles.categoryName}>{category}</span>{' '}
           options

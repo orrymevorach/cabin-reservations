@@ -6,16 +6,10 @@ import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons';
 import { useRef, useState } from 'react';
 import { useFilters } from '../../../filters/filters-context';
 import clsx from 'clsx';
-import {
-  filterByAvailableBeds,
-  filterByCategory,
-  sortByLeastAvailability,
-} from './filter-utils';
 
 export default function CabinList({ unitData, setHasAvailability }) {
   const { dispatch, actions } = useCabinSelection();
   const [scrollValue, setScrollValue] = useState(0);
-  const { selectedFilters } = useFilters();
 
   const cabins = unitData.cabins;
 
@@ -30,7 +24,6 @@ export default function CabinList({ unitData, setHasAvailability }) {
   const handleScrollDown = () => {
     cabinListRef.current.scrollTop = scrollValue + 150;
   };
-  // console.log('cabins', cabins);
   const hasCabins = !!cabins.length;
   setHasAvailability(hasCabins);
 

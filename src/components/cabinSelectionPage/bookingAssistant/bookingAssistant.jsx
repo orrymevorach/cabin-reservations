@@ -3,11 +3,10 @@ import styles from './bookingAssistant.module.scss';
 import { useCabinSelection } from '@/context/cabin-selection-context';
 import { useState } from 'react';
 import StageOne from './stageOne/stageOne';
-// import StageTwo from './stageTwo/stageTwo';
 import StageFour from './stageFour/stageFour';
 import CabinCategories from '../cabinCategories/cabinCategories';
 
-export default function BookingAssistant() {
+export default function BookingAssistant({ headerRef }) {
   const { dispatch, actions } = useCabinSelection();
   const [stage, setStage] = useState(1);
 
@@ -17,14 +16,13 @@ export default function BookingAssistant() {
       modalClassNames={styles.takeover}
     >
       {stage === 1 && <StageOne setStage={setStage} />}
-      {/* {stage === 2 && <StageTwo setStage={setStage} />} */}
       {stage === 3 && (
         <CabinCategories
           setStage={setStage}
           title="I want to live in a cabin that is..."
         />
       )}
-      {stage === 4 && <StageFour setStage={setStage} />}
+      {stage === 4 && <StageFour setStage={setStage} headerRef={headerRef} />}
     </Takeover>
   );
 }
