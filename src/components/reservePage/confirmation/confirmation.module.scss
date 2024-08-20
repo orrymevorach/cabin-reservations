@@ -3,11 +3,12 @@
 
 .container {
   max-width: 700px;
+  margin-top: 50px;
 }
 
 .title {
   font-size: 32px;
-  margin: 50px 0 20px;
+  margin-bottom: 20px;
   @include mixins.fontSecondary;
   color: variables.$darkGreen;
 }

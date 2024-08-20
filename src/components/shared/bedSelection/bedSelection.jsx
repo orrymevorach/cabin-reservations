@@ -58,7 +58,7 @@ export default function BedSelection({ readOnly = false, cabin }) {
     //   selectedBeds,
     // });
     setIsLoading(false);
-    window.location = '/summary?stage=BED_SELECTION';
+    window.location = '/summary?stage=CONFIRMATION';
   };
 
   const ConfirmButton = () => (

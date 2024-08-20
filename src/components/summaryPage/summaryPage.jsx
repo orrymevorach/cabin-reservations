@@ -11,6 +11,7 @@ import ReservationSummary from '../shared/reservationSummary/reservationSummary'
 import VerifiedUsers from '../shared/verifiedUsers/verifiedUsers';
 import AddGuestsTakeover from './addGuestsTakeover/addGuestsTakeover';
 import SelectCabinTakeover from '../reservePage/selectCabinTakeover/selectCabinTakeover';
+import ConfirmationTakeover from './confirmationTakeover/confirmationTakeover';
 
 export default function SummaryPage() {
   const { user, isLoading: isUserDataLoading } = useUser();
@@ -45,6 +46,9 @@ export default function SummaryPage() {
       )}
       {currentStage === CABIN_SELECTION_STAGES.BED_SELECTION && (
         <BedSelectionTakeover />
+      )}
+      {currentStage === CABIN_SELECTION_STAGES.CONFIRMATION && (
+        <ConfirmationTakeover />
       )}
 
       <div>
