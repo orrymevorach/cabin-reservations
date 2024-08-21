@@ -8,6 +8,7 @@ import Legend from './legend/legend';
 import { useWindowSize } from '@/context/window-size-context';
 import { sendConfirmationEmail } from '@/lib/mailgun';
 import { BEDS } from '@/utils/constants';
+import { useUser } from '@/context/user-context';
 
 const HeadStaffCabinInformation = () => {
   return (
@@ -23,6 +24,7 @@ const HeadStaffCabinInformation = () => {
 
 export default function BedSelection({ readOnly = false, cabin }) {
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useUser();
   const {
     selectedBeds,
     groupData: { members },
@@ -42,7 +44,8 @@ export default function BedSelection({ readOnly = false, cabin }) {
       }
     });
     for (let i = 0; i < usersToBeUpdated.length; i++) {
-      const { bedName, id } = usersToBeUpdated[i];
+      const userToBeUpdated = usersToBeUpdated[i];
+      const { bedName, id } = userToBeUpdated;
       const bedField = BEDS[bedName];
       await clearCurrentBedSelection({ userId: id });
 
@@ -51,12 +54,13 @@ export default function BedSelection({ readOnly = false, cabin }) {
         bedName: bedField,
         cabinId: cabin.id || cabin[0], // After a bed is selected and then removed, the cabin data is removed and we only get the record id inside of the array
       });
+      await sendConfirmationEmail({
+        groupMember: userToBeUpdated,
+        cabin,
+        selectedBeds,
+        host: user,
+      });
     }
-    // await sendConfirmationEmail({
-    //   groupMembers: usersToBeUpdated,
-    //   cabin,
-    //   selectedBeds,
-    // });
     setIsLoading(false);
     window.location = '/summary?stage=CONFIRMATION';
   };

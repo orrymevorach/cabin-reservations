@@ -45,7 +45,7 @@ const useSetStageBasedOnQuery = () => {
 };
 
 export default function ReservePage() {
-  const { currentStage, cabinData } = useReservation();
+  const { currentStage } = useReservation();
   const { ADD_GUESTS, CONFIRMATION } = CABIN_SELECTION_STAGES;
   const { showSelectCabinTakeover } = useSetStageBasedOnQuery();
   if (!currentStage) return <Loader isDotted />;
@@ -56,7 +56,7 @@ export default function ReservePage() {
       <div className={styles.container}>
         {currentStage === ADD_GUESTS && <AddGuestsReservePage />}
         {currentStage === CONFIRMATION && <Confirmation />}
-        <Sidebar cabinData={cabinData} />
+        <Sidebar />
       </div>
     </div>
   );

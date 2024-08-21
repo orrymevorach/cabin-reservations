@@ -7,9 +7,11 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import clsx from 'clsx';
 import { sendConfirmationEmail } from '@/lib/mailgun';
+import { useUser } from '@/context/user-context';
 
 export default function ReserveButton({ children, cabin, classNames = '' }) {
-  const { groupData, dispatch, actions } = useReservation();
+  const { user } = useUser();
+  const { groupData, dispatch, actions, selectedBeds } = useReservation();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const groupMembers = groupData.members;
@@ -29,25 +31,31 @@ export default function ReserveButton({ children, cabin, classNames = '' }) {
           userHasNoPrevioulsyReservedCabin ||
           usersExistingCabinIsDifferentThenCurrentCabin
         ) {
-          const response = await reserveSpotInCabin({
+          await reserveSpotInCabin({
             cabinId,
             attendeeId: groupMember.id,
+          });
+          await sendConfirmationEmail({
+            groupMember,
+            cabin,
+            selectedBeds,
+            host: user,
           });
         }
       }
 
-      setIsLoading(false);
       dispatch({
         type: actions.SET_SELECTION_STAGE,
         currentStage: CABIN_SELECTION_STAGES.CONFIRMATION,
       });
-      // await sendConfirmationEmail({ groupMembers, cabin, selectedBeds });
 
       router.push({
         query: {
+          cabin: cabin.name,
           stage: CABIN_SELECTION_STAGES.CONFIRMATION,
         },
       });
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
     }

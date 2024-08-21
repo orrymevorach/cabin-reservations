@@ -10,15 +10,16 @@ import { useUser } from '@/context/user-context';
 import Loader from '@/components/shared/loader/loader';
 import Link from 'next/link';
 
-export default function Sidebar({ cabinData }) {
+export default function Sidebar() {
   const {
     currentStage,
     groupData: { members },
+    cabinData,
   } = useReservation();
   const { user } = useUser();
-  const { isLoading: isCabinDataLoading, cabin } = cabinData;
+  const { cabin } = cabinData;
 
-  if (isCabinDataLoading || !user) {
+  if (!user || !cabin) {
     return (
       <div className={styles.sidebar}>
         <Loader isDotted />

@@ -127,16 +127,6 @@ export const getUnits = async () => {
   return units;
 };
 
-export const getCabin = async ({ cabinName }) => {
-  const { record: cabin } = await getRecord({
-    tableId: 'Cabins',
-    field: 'Name',
-    fieldValue: cabinName,
-    endpoint: '/get-cabin',
-  });
-  return cabin;
-};
-
 export const getCabinById = async ({ cabinId }) => {
   const { record: cabin } = await getRecordById({
     tableId: 'Cabins',

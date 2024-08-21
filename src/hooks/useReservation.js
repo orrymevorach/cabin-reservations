@@ -1,5 +1,5 @@
+import { useCabinAndUnitData } from '@/context/cabin-and-unit-data-context';
 import { useUser } from '@/context/user-context';
-import { getBedOccupant, getCabin } from '@/lib/airtable';
 import { BEDS } from '@/utils/constants';
 import { useRouter } from 'next/router';
 import { useReducer, useEffect, useState } from 'react';
@@ -51,43 +51,22 @@ const reducer = (state, action) => {
 };
 
 const useGetCabinData = () => {
-  const [cabin, setCabin] = useState();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
   const { user } = useUser();
+  const { cabins } = useCabinAndUnitData();
 
   const cabinQuery = router.query.cabin;
+  const cabinName = cabinQuery || user?.cabin?.name;
 
-  // Used on reservation page
-  useEffect(() => {
-    const getCabinData = async () => {
-      const cabinData = await getCabin({ cabinName: cabinQuery });
-      setCabin(cabinData);
-      setIsLoading(false);
-      return;
+  if (!cabinName)
+    return {
+      cabin: null,
     };
-    if (cabinQuery && !cabin) {
-      getCabinData();
-    }
-  }, [cabinQuery, cabin]);
 
-  // Used on summary page
-  useEffect(() => {
-    const getCabinData = async () => {
-      const cabinData = await getCabin({ cabinName: user.cabin.name });
-      setCabin(cabinData);
-      setIsLoading(false);
-      return;
-    };
-    const hasCabin = user?.cabin;
-    if (!cabinQuery && !cabin && hasCabin) {
-      getCabinData();
-    }
-  }, [user, cabin, cabinQuery]);
+  const cabin = cabins.find(({ name }) => cabinName === name);
 
   return {
     cabin,
-    isLoading,
   };
 };
 
@@ -100,9 +79,7 @@ const useGetBeds = ({ cabinData, dispatch, actions }) => {
       const bedsArray = Object.keys(BEDS);
       for (let bed of bedsArray) {
         if (cabinData.cabin[bed]) {
-          const currentBedOccupant = await getBedOccupant({
-            userId: cabinData.cabin[bed][0],
-          });
+          const currentBedOccupant = cabinData.cabin[bed];
           selectedBeds.push({
             bedName: bed,
             ...currentBedOccupant,

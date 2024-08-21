@@ -1,3 +1,4 @@
+import { useCabinAndUnitData } from '@/context/cabin-and-unit-data-context';
 import {
   getBedOccupant,
   getCabinById,
@@ -45,6 +46,7 @@ const initialState = {
 export default function useUserReducer() {
   const userRecordCookie = Cookies.get(COOKIES.USER_RECORD);
   const [state, dispatch] = useReducer(reducer, initialState);
+  const cabinAndUnitData = useCabinAndUnitData();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -54,10 +56,7 @@ export default function useUserReducer() {
       // Get cabin data from reference record
       const cabinId = (userData.cabin && userData.cabin[0]) || '';
       if (cabinId) {
-        const cabinData = await getCabinById({
-          tableId: 'Cabins',
-          cabinId: cabinId,
-        });
+        const cabinData = cabins.find(({ id }) => id === cabinId);
         // Get reference record for occupant of each bed
         const bedsArray = Object.keys(BEDS);
         for (let bed of bedsArray) {
@@ -88,10 +87,14 @@ export default function useUserReducer() {
       }
       dispatch({ type: actions.LOG_IN, userData });
     };
-    if (userRecordCookie) {
+    const cabins = cabinAndUnitData?.cabins?.length
+      ? cabinAndUnitData?.cabins
+      : [];
+
+    if (userRecordCookie && !state?.user && cabins.length) {
       loadUser();
     }
-  }, [userRecordCookie, dispatch]);
+  }, [userRecordCookie, dispatch, cabinAndUnitData, state?.user]);
 
   return {
     ...state,

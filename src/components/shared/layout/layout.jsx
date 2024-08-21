@@ -14,7 +14,9 @@ export const Logo = ({ classNames = ' ' }) => {
 
 export default function Layout({ children }) {
   const router = useRouter();
-  const { user, dispatch } = useUser();
+  const userData = useUser();
+  if (!userData) return;
+  const { user, dispatch } = userData;
 
   const handleLogout = () => {
     Cookies.remove(COOKIES.USER_RECORD);

@@ -8,10 +8,8 @@ export default function useGetCabinCategories() {
       const response = await getCabinCategories({});
       setCabinCategories(response);
     };
-    if (!cabinCategories) {
-      getCabinCategoryData();
-    }
-  }, [cabinCategories]);
+    getCabinCategoryData();
+  }, []);
 
   return {
     cabinCategories,

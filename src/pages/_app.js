@@ -38,10 +38,8 @@ export default function App({ Component, pageProps }) {
           `,
         }}
       />
-      <UserProvider>
-        <Head />
-        <Component {...pageProps} />
-      </UserProvider>
+      <Head />
+      <Component {...pageProps} />
     </WindowSizeProvider>
   );
 }
