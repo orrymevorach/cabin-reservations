@@ -15,9 +15,15 @@ export const Logo = ({ classNames = ' ' }) => {
 export default function Layout({ children }) {
   const router = useRouter();
   const userData = useUser();
-  if (!userData) return;
-  const { user, dispatch } = userData;
+  if (!userData)
+    return (
+      <div className={styles.container}>
+        <Image src={logo} className={styles.image} alt="" quality={50} />
+        {children}
+      </div>
+    );
 
+  const { user, dispatch } = userData;
   const handleLogout = () => {
     Cookies.remove(COOKIES.USER_RECORD);
     dispatch({ type: 'LOG_OUT' });
