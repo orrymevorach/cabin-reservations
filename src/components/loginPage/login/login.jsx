@@ -9,11 +9,13 @@ import { signInWithFirebaseEmailAndPassword } from './firebase-utils';
 import { useRouter } from 'next/router';
 import { errors as firebaseErrors } from './firebase-utils';
 
-const errors = {
+export const errors = {
   USER_NOT_FOUND:
     'We do not have a record of this email. Please buy a ticket, or contact info@highlandsmusicfestival.ca',
   GENERIC:
     "We're sorry, an unknown error has occured. Please contact info@highlandsmusicfestival.ca.",
+  PASSWORD_DOES_NOT_MATCH:
+    'This password does not match the one that was sent to your email. Please check your email and try again.',
 };
 
 export default function Login({ handleSuccess }) {
@@ -66,7 +68,10 @@ export default function Login({ handleSuccess }) {
       // Step 2a: If user has ticket, redirect them to create account page
       if (userHasTicket) {
         setIsLoading(false);
-        router.push(ROUTES.CREATE_ACCOUNT);
+        router.push({
+          pathname: ROUTES.CREATE_ACCOUNT,
+          query: { email },
+        });
         return;
       }
       // Step 2b: If user does not have a ticket, show error message that they should buy a ticket

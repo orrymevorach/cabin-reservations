@@ -11,11 +11,13 @@ export default function Input({
   classNames,
   handleChange,
   placeholder,
+  asterisk = '',
 }) {
   return (
     <div className={styles.inputContainer}>
       <label htmlFor={id} className={styles.label}>
         {label}
+        {asterisk && <span className={styles.asterisk}>{asterisk}</span>}
       </label>
       {error && <p className={styles.error}>{error}</p>}
       <TextField

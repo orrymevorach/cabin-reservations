@@ -1,10 +1,5 @@
 import { useCabinAndUnitData } from '@/context/cabin-and-unit-data-context';
-import {
-  getBedOccupant,
-  getCabinById,
-  getGroup,
-  getUserByRecordId,
-} from '@/lib/airtable';
+import { getBedOccupant, getGroup, getUserByRecordId } from '@/lib/airtable';
 import { BEDS, COOKIES } from '@/utils/constants';
 import Cookies from 'js-cookie';
 import { useEffect, useReducer } from 'react';

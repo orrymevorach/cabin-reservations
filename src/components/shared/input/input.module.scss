@@ -22,6 +22,12 @@
   @include mixins.fontPrimaryLight;
 }
 
+.asterisk {
+  font-size: 12px;
+  @include mixins.fontPrimaryLight;
+  margin-left: 5px;
+}
+
 @media screen and (max-width: variables.$mobile) {
   .inputContainer,
   .input {
