@@ -1,5 +1,6 @@
 import { useCabinAndUnitData } from '@/context/cabin-and-unit-data-context';
 import { useUser } from '@/context/user-context';
+import { getBedOccupant } from '@/lib/airtable';
 import { BEDS } from '@/utils/constants';
 import { useRouter } from 'next/router';
 import { useReducer, useEffect, useState } from 'react';
@@ -79,7 +80,9 @@ const useGetBeds = ({ cabinData, dispatch, actions }) => {
       const bedsArray = Object.keys(BEDS);
       for (let bed of bedsArray) {
         if (cabinData.cabin[bed]) {
-          const currentBedOccupant = cabinData.cabin[bed];
+          const currentBedOccupant = await getBedOccupant({
+            userId: cabinData.cabin[bed][0],
+          });
           selectedBeds.push({
             bedName: bed,
             ...currentBedOccupant,
