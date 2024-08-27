@@ -33,7 +33,8 @@ export default function Button({
     classNames,
     isLight && styles.light,
     isSmall && styles.small,
-    isInverted && styles.inverted
+    isInverted && styles.inverted,
+    isDisabled && styles.disabled
   );
 
   if (isAnchor) {

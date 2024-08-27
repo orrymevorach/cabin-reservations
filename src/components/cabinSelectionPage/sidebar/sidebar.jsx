@@ -16,6 +16,11 @@ export default function Sidebar() {
     groupData: { members },
     cabinData,
   } = useReservation();
+  const isHeadStaffCabin = cabinData?.cabin?.bedConfiguration === 'Head Staff';
+  const numberOfMembersInGroup = members?.length;
+  const isEligibleToBookHeadStaffCabin =
+    !isHeadStaffCabin || (isHeadStaffCabin && numberOfMembersInGroup === 3);
+
   const { user } = useUser();
   const { cabin } = cabinData;
 
@@ -28,11 +33,14 @@ export default function Sidebar() {
   }
 
   const isConfirmationStage =
-    currentStage !== CABIN_SELECTION_STAGES.CONFIRMATION;
+    currentStage === CABIN_SELECTION_STAGES.CONFIRMATION;
   const cabinHasEnoughBeds = cabin.openBeds >= members?.length;
   const cabinIsOpen = cabin.availability === 'Open';
   const showReservationButton =
-    isConfirmationStage && cabinHasEnoughBeds && cabinIsOpen;
+    !isConfirmationStage &&
+    cabinHasEnoughBeds &&
+    cabinIsOpen &&
+    isEligibleToBookHeadStaffCabin;
 
   return (
     <div className={styles.sidebar}>
@@ -61,6 +69,14 @@ export default function Sidebar() {
             cabin selection page.
           </Link>
         </p>
+      )}
+      {isHeadStaffCabin && numberOfMembersInGroup < 3 ? (
+        <p className={styles.headStaffText}>
+          Please add {3 - numberOfMembersInGroup} more guest
+          {numberOfMembersInGroup !== 2 && 's'} to your group to book this cabin
+        </p>
+      ) : (
+        ''
       )}
       {showReservationButton && <ReserveButton cabin={cabinData?.cabin} />}
     </div>

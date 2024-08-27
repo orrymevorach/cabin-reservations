@@ -1,0 +1,22 @@
+@use '@variables' as variables;
+@use '@mixins' as mixins;
+
+.modal {
+  width: 1000px;
+}
+
+.line {
+  margin: 15px 0;
+  @include mixins.fontPrimary;
+}
+
+.title {
+  font-size: 20px;
+  text-align: center;
+  @include mixins.fontPrimaryBold;
+}
+
+.button {
+  margin: 40px auto 0;
+  display: block;
+}

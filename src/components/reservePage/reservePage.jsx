@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import Loader from '../shared/loader/loader';
 import AddGuestsReservePage from './addGuestsReservePage/addGuestsReservePage';
 import SelectCabinTakeover from './selectCabinTakeover/selectCabinTakeover';
+import HeadStaffCabinMessageTakeover from './headStaffCabinMessageTakeover/headStaffCabinMessageTakeover';
 
 const useSetStageBasedOnQuery = () => {
   const [showSelectCabinTakeover, setShowSelectCabinTakeover] = useState(false);
@@ -52,6 +53,7 @@ export default function ReservePage() {
   return (
     <div className={styles.sideMargins}>
       {showSelectCabinTakeover && <SelectCabinTakeover />}
+      <HeadStaffCabinMessageTakeover />
       <Logo classNames={styles.logo} />
       <div className={styles.container}>
         {currentStage === ADD_GUESTS && <AddGuestsReservePage />}

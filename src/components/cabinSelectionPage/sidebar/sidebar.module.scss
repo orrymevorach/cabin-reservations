@@ -59,6 +59,11 @@ a.link {
   }
 }
 
+.headStaffText {
+  color: red;
+  padding-right: 30px;
+}
+
 @media screen and (max-width: variables.$mobile) {
   .sidebar {
     margin-top: 50px;

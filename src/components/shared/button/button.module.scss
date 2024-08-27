@@ -43,6 +43,11 @@ $primaryColor: variables.$darkGreen;
     background-color: white;
     color: variables.$darkGreen;
   }
+  &.disabled {
+    background-color: rgb(85, 84, 84);
+    color: white;
+    border: none;
+  }
 }
 
 @keyframes rotate {
