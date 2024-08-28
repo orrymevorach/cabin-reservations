@@ -3,8 +3,10 @@ import Image from 'next/image';
 import CabinList from './cabinList/cabinList';
 import { useWindowSize } from '@/context/window-size-context';
 import Takeover from '@/components/shared/takeover/takeover';
-import { useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import Button from '@/components/shared/button/button';
+import { VisibleSectionContext } from '@/context/visible-section-context';
+import useIsVisible from '@/hooks/useIsVisible';
 
 export default function UnitRow({ unitData }) {
   const [showTakeover, setShowTakeover] = useState(false);
@@ -13,8 +15,16 @@ export default function UnitRow({ unitData }) {
   const unitImage = unitData.image && unitData.image[0];
   const { isDesktop } = useWindowSize();
 
+  const ref = useRef();
+  const isVisible = useIsVisible(ref);
+  const { setSectionInViewport } = useContext(VisibleSectionContext);
+
+  useEffect(() => {
+    if (isVisible) setSectionInViewport(unitData.name);
+  }, [isVisible, setSectionInViewport, unitData.name]);
+
   return (
-    <div id={unitName} className={styles.outerContainer}>
+    <div id={unitName} className={styles.outerContainer} ref={ref}>
       <div className={styles.innerContainer}>
         <div className={styles.unitTitleContainer}>
           <p className={styles.unitName}>{unitName}</p>

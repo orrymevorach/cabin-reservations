@@ -1,5 +1,5 @@
 import { useReservation } from '@/context/reservation-context';
-import Sidebar from '../cabinSelectionPage/sidebar/sidebar';
+import Sidebar from './sidebar/sidebar';
 import { Logo } from '../shared/layout/layout';
 import styles from './reservePage.module.scss';
 import { CABIN_SELECTION_STAGES } from '@/hooks/useReservation';

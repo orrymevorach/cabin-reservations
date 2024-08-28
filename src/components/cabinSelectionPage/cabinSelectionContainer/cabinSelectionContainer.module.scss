@@ -12,12 +12,6 @@
   margin: 0 auto;
 }
 
-.backToTop {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-}
-
 @media screen and (max-width: variables.$mobile) {
   .outerContainer {
     padding: 30px 0 0 0;

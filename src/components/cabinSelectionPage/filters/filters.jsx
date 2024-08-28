@@ -7,7 +7,11 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useCabinCategories } from '@/context/cabin-categories';
 
-export default function Filters({ classNames = '' }) {
+export default function Filters({
+  classNames = '',
+  isColumn = false,
+  hideUnitFilter = false,
+}) {
   const { selectedFilters, setSelectedFilters } = useFilters();
   const { units } = useCabinAndUnitData();
   const { cabinCategories } = useCabinCategories();
@@ -33,9 +37,11 @@ export default function Filters({ classNames = '' }) {
   };
 
   return (
-    <div className={clsx(styles.filters, classNames)}>
+    <div
+      className={clsx(styles.filters, classNames, isColumn && styles.column)}
+    >
       <p className={styles.title}>Filter by:</p>
-      <div style={{ display: 'flex' }}>
+      <div className={styles.dropdowns}>
         <Dropdown
           options={numberOfGuests}
           label={FILTERS.AVAILABLE_BEDS}
@@ -46,14 +52,16 @@ export default function Filters({ classNames = '' }) {
           defaultValue={router.query[FILTERS.AVAILABLE_BEDS]}
           classNames={styles.dropdown}
         />
-        <Dropdown
-          options={['All', ...unitNames]}
-          label={FILTERS.UNIT}
-          variant="standard"
-          handleChange={event => handleChange({ event, label: 'Unit' })}
-          defaultValue={router.query[FILTERS.UNIT]}
-          classNames={styles.dropdown}
-        />
+        {!hideUnitFilter && (
+          <Dropdown
+            options={['All', ...unitNames]}
+            label={FILTERS.UNIT}
+            variant="standard"
+            handleChange={event => handleChange({ event, label: 'Unit' })}
+            defaultValue={router.query[FILTERS.UNIT]}
+            classNames={styles.dropdown}
+          />
+        )}
         <Dropdown
           options={['All', ...categoryNames]}
           label={FILTERS.CATEGORY}

@@ -6,25 +6,28 @@ import { CabinAndUnitDataProvider } from '@/context/cabin-and-unit-data-context'
 import { ReservationProvider } from '@/context/reservation-context';
 import { CabinCategoriesProvider } from '@/context/cabin-categories';
 import { UserProvider } from '@/context/user-context';
+import VisibleSectionProvider from '@/context/visible-section-context';
 
 export default function CabinSelection() {
   return (
-    <CabinAndUnitDataProvider>
-      <UserProvider>
-        <ReservationProvider>
-          <CabinSelectionProvider>
-            <FiltersProvider>
-              <CabinCategoriesProvider>
-                <Layout>
-                  <main>
-                    <CabinSelectionContainer />
-                  </main>
-                </Layout>
-              </CabinCategoriesProvider>
-            </FiltersProvider>
-          </CabinSelectionProvider>
-        </ReservationProvider>
-      </UserProvider>
-    </CabinAndUnitDataProvider>
+    <VisibleSectionProvider>
+      <CabinAndUnitDataProvider>
+        <UserProvider>
+          <ReservationProvider>
+            <CabinSelectionProvider>
+              <FiltersProvider>
+                <CabinCategoriesProvider>
+                  <Layout>
+                    <main>
+                      <CabinSelectionContainer />
+                    </main>
+                  </Layout>
+                </CabinCategoriesProvider>
+              </FiltersProvider>
+            </CabinSelectionProvider>
+          </ReservationProvider>
+        </UserProvider>
+      </CabinAndUnitDataProvider>
+    </VisibleSectionProvider>
   );
 }

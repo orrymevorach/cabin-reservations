@@ -1,84 +1,76 @@
+import React, { useState, useContext, useEffect } from 'react';
 import styles from './sidebar.module.scss';
-import { useReservation } from '@/context/reservation-context';
-import { CABIN_SELECTION_STAGES } from '@/hooks/useReservation';
-import ReserveButton from '@/components/shared/reserveButton/reserveButton';
-import rainbow from 'public/rainbow-min.png';
-import Image from 'next/image';
-import ReservationSummary from '@/components/shared/reservationSummary/reservationSummary';
-import VerifiedUsers from '@/components/shared/verifiedUsers/verifiedUsers';
-import { useUser } from '@/context/user-context';
-import Loader from '@/components/shared/loader/loader';
-import Link from 'next/link';
+import { VisibleSectionContext } from '@/context/visible-section-context';
+import clsx from 'clsx';
+import { useCabinAndUnitData } from '@/context/cabin-and-unit-data-context';
+import Filters from '../filters/filters';
+import { FILTERS, useFilters } from '../filters/filters-context';
+import { sortAndFilterUnits } from '../units/units';
+import Button from '@/components/shared/button/button';
 
-export default function Sidebar() {
-  const {
-    currentStage,
-    groupData: { members },
-    cabinData,
-  } = useReservation();
-  const isHeadStaffCabin = cabinData?.cabin?.bedConfiguration === 'Head Staff';
-  const numberOfMembersInGroup = members?.length;
-  const isEligibleToBookHeadStaffCabin =
-    !isHeadStaffCabin || (isHeadStaffCabin && numberOfMembersInGroup === 3);
+function useShowSidebar({ mainSectionRef, setIsSidebarShowing }) {
+  useEffect(() => {
+    const bottomOfMainSection = mainSectionRef?.current?.clientHeight;
+    const handleScroll = () => {
+      const hasScrolledPassedMainSection =
+        window.scrollY > bottomOfMainSection - 1;
+      if (!bottomOfMainSection || hasScrolledPassedMainSection) {
+        setIsSidebarShowing(true);
+      } else {
+        setIsSidebarShowing(false);
+      }
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [mainSectionRef, setIsSidebarShowing]);
+}
 
-  const { user } = useUser();
-  const { cabin } = cabinData;
+export default function Sidebar({ mainSectionRef }) {
+  const [isSidebarShowing, setIsSidebarShowing] = useState(false);
+  const { sectionInViewport } = useContext(VisibleSectionContext);
+  useShowSidebar({ mainSectionRef, setIsSidebarShowing });
+  const { units } = useCabinAndUnitData();
 
-  if (!user || !cabin) {
-    return (
-      <div className={styles.sidebar}>
-        <Loader isDotted />
-      </div>
-    );
-  }
+  const { selectedFilters } = useFilters();
+  const { UNIT } = FILTERS;
+  const unitFilter = selectedFilters[UNIT];
+  const sortedUnits = sortAndFilterUnits({
+    unitData: units,
+    unitFilter,
+    selectedFilters,
+  });
 
-  const isConfirmationStage =
-    currentStage === CABIN_SELECTION_STAGES.CONFIRMATION;
-  const cabinHasEnoughBeds = cabin.openBeds >= members?.length;
-  const cabinIsOpen = cabin.availability === 'Open';
-  const showReservationButton =
-    !isConfirmationStage &&
-    cabinHasEnoughBeds &&
-    cabinIsOpen &&
-    isEligibleToBookHeadStaffCabin;
+  const scrollToTop = () => window.scrollTo(0, 0);
 
   return (
-    <div className={styles.sidebar}>
-      <div className={styles.titleContainer}>
-        <p className={styles.title}>Summary</p>
-        <Image src={rainbow} alt="" className={styles.image} />
-      </div>
-      <ReservationSummary cabinData={cabinData} />
-      <VerifiedUsers
-        hideRemoveButton={currentStage !== CABIN_SELECTION_STAGES.ADD_GUESTS}
-      />
-      {!cabinHasEnoughBeds && (
-        <p className={styles.notEnoughBedsText}>
-          There are not enough beds in this cabin for your entire group. Please
-          select a different cabin on the{' '}
-          <Link href="/cabin-selection" className={styles.link}>
-            cabin selection page.
-          </Link>
-        </p>
+    <>
+      {isSidebarShowing && (
+        <nav className={clsx(styles.sidebar, styles.slideIn)}>
+          <ul className={styles.sectionsList}>
+            <p className={styles.unitTitle}>Go to Unit:</p>
+            {sortedUnits.map(({ name }) => {
+              return (
+                <li key={`sidebar-${name}`}>
+                  <a
+                    className={clsx(
+                      styles['list-item'],
+                      sectionInViewport === name ? styles.active : ''
+                    )}
+                    href={`#${name}`}
+                  >
+                    {name}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+          <Filters isColumn classNames={styles.filters} hideUnitFilter />
+          <Button handleClick={scrollToTop} classNames={styles.backToTop}>
+            Back to top
+          </Button>
+        </nav>
       )}
-      {!cabinIsOpen && (
-        <p className={styles.notEnoughBedsText}>
-          This cabin is not available for booking. Please select a different
-          cabin on the{' '}
-          <Link href="/cabin-selection" className={styles.link}>
-            cabin selection page.
-          </Link>
-        </p>
-      )}
-      {isHeadStaffCabin && numberOfMembersInGroup < 3 ? (
-        <p className={styles.headStaffText}>
-          Please add {3 - numberOfMembersInGroup} more guest
-          {numberOfMembersInGroup !== 2 && 's'} to your group to book this cabin
-        </p>
-      ) : (
-        ''
-      )}
-      {showReservationButton && <ReserveButton cabin={cabinData?.cabin} />}
-    </div>
+    </>
   );
 }

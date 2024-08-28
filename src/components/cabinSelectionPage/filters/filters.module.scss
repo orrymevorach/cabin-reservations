@@ -16,6 +16,19 @@
   margin-bottom: 5px;
 }
 
+.dropdowns {
+  display: flex;
+}
+
+.column {
+  .dropdowns {
+    flex-direction: column;
+    .dropdown {
+      margin: 10px 0;
+    }
+  }
+}
+
 div.dropdown {
   margin-right: 10px;
 }

@@ -1,76 +1,76 @@
 @use '@variables' as variables;
 @use '@mixins' as mixins;
 
+@mixin hover {
+  color: white;
+  font-weight: 500;
+  transition: 0.1s;
+  background-color: variables.$darkGreen;
+}
+
 .sidebar {
   position: fixed;
   top: 0;
   right: 0;
-  height: 100%;
-  background-color: white;
-  box-shadow: 5px 0px 15px 2px variables.$charcoal;
-  z-index: 100;
-  animation: slideLeft 0.3s linear;
-  width: 400px;
-  padding: 0 30px;
-  display: flex;
-  flex-direction: column;
-  transition: 0.5s;
-}
-
-@keyframes slideLeft {
-  0% {
-    transform: translateX(100px);
-  }
-  100% {
-    transform: translateX(0px);
-  }
-}
-
-.titleContainer {
+  height: 100vh;
+  width: 220px;
+  background-color: variables.$yellow;
+  border-left: 5px solid variables.$darkGreen;
   display: flex;
   align-items: center;
-  margin-top: 50px;
-}
+  justify-content: center;
+  flex-direction: column;
+  z-index: 10;
+  overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
+  opacity: 0;
+  right: -50px;
+  animation: slideInAndFadeIn 0.3s forwards;
 
-.image {
-  width: 50px;
-  height: auto;
-  position: relative;
-  top: -14px;
-  margin-left: 10px;
-}
+  .unitTitle {
+    font-size: 18px;
+    @include mixins.fontPrimaryBold;
+    margin-left: 13px;
+    margin-bottom: 10px;
+  }
 
-.title {
-  font-size: 28px;
-  @include mixins.fontSecondary;
-  color: variables.$darkGreen;
-  margin-bottom: 20px;
-}
+  ul {
+    width: 100%;
+  }
 
-.notEnoughBedsText {
-  margin-bottom: 20px;
-}
+  .list-item {
+    display: block;
+    color: black;
+    padding: 15px;
+    &:hover,
+    &.active {
+      @include hover;
+    }
+    &:active {
+      color: black;
+    }
+  }
+  .backToTop {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    box-shadow: none;
+    border-radius: 0;
+  }
 
-a.link {
-  color: variables.$charcoal;
-  text-decoration: underline;
-  &:active {
-    color: variables.$charcoal;
+  div.filters {
+    width: 100%;
+    padding: 0 10px;
+    margin-top: 100px;
+    p {
+      font-size: 18px;
+    }
   }
 }
 
-.headStaffText {
-  color: red;
-  padding-right: 30px;
-}
-
-@media screen and (max-width: variables.$mobile) {
-  .sidebar {
-    margin-top: 50px;
-    position: static;
-    width: 100%;
-    padding: 0;
-    box-shadow: none;
-    animation: none;
+@keyframes slideInAndFadeIn {
+  100% {
+    right: 0;
+    opacity: 1;
   }
 }

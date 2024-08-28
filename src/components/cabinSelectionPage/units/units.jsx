@@ -18,44 +18,55 @@ const filterByFilterSelection = ({ cabins, selectedFilters }) => {
   return filteredCabins;
 };
 
+export const sortAndFilterUnits = ({
+  unitData,
+  unitFilter,
+  selectedFilters,
+}) => {
+  return unitData
+    .filter(unitData => {
+      // filter based on unit filter
+      if (!unitFilter) return true;
+      if (unitData.name === unitFilter || unitFilter === 'All') return true;
+      return false;
+    })
+    .sort((a, b) => {
+      // move units with higher cabin count higher on the list
+      const aCabins = filterByFilterSelection({
+        cabins: a.cabins,
+        selectedFilters,
+      });
+      const bCabins = filterByFilterSelection({
+        cabins: b.cabins,
+        selectedFilters,
+      });
+      if (aCabins > bCabins) return -1;
+      return 1;
+    });
+};
+
 export default function Units() {
   const { units } = useCabinAndUnitData();
   const { selectedFilters } = useFilters();
   const { UNIT } = FILTERS;
   const unitFilter = selectedFilters[UNIT];
+  const sortedUnits = sortAndFilterUnits({
+    unitData: units,
+    unitFilter,
+    selectedFilters,
+  });
 
   return (
     <>
-      {units
-        // filter based on unit filter
-        .filter(unitData => {
-          if (!unitFilter) return true;
-          if (unitData.name === unitFilter || unitFilter === 'All') return true;
-          return false;
-        })
-        // move units with higher cabin count higher on the list
-        .sort((a, b) => {
-          const aCabins = filterByFilterSelection({
-            cabins: a.cabins,
-            selectedFilters,
-          });
-          const bCabins = filterByFilterSelection({
-            cabins: b.cabins,
-            selectedFilters,
-          });
-          if (aCabins > bCabins) return -1;
-          return 1;
-        })
-        // filter
-        .map(unitData => {
-          const unitCopy = { ...unitData };
-          const cabins = filterByFilterSelection({
-            cabins: unitCopy.cabins,
-            selectedFilters,
-          });
-          unitCopy.cabins = cabins;
-          return <UnitRow key={unitData.name} unitData={unitCopy} />;
-        })}
+      {sortedUnits.map(unitData => {
+        const unitCopy = { ...unitData };
+        const cabins = filterByFilterSelection({
+          cabins: unitCopy.cabins,
+          selectedFilters,
+        });
+        unitCopy.cabins = cabins;
+        return <UnitRow key={unitData.name} unitData={unitCopy} />;
+      })}
     </>
   );
 }

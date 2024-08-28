@@ -1,0 +1,76 @@
+@use '@variables' as variables;
+@use '@mixins' as mixins;
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  background-color: white;
+  box-shadow: 5px 0px 15px 2px variables.$charcoal;
+  z-index: 100;
+  animation: slideLeft 0.3s linear;
+  width: 400px;
+  padding: 0 30px;
+  display: flex;
+  flex-direction: column;
+  transition: 0.5s;
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(100px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.image {
+  width: 50px;
+  height: auto;
+  position: relative;
+  top: -14px;
+  margin-left: 10px;
+}
+
+.title {
+  font-size: 28px;
+  @include mixins.fontSecondary;
+  color: variables.$darkGreen;
+  margin-bottom: 20px;
+}
+
+.notEnoughBedsText {
+  margin-bottom: 20px;
+}
+
+a.link {
+  color: variables.$charcoal;
+  text-decoration: underline;
+  &:active {
+    color: variables.$charcoal;
+  }
+}
+
+.headStaffText {
+  color: red;
+  padding-right: 30px;
+}
+
+@media screen and (max-width: variables.$mobile) {
+  .sidebar {
+    margin-top: 50px;
+    position: static;
+    width: 100%;
+    padding: 0;
+    box-shadow: none;
+    animation: none;
+  }
+}

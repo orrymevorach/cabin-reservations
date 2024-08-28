@@ -3,15 +3,20 @@ import CabinSelectionTile from '../../cabinSelectionTile/cabinSelectionTile';
 import { useCabinSelection } from '@/context/cabin-selection-context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons';
-import { useRef, useState } from 'react';
-import { useFilters } from '../../../filters/filters-context';
+import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
 export default function CabinList({ unitData, setHasAvailability }) {
   const { dispatch, actions } = useCabinSelection();
   const [scrollValue, setScrollValue] = useState(0);
+  const cabinListRef = useRef();
 
   const cabins = unitData.cabins;
+  const hasCabins = !!cabins?.length;
+
+  useEffect(() => {
+    setHasAvailability(hasCabins);
+  }, []);
 
   const handleSubmit = selectedCabin => {
     dispatch({
@@ -19,13 +24,10 @@ export default function CabinList({ unitData, setHasAvailability }) {
       cabin: selectedCabin,
     });
   };
-  const cabinListRef = useRef();
 
   const handleScrollDown = () => {
     cabinListRef.current.scrollTop = scrollValue + 150;
   };
-  const hasCabins = !!cabins.length;
-  setHasAvailability(hasCabins);
 
   return (
     <div className={styles.cabinListOuterContainer}>

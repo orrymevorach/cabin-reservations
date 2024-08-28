@@ -5,23 +5,18 @@ import { useCabinAndUnitData } from '@/context/cabin-and-unit-data-context';
 import Filters from '../filters/filters';
 import styles from './cabinSelectionContainer.module.scss';
 import Loader from '@/components/shared/loader/loader';
-import Button from '@/components/shared/button/button';
-import { useRef, useState } from 'react';
-import useShowOnScroll from '@/hooks/useShowOnScroll';
+import { useRef } from 'react';
 import MapOfCamp from '../mapOfCamp/mapOfCamp';
 import UnitDescriptions from '../unitDescriptions/unitDescriptions';
 import BookingAssistant from '../bookingAssistant/bookingAssistant';
+import Sidebar from '../sidebar/sidebar';
 
 export default function CabinSelectionContainer() {
-  const [showBackToTopButton, setShowBackToTopButton] = useState(false);
   const { showTakeover, showBookingAssistant } = useCabinSelection();
   const { isLoading, units } = useCabinAndUnitData();
   const headerRef = useRef();
-  useShowOnScroll({ ref: headerRef, setIsShowing: setShowBackToTopButton });
 
   if (isLoading || !units.length) return <Loader isDotted />;
-
-  const scrollToTop = () => window.scrollTo(0, 0);
 
   return (
     <>
@@ -34,15 +29,11 @@ export default function CabinSelectionContainer() {
               <UnitDescriptions />
               <Filters />
               <MapOfCamp />
+              <Sidebar mainSectionRef={headerRef} />
             </div>
           </div>
           <Units />
           {showTakeover && <CabinSelectionTakeover />}
-          {showBackToTopButton && (
-            <Button handleClick={scrollToTop} classNames={styles.backToTop}>
-              Back to top
-            </Button>
-          )}
         </>
       )}
     </>
