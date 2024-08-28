@@ -1,9 +1,13 @@
 @use '@mixins' as mixins;
 @use '@variables' as variables;
 
+.title {
+  margin-bottom: 20px;
+}
+
 .list {
   @include mixins.fontPrimaryLight;
   color: variables.$charcoal;
-  margin: 5px 0 40px 15px;
+  margin: 5px 0 30px 15px;
   padding: 0;
 }
