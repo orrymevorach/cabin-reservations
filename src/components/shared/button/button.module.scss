@@ -24,7 +24,7 @@ $primaryColor: variables.$darkGreen;
   }
   &:hover {
     color: $primaryColor;
-    background-color: white;
+    background-color: variables.$beige;
     transition: 0.1s;
   }
   &.light {

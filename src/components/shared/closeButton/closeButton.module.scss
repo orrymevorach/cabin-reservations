@@ -1,7 +1,7 @@
 @use '@variables' as variables;
 
 .closeButton {
-  background-color: white;
+  background-color: variables.$beige;
   border: none;
   color: variables.$primaryColor;
   position: absolute;
@@ -13,7 +13,7 @@
   padding: 0;
   &:hover {
     background-color: variables.$primaryColor;
-    color: white;
+    color: variables.$beige;
     transition: 0.3s;
     border-radius: 50%;
   }

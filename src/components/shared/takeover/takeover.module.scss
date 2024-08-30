@@ -10,6 +10,7 @@
   width: 100%;
   @include mixins.fontPrimaryBold;
   color: variables.$charcoal;
+
   top: 0;
   left: 0;
   z-index: 2002;
@@ -38,6 +39,7 @@
   padding: 50px;
   border-radius: variables.$borderRadius;
   margin: 25px;
+  background-color: variables.$beige;
   &:before {
     content: '';
     position: fixed;
