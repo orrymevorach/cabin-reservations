@@ -3,7 +3,7 @@
 
 .textContainer {
   font-size: 15px;
-  margin: 30px auto 30px;
+  margin: 30px auto;
   border-bottom: 1px solid black;
   padding-bottom: 20px;
 }
@@ -11,6 +11,7 @@
 .lineOne {
   margin-bottom: 10px;
   font-size: 16px;
+  @include mixins.fontPrimaryBold;
 }
 
 .text {

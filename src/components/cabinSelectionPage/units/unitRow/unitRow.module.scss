@@ -6,8 +6,13 @@
 .innerContainer {
   padding: 43px 0 50px;
   width: 1000px;
-  // margin: 0 auto;
-  margin-left: 50px;
+  margin-left: 20%;
+  @media screen and (max-width: 1650px) {
+    margin-left: 8%;
+  }
+  @media screen and (max-width: 1400px) {
+    margin-left: 5%;
+  }
 }
 
 .unitName {
@@ -23,6 +28,7 @@
   height: auto;
   object-fit: contain;
   width: 80%;
+  margin-left: 20px;
 }
 
 @media screen and (max-width: variables.$tablet) {
@@ -32,6 +38,7 @@
   }
   .unitImage {
     align-self: flex-start;
+    margin: 0;
   }
   button.showMapButton {
     margin-left: 20px;
