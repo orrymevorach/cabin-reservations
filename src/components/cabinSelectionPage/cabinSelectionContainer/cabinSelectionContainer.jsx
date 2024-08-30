@@ -10,11 +10,13 @@ import MapOfCamp from '../mapOfCamp/mapOfCamp';
 import UnitDescriptions from '../unitDescriptions/unitDescriptions';
 import BookingAssistant from '../bookingAssistant/bookingAssistant';
 import Sidebar from '../sidebar/sidebar';
+import useWindowSize from '@/hooks/useWindowSize';
 
 export default function CabinSelectionContainer() {
   const { showTakeover, showBookingAssistant } = useCabinSelection();
   const { isLoading, units } = useCabinAndUnitData();
   const headerRef = useRef();
+  const { isMobile } = useWindowSize();
 
   if (isLoading || !units.length) return <Loader isDotted />;
 
@@ -29,7 +31,7 @@ export default function CabinSelectionContainer() {
               <UnitDescriptions />
               <Filters />
               <MapOfCamp />
-              <Sidebar mainSectionRef={headerRef} />
+              {!isMobile && <Sidebar mainSectionRef={headerRef} />}
             </div>
           </div>
           <Units />
