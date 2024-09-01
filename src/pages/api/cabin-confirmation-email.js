@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     subject,
     html: `
       <div>
-        <img src="https://reservations.highlandsmusicfestival.ca/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FLogo-1200px-No-Bkgd-min.effb0614.png&w=3840&q=75" />
+        <img style="width:400px;"src="https://reservations.highlandsmusicfestival.ca/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FLogo-1200px-No-Bkgd-min.effb0614.png&w=3840&q=75" />
         <p>Your reservation is confirmed!</p>
         <p style="display:flex;"><span style="display:block;width:45px;">Cabin:</span> <span style="display:block;font-weight:bold;">${
           cabin.name
