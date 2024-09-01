@@ -29,10 +29,6 @@ div.overlay {
 }
 
 @media screen and (max-width: variables.$mobile) {
-  .bottomRow {
-    margin-bottom: 100px;
-  }
-
   .bottomRow,
   .leftContainer {
     display: flex;

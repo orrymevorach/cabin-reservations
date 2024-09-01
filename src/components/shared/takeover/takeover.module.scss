@@ -70,3 +70,9 @@
     padding: 25px;
   }
 }
+
+@media screen and (max-width: variables.$mobile) {
+  .modal {
+    padding-bottom: 100px;
+  }
+}
