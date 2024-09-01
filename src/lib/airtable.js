@@ -178,6 +178,7 @@ export const reserveBed = async ({ userId, bedName, cabinId }) => {
 };
 
 export const getBedOccupant = async ({ userId }) => {
+  // if (!userId) return;
   const { record: currentBedOccupant } = await getRecordById({
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,
     recordId: userId,
