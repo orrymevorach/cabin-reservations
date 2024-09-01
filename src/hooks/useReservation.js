@@ -80,7 +80,7 @@ const useGetBeds = ({ cabinData, dispatch, actions }) => {
       const bedsArray = Object.keys(BEDS);
       for (let bed of bedsArray) {
         const current = cabinData.cabin[bed];
-        console.log('current', current);
+        console.log(bed, current);
         if (cabinData.cabin[bed]) {
           console.log('level 1');
           const currentBedOccupant = await getBedOccupant({
