@@ -79,10 +79,7 @@ const useGetBeds = ({ cabinData, dispatch, actions }) => {
       const selectedBeds = [];
       const bedsArray = Object.keys(BEDS);
       for (let bed of bedsArray) {
-        const current = cabinData.cabin[bed];
-        console.log(bed, current);
-        if (cabinData.cabin[bed]) {
-          console.log('level 1');
+        if (cabinData.cabin[bed] && cabinData.cabin[bed][0]) {
           const currentBedOccupant = await getBedOccupant({
             userId: cabinData.cabin[bed][0],
           });

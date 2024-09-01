@@ -55,7 +55,7 @@ export default function useUserReducer() {
         // Get reference record for occupant of each bed
         const bedsArray = Object.keys(BEDS);
         for (let bed of bedsArray) {
-          if (cabinData[bed]) {
+          if (cabinData[bed] && cabinData[bed][0]) {
             const currentBedOccupant = await getBedOccupant({
               userId: cabinData[bed][0],
             });
