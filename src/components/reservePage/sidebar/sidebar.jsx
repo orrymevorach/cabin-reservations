@@ -43,7 +43,7 @@ export default function Sidebar() {
     isEligibleToBookHeadStaffCabin;
 
   return (
-    <div className={styles.sidebar}>
+    <div className={styles.sidebar} id="sidebar">
       <div className={styles.titleContainer}>
         <p className={styles.title}>Summary</p>
         <Image src={rainbow} alt="" className={styles.image} />

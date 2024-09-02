@@ -8,3 +8,27 @@
     margin-top: 10px;
   }
 }
+
+.or {
+  text-align: center;
+  margin: 20px 0 10px;
+  position: relative;
+  &:before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 0;
+    height: 1px;
+    width: 40%;
+    background-color: black;
+  }
+  &:after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 0;
+    height: 1px;
+    width: 40%;
+    background-color: black;
+  }
+}
