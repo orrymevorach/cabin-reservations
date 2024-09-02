@@ -41,7 +41,6 @@ export default function CabinList({ unitData, setHasAvailability }) {
       >
         {hasCabins ? (
           cabins.map(cabin => {
-            if (cabin.openBeds <= 0) return;
             return (
               <CabinSelectionTile
                 cabin={cabin}
