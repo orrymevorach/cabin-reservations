@@ -163,7 +163,7 @@ export default function CheckInForm() {
           className={styles.dropdown}
           onChange={e =>
             dispatch({
-              type: actions.SET_ARRIVAL_TIME,
+              type: actions.SET_DEPARTURE_TIME,
               departureTime: e.target.value,
             })
           }
