@@ -22,6 +22,10 @@ label.inputLabel {
   width: 400px !important;
 }
 
+.input input {
+  text-align: center;
+}
+
 .input::placeholder {
   text-align: center;
 }

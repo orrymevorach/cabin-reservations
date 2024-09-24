@@ -9,6 +9,8 @@ const actions = {
   SET_CITY: 'SET_CITY',
   SET_BIRTHDAY: 'SET_BIRTHDAY',
   HOW_DID_YOU_HEAR_ABOUT_HIGHLANDS: 'HOW_DID_YOU_HEAR_ABOUT_HIGHLANDS',
+  SET_ELECTRIC_VEHICLE: 'SET_ELECTRIC_VEHICLE',
+  SET_DEPARTURE_TIME: 'SET_DEPARTURE_TIME',
 };
 
 const stages = {
@@ -28,6 +30,8 @@ const initialState = {
   city: '',
   birthday: '',
   howDidYouHearAboutHighlands: '',
+  departureTime: '',
+  electricVehicle: '',
 };
 
 const reducer = (state, action) => {
@@ -40,6 +44,8 @@ const reducer = (state, action) => {
     SET_BIRTHDAY,
     SET_CITY,
     HOW_DID_YOU_HEAR_ABOUT_HIGHLANDS,
+    SET_ELECTRIC_VEHICLE,
+    SET_DEPARTURE_TIME,
   } = actions;
   switch (action.type) {
     case SET_NAME:
@@ -81,6 +87,16 @@ const reducer = (state, action) => {
       return {
         ...state,
         howDidYouHearAboutHighlands: action.howDidYouHearAboutHighlands,
+      };
+    case SET_ELECTRIC_VEHICLE:
+      return {
+        ...state,
+        electricVehicle: action.electricVehicle,
+      };
+    case SET_DEPARTURE_TIME:
+      return {
+        ...state,
+        departureTime: action.departureTime,
       };
   }
 };

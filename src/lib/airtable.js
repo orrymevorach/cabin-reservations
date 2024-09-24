@@ -249,6 +249,8 @@ export const checkIn = async ({
   city,
   birthday,
   howDidYouHearAboutHighlands,
+  electricVehicle,
+  departureTime,
 }) => {
   const { record: user } = await createRecord({
     tableId: 'Check In',
@@ -256,6 +258,12 @@ export const checkIn = async ({
       Name: name,
       City: city,
       Birthday: birthday,
+      'Arrival Day': arrivalDay,
+      'Arrival Time': arrivalTime,
+      'How Did You Hear About Highlands': howDidYouHearAboutHighlands,
+      Questions: questions,
+      'Does your EV need to be charged?': electricVehicle,
+      'Departing before 9AM on Sunday?': departureTime,
     },
   });
   return user;

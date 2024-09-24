@@ -39,6 +39,8 @@ export default function CheckInForm() {
       city: state.city,
       birthday: state.birthday,
       howDidYouHearAboutHighlands: state.howDidYouHearAboutHighlands,
+      electricVehicle: state.electricVehicle,
+      departureTime: state.departureTime,
     });
     setIsFormSubmitting(false);
     dispatch({
@@ -127,6 +129,48 @@ export default function CheckInForm() {
           }
           classNames={styles.input}
         />
+      </div>
+      <div className={styles.formFieldContainer}>
+        <InputLabel className={styles.inputLabel} id="time-label">
+          Are you driving an electric vehicle that needs charging?
+        </InputLabel>
+        <Select
+          required
+          labelId="electric-vehicle"
+          id="ev"
+          value={state.arrivalTime}
+          className={styles.dropdown}
+          onChange={e =>
+            dispatch({
+              type: actions.SET_ARRIVAL_TIME,
+              arrivalTime: e.target.value,
+            })
+          }
+        >
+          <MenuItem value={'yes'}>Yes</MenuItem>
+          <MenuItem value={'no'}>No</MenuItem>
+        </Select>
+      </div>
+      <div className={styles.formFieldContainer}>
+        <InputLabel className={styles.inputLabel} id="time-label">
+          Do you plan to depart at any point before 9:00AM on Sunday?
+        </InputLabel>
+        <Select
+          required
+          labelId="depart-label"
+          id="depart"
+          value={state.arrivalTime}
+          className={styles.dropdown}
+          onChange={e =>
+            dispatch({
+              type: actions.SET_ARRIVAL_TIME,
+              arrivalTime: e.target.value,
+            })
+          }
+        >
+          <MenuItem value={'yes'}>Yes</MenuItem>
+          <MenuItem value={'no'}>No</MenuItem>
+        </Select>
       </div>
       <div className={styles.formFieldContainer}>
         <InputLabel className={styles.inputLabel} id="birthday-label">
