@@ -138,11 +138,11 @@ export default function CheckInForm() {
           required
           labelId="electric-vehicle"
           id="ev"
-          value={state.arrivalTime}
+          value={state.electricVehicle}
           className={styles.dropdown}
           onChange={e =>
             dispatch({
-              type: actions.SET_ARRIVAL_TIME,
+              type: actions.SET_ELECTRIC_VEHICLE,
               arrivalTime: e.target.value,
             })
           }
@@ -159,7 +159,7 @@ export default function CheckInForm() {
           required
           labelId="depart-label"
           id="depart"
-          value={state.arrivalTime}
+          value={state.departureTime}
           className={styles.dropdown}
           onChange={e =>
             dispatch({
