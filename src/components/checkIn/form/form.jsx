@@ -137,13 +137,13 @@ export default function CheckInForm() {
         <Select
           required
           labelId="electric-vehicle"
-          id="ev"
+          id="electricVehicle"
           value={state.electricVehicle}
           className={styles.dropdown}
           onChange={e =>
             dispatch({
               type: actions.SET_ELECTRIC_VEHICLE,
-              arrivalTime: e.target.value,
+              electricVehicle: e.target.value,
             })
           }
         >
@@ -158,13 +158,13 @@ export default function CheckInForm() {
         <Select
           required
           labelId="depart-label"
-          id="depart"
+          id="departureTime"
           value={state.departureTime}
           className={styles.dropdown}
           onChange={e =>
             dispatch({
               type: actions.SET_ARRIVAL_TIME,
-              arrivalTime: e.target.value,
+              departureTime: e.target.value,
             })
           }
         >
