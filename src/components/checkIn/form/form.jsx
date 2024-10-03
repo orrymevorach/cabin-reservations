@@ -183,6 +183,7 @@ export default function CheckInForm() {
           placeholder="MM/DD/YYYY"
           value={state.birthday}
           classNames={styles.input}
+          required
         />
       </div>
       <div className={styles.formFieldContainer}>

@@ -12,6 +12,7 @@ export default function Input({
   handleChange,
   placeholder,
   asterisk = '',
+  required = false,
 }) {
   return (
     <div className={styles.inputContainer}>
@@ -29,6 +30,7 @@ export default function Input({
         className={clsx(styles.input, classNames)}
         size="small"
         placeholder={placeholder}
+        required={required}
       />
     </div>
   );
