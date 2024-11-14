@@ -1,13 +1,12 @@
 import InputVerify from './inputVerify/inputVerify';
 import styles from './addGuests.module.scss';
-import { useReservation } from '@/context/reservation-context';
 import clsx from 'clsx';
 
 const getErrorMessage = ({
   numberOfOpenBeds,
   // numberOfMembersNotConfirmedInCurrentCabin,
 }) => {
-  const isCabinFull = numberOfOpenBeds === 0;
+  const isCabinFull = numberOfOpenBeds <= 0;
   // const noAdditionalBeds =
   //   numberOfMembersNotConfirmedInCurrentCabin >= numberOfOpenBeds;
   if (isCabinFull) return 'No additional beds are available in this cabin.';

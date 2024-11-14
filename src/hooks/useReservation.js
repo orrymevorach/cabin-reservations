@@ -23,6 +23,7 @@ const reducer = (state, action) => {
         groupData: action.groupData,
         numberOfMembersNotConfirmedInCurrentCabin:
           action.numberOfMembersNotConfirmedInCurrentCabin,
+        cabin: action.cabin,
       };
     case SET_SELECTION_STAGE:
       return {
@@ -63,12 +64,13 @@ export const useReservationReducer = ({
     selectedBeds,
     groupData: group,
     numberOfMembersNotConfirmedInCurrentCabin: 0,
+    cabin: user.cabin,
   };
+
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const router = useRouter();
   const cabinQuery = router.query.cabin;
-
-  const [state, dispatch] = useReducer(reducer, initialState);
 
   const { cabins } = cabinAndUnitData;
   const cabinData = getCabinData({ user, cabins, cabinQuery });

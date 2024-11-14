@@ -125,7 +125,6 @@ export default function InputVerify({ allowCreateNewUser }) {
     });
 
     const cabin = await getCabinById({ cabinId: user.cabin.id });
-    console.log('cabin', cabin);
 
     setIsLoading(false);
     setEmail('');
@@ -138,6 +137,7 @@ export default function InputVerify({ allowCreateNewUser }) {
         numberOfMembersNotConfirmedInCurrentCabin + 1,
       cabin,
     });
+    // If creating new user, focus on first name ref, otherwise focus on email ref
     firstNameRef?.current
       ? firstNameRef.current.focus()
       : emailRef.current.focus();

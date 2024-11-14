@@ -13,9 +13,8 @@ import { updateGroup } from '@/lib/airtable';
 import clsx from 'clsx';
 
 export default function AddGuestsTakeover({ allowCreateNewUser }) {
-  const { dispatch, actions, groupData } = useReservation();
+  const { dispatch, actions, groupData, cabin } = useReservation();
   const { user } = useUser();
-  const cabin = user.cabin;
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();

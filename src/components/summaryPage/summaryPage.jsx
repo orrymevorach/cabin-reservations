@@ -10,7 +10,6 @@ import { useReservation } from '@/context/reservation-context';
 import ReservationSummary from '../shared/reservationSummary/reservationSummary';
 import VerifiedUsers from '../shared/verifiedUsers/verifiedUsers';
 import AddGuestsTakeover from './addGuestsTakeover/addGuestsTakeover';
-import SelectCabinTakeover from '../reservePage/selectCabinTakeover/selectCabinTakeover';
 import ConfirmationTakeover from './confirmationTakeover/confirmationTakeover';
 
 export default function SummaryPage() {
@@ -21,6 +20,7 @@ export default function SummaryPage() {
     dispatch,
     actions,
     groupData: { members },
+    cabin,
   } = useReservation();
 
   const stageQuery = router.query.stage;
@@ -32,12 +32,9 @@ export default function SummaryPage() {
 
   if (isUserDataLoading || !user) return <Loader isDotted />;
   const cabinData = {
-    cabin: user.cabin,
+    cabin,
     isLoading: isUserDataLoading,
   };
-
-  const hasCabin = !!user.cabin;
-  if (user && !hasCabin) return <SelectCabinTakeover />;
 
   const allowCreateNewUser = !!user?.remainingBalanceProduct;
 

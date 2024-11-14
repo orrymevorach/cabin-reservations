@@ -11,13 +11,16 @@ import {
   getUserByRecordId,
 } from '@/lib/airtable';
 import { BEDS } from '@/utils/constants';
+import SelectCabinTakeover from '@/components/reservePage/selectCabinTakeover/selectCabinTakeover';
 
 export default function Summary({
   cabinAndUnitData,
   user,
   group,
   selectedBeds,
+  hasCabin,
 }) {
+  if (!hasCabin) return <SelectCabinTakeover />;
   return (
     <CabinAndUnitDataProvider cabinAndUnitData={cabinAndUnitData}>
       <UserProvider user={user}>
@@ -37,8 +40,22 @@ export default function Summary({
 }
 
 export async function getServerSideProps(context) {
-  const cabinAndUnitData = await getCabinAndUnitData();
   const { user } = await getPageLoadData(context);
+  const cabin = user.cabin;
+  if (!cabin) {
+    return {
+      props: {
+        hasCabin: false,
+      },
+    };
+  }
+
+  const cabinAndUnitData = await getCabinAndUnitData();
+
+  const currentCabin = cabinAndUnitData.cabins.find(cabin => {
+    return cabin.id === user.cabin[0];
+  });
+
   const group = await getGroup({ groupId: user.group });
   const groupWithMemberData = await Promise.all(
     group.members.map(async memberId => {
@@ -48,7 +65,6 @@ export async function getServerSideProps(context) {
   );
   const selectedBeds = [];
   const bedsArray = Object.keys(BEDS);
-  const cabin = user.cabin;
   for (let bed of bedsArray) {
     if (cabin[bed] && cabin[bed][0]) {
       const currentBedOccupant = await getBedOccupant({
@@ -64,12 +80,16 @@ export async function getServerSideProps(context) {
   return {
     props: {
       cabinAndUnitData,
-      user,
+      user: {
+        ...user,
+        cabin: currentCabin,
+      },
       group: {
         id: user.group[0],
         members: groupWithMemberData,
       },
       selectedBeds,
+      hasCabin: true,
     },
   };
 }
