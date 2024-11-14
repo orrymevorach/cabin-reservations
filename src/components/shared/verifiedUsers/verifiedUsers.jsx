@@ -69,7 +69,7 @@ export default function VerifiedUsers({ hideRemoveButton }) {
   const { groupData } = useReservation();
   const { user } = useUser();
 
-  const members = groupData?.members || [];
+  const members = groupData?.members?.length ? groupData.members : [user];
 
   return (
     <div className={styles.container}>

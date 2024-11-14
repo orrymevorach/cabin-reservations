@@ -56,20 +56,28 @@ export async function getServerSideProps(context) {
     return cabin.id === user.cabin[0];
   });
 
-  const group = await getGroup({ groupId: user.group });
-  const groupWithMemberData = await Promise.all(
-    group.members.map(async memberId => {
-      const member = await getUserByRecordId({ id: memberId });
-      return member;
-    })
-  );
+  let groupMembers = [];
+  let groupId = '';
+
+  if (user.group) {
+    const groupResponse = await getGroup({ groupId: user.group });
+    groupId = user.group[0];
+    groupMembers = await Promise.all(
+      groupResponse.members.map(async memberId => {
+        const member = await getUserByRecordId({ id: memberId });
+        return member;
+      })
+    );
+  }
+
   const selectedBeds = [];
   const bedsArray = Object.keys(BEDS);
   for (let bed of bedsArray) {
-    if (cabin[bed] && cabin[bed][0]) {
+    if (currentCabin[bed] && currentCabin[bed][0]) {
       const currentBedOccupant = await getBedOccupant({
-        userId: cabin[bed][0],
+        userId: currentCabin[bed][0],
       });
+      currentCabin[bed] = currentBedOccupant;
       selectedBeds.push({
         bedName: bed,
         ...currentBedOccupant,
@@ -83,10 +91,11 @@ export async function getServerSideProps(context) {
       user: {
         ...user,
         cabin: currentCabin,
+        group: groupMembers,
       },
       group: {
-        id: user.group[0],
-        members: groupWithMemberData,
+        id: groupId,
+        members: groupMembers,
       },
       selectedBeds,
       hasCabin: true,

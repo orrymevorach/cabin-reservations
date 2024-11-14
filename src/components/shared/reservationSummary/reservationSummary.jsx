@@ -16,7 +16,7 @@ export default function ReservationSummary({
     ? replaceCamelCaseWithSpaces(selectedBed.bedName)
     : '--';
 
-  const { name, unit, additionalInformation } = cabin;
+  const { name, unit, additionalInformation, category } = cabin;
   const hasAdditionalInformation =
     additionalInformation && additionalInformation.length > 0;
 
@@ -34,6 +34,12 @@ export default function ReservationSummary({
         <span className={styles.left}>Unit:</span>
         <span className={styles.right}>{unit}</span>
       </p>
+      {category?.length && (
+        <p>
+          <span className={styles.left}>Category:</span>
+          <span className={styles.right}>{category[0]}</span>
+        </p>
+      )}
       {showBedSelection && (
         <p>
           <span className={styles.left}>Bed:</span>

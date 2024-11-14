@@ -18,7 +18,7 @@ import clsx from 'clsx';
 import { sendConfirmationEmail } from '@/lib/mailgun';
 
 const createOrUpdateGroup = async ({ user, groupData }) => {
-  const hasExistingGroup = !!groupData.id;
+  const hasExistingGroup = !!groupData?.id;
   const groupRecordIds = groupData.members.map(({ id }) => id);
   if (!hasExistingGroup) {
     const response = await createGroup({
@@ -105,9 +105,12 @@ export default function InputVerify({ allowCreateNewUser }) {
     }
 
     // Using member data, create group or update existing group
+    // If a group doesn't exist, include the user who is adding new users to the group, otherwise leave them out because they are already in the members array
     const groupDataWithNewMembers = {
       ...groupData,
-      members: [...groupData.members, userToAddToGroup],
+      members: groupData?.members?.length
+        ? [...groupData.members, userToAddToGroup]
+        : [...groupData.members, user, userToAddToGroup],
     };
     const updatedGroupData = await createOrUpdateGroup({
       user,
@@ -160,8 +163,7 @@ export default function InputVerify({ allowCreateNewUser }) {
       name: `${firstName} ${lastName}`,
       email,
     });
-    console.log('newUser', newUser);
-    await handleAddExistingGuest({ user: newUser, event });
+    await handleAddExistingGuest({ newUser, event });
   };
 
   const handleSubmit = allowCreateNewUser
