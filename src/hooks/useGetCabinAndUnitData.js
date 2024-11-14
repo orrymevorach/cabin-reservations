@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { getCabins, getUnits } from '@/lib/airtable';
 
 const sortCabinsIntoUnits = ({ units, cabins }) => {
@@ -22,31 +21,16 @@ const sortCabinsIntoUnits = ({ units, cabins }) => {
   );
 };
 
-export default function useGetCabinAndUnitData() {
-  const [units, setUnits] = useState([]);
-  const [cabins, setCabins] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const getData = async () => {
-      const cabinResponse = await getCabins({});
-      const unitResponse = await getUnits({});
-      const unitsWithAllCabins = sortCabinsIntoUnits({
-        units: unitResponse,
-        cabins: cabinResponse,
-      });
-      setUnits(unitsWithAllCabins);
-      setCabins(cabinResponse);
-      setIsLoading(false);
-    };
-
-    if (!units.length) {
-      getData();
-    }
-  }, [units.length]);
+export default async function getCabinAndUnitData() {
+  const cabinResponse = await getCabins({});
+  const unitResponse = await getUnits({});
+  const unitsWithAllCabins = sortCabinsIntoUnits({
+    units: unitResponse,
+    cabins: cabinResponse,
+  });
 
   return {
-    units,
-    cabins,
-    isLoading,
+    units: unitsWithAllCabins,
+    cabins: cabinResponse,
   };
 }

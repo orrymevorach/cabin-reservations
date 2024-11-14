@@ -1,5 +1,10 @@
-import { toCamelCase } from '@/utils/string-utils';
-import { BEDS, AIRTABLE_BASES } from '@/utils/constants';
+import {
+  generateRandomPassword,
+  isObjectEmpty,
+  toCamelCase,
+} from '@/utils/string-utils';
+import { BEDS, AIRTABLE_BASES, COOKIES } from '@/utils/constants';
+import Cookies from 'cookies';
 
 export const createRecord = async ({
   tableId,
@@ -26,13 +31,16 @@ export async function getRecords({
   view = 'Grid view',
 }) {
   try {
-    const response = await fetch(`/api/airtable${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ tableId, view }),
-    }).then(res => res.json());
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tableId, view }),
+      }
+    ).then(res => res.json());
     return response;
   } catch (error) {
     console.log('error', error);
@@ -46,13 +54,16 @@ export async function getRecord({
   endpoint = '/get-record',
 }) {
   try {
-    const response = await fetch(`/api/airtable${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ tableId, field, fieldValue }),
-    }).then(res => res.json());
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tableId, field, fieldValue }),
+      }
+    ).then(res => res.json());
     return response;
   } catch (error) {
     console.log('error', error);
@@ -65,13 +76,16 @@ export async function getRecordById({
   endpoint = '/get-record-by-id',
 }) {
   try {
-    const response = await fetch(`/api/airtable${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ tableId, recordId }),
-    }).then(res => res.json());
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tableId, recordId }),
+      }
+    ).then(res => res.json());
     return response;
   } catch (error) {
     console.log('error', error);
@@ -85,13 +99,16 @@ export const updateRecord = async ({
   endpoint = '/update-record',
 }) => {
   try {
-    const response = await fetch(`/api/airtable${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ tableId, newFields, recordId }),
-    }).then(res => res.json());
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tableId, newFields, recordId }),
+      }
+    ).then(res => res.json());
     return response;
   } catch (error) {
     console.log('error', error);
@@ -276,3 +293,40 @@ export const getCabinCategories = async () => {
   });
   return cabins;
 };
+
+export const addFirebaseUid = async ({ attendeeId, uid }) => {
+  const { record } = await updateRecord({
+    tableId: AIRTABLE_BASES.TICKET_PURCHASES,
+    recordId: attendeeId,
+    newFields: { 'Firebase UID': uid },
+    endpoint: '/add-firebase-uid',
+  });
+  return record;
+};
+
+export const createUser = async ({ email, name }) => {
+  const randomPassword = generateRandomPassword();
+  const { record: airtableResponse } = await createRecord({
+    tableId: AIRTABLE_BASES.TICKET_PURCHASES,
+    newFields: {
+      'Temporary Password': randomPassword,
+      Name: name,
+      'Email Address': email,
+      Status:
+        process.env.NODE_ENV === 'production' ? 'Ticket Purchased' : 'Testing',
+    },
+  });
+  return airtableResponse;
+};
+
+export async function getPageLoadData({ req, res }) {
+  const cookies = new Cookies(req, res);
+  const userRecId = cookies.get(COOKIES.USER_RECORD);
+  const user = await getUserByRecordId({ id: userRecId });
+  const hasUser = !isObjectEmpty(user);
+  // const hasMembership = hasUser ? user.hasMembership === 'True' : false;
+  return {
+    user: hasUser ? user : null,
+    // hasMembership,
+  };
+}

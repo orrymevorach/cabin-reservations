@@ -39,10 +39,12 @@ export default function SummaryPage() {
   const hasCabin = !!user.cabin;
   if (user && !hasCabin) return <SelectCabinTakeover />;
 
+  const allowCreateNewUser = !!user?.remainingBalanceProduct;
+
   return (
     <div className={styles.container}>
       {currentStage === CABIN_SELECTION_STAGES.ADD_GUESTS && (
-        <AddGuestsTakeover />
+        <AddGuestsTakeover allowCreateNewUser={allowCreateNewUser} />
       )}
       {currentStage === CABIN_SELECTION_STAGES.BED_SELECTION && (
         <BedSelectionTakeover />

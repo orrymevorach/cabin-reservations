@@ -38,7 +38,7 @@ const initialState = {
   isLoading: false,
 };
 
-export default function useUserReducer() {
+export default function useUserReducer({ userData }) {
   const userRecordCookie = Cookies.get(COOKIES.USER_RECORD);
   const [state, dispatch] = useReducer(reducer, initialState);
   const cabinAndUnitData = useCabinAndUnitData();
@@ -46,7 +46,6 @@ export default function useUserReducer() {
   useEffect(() => {
     const loadUser = async () => {
       dispatch({ type: actions.INIT_LOGIN });
-      const userData = await getUserByRecordId({ id: userRecordCookie });
 
       // Get cabin data from reference record
       const cabinId = (userData.cabin && userData.cabin[0]) || '';

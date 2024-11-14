@@ -10,3 +10,20 @@ export function toCamelCase(str) {
     })
     .replace(/\s+/g, '');
 }
+
+export function isObjectEmpty(obj) {
+  return Object.keys(obj).length === 0;
+}
+
+export function generateRandomPassword(length = 12) {
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}:"<>?|[];,./~`-=\\';
+  let password = '';
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    password += characters[randomIndex];
+  }
+
+  return `hmf_${password}`;
+}

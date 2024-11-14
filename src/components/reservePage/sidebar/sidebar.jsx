@@ -49,9 +49,7 @@ export default function Sidebar() {
         <Image src={rainbow} alt="" className={styles.image} />
       </div>
       <ReservationSummary cabinData={cabinData} />
-      <VerifiedUsers
-        hideRemoveButton={currentStage !== CABIN_SELECTION_STAGES.ADD_GUESTS}
-      />
+      <VerifiedUsers hideRemoveButton={true} />
       {!cabinHasEnoughBeds && (
         <p className={styles.notEnoughBedsText}>
           There are not enough beds in this cabin for your entire group. Please

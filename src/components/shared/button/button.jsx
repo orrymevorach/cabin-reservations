@@ -27,6 +27,7 @@ export default function Button({
   isAnchor = false,
   isSmall = false,
   isInverted = false,
+  target = '',
 }) {
   const classnames = clsx(
     styles.button,
@@ -39,7 +40,7 @@ export default function Button({
 
   if (isAnchor) {
     return (
-      <a href={href} className={classnames}>
+      <a href={href} className={classnames} target={target}>
         {children}
       </a>
     );

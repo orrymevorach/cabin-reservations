@@ -1,4 +1,4 @@
-import { getUserByEmail } from '@/lib/airtable';
+import { addFirebaseUid, getUserByEmail } from '@/lib/airtable';
 import { useState } from 'react';
 import styles from './login.module.scss';
 import Button from '../../shared/button/button';
@@ -8,6 +8,7 @@ import { COOKIES, ROUTES } from '@/utils/constants';
 import { signInWithFirebaseEmailAndPassword } from './firebase-utils';
 import { useRouter } from 'next/router';
 import { errors as firebaseErrors } from './firebase-utils';
+import { isObjectEmpty } from '@/utils/string-utils';
 
 export const errors = {
   USER_NOT_FOUND:
@@ -38,6 +39,20 @@ export default function Login({ handleSuccess }) {
     let user = null;
     try {
       user = await getUserByEmail({ email });
+      const hasUser = !isObjectEmpty(user);
+      // Firebase account exists but user does not have a ticket. This scenario occurs if someone purchased a ticket in a previous year, but has not purchased a ticket this year.
+      if (!hasUser) {
+        setError(errors.USER_NOT_FOUND);
+        setIsLoading(false);
+        return;
+      }
+      // Firebase account exists and user has a ticket, but no firebase UID. This scenario occurs for people who purchased tickets at the festival, or were added by people who purchased tickets at the festival.
+      if (!user.firebaseUID) {
+        await addFirebaseUid({
+          attendeeId: user.id,
+          uid: firebaseResponse.user.uid,
+        });
+      }
     } catch (error) {
       console.error(error);
     }

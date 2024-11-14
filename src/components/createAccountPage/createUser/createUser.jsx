@@ -36,11 +36,11 @@ export default function CreateUser() {
       setIsLoading(false);
       setError(errors.USER_NOT_FOUND);
       return;
-    } else if (password !== userData.paymentIntent) {
+    } else if (password !== userData.temporaryPassword) {
       setIsLoading(false);
       setError(errors.PASSWORD_DOES_NOT_MATCH);
       return;
-    } else if (password === userData.paymentIntent) {
+    } else if (password === userData.temporaryPassword) {
       setIsLoading(false);
       setUser(userData);
       setShowTakeover(true);

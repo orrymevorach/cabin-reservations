@@ -3,7 +3,7 @@ import { replaceCamelCaseWithSpaces } from '@/utils/string-utils';
 let nodemailer = require('nodemailer');
 
 export default async function handler(req, res) {
-  const { groupMember, cabin, selectedBeds, host } = req.body;
+  const { groupMember, cabin, selectedBeds = [], host } = req.body;
 
   let transporter = nodemailer.createTransport({
     host: 'smtp.mailgun.org',

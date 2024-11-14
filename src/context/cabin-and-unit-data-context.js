@@ -1,12 +1,10 @@
-import useGetCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
 import { createContext, useContext } from 'react';
 
 const CabinAndUnitData = createContext();
 
 export const useCabinAndUnitData = () => useContext(CabinAndUnitData);
 
-export const CabinAndUnitDataProvider = ({ children }) => {
-  const cabinAndUnitData = useGetCabinAndUnitData();
+export const CabinAndUnitDataProvider = ({ children, cabinAndUnitData }) => {
   return (
     <CabinAndUnitData.Provider value={cabinAndUnitData}>
       {children}

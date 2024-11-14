@@ -5,8 +5,8 @@ const UserContext = createContext();
 
 export const useUser = () => useContext(UserContext);
 
-export const UserProvider = ({ children }) => {
-  const userReducer = useUserReducer();
+export const UserProvider = ({ children, user }) => {
+  const userReducer = useUserReducer({ userData: user });
 
   return (
     <UserContext.Provider value={userReducer}>{children}</UserContext.Provider>

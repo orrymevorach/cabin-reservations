@@ -10,8 +10,9 @@ import { ROUTES } from '@/utils/constants';
 import VerifiedUsers from '@/components/shared/verifiedUsers/verifiedUsers';
 import { useState } from 'react';
 import { updateGroup } from '@/lib/airtable';
+import clsx from 'clsx';
 
-export default function AddGuestsTakeover() {
+export default function AddGuestsTakeover({ allowCreateNewUser }) {
   const { dispatch, actions, groupData } = useReservation();
   const { user } = useUser();
   const cabin = user.cabin;
@@ -48,19 +49,25 @@ export default function AddGuestsTakeover() {
         <div className={styles.takeover}>
           <AddGuests
             cabin={cabin}
-            classNames={styles.addGuests}
+            classNames={clsx(
+              styles.addGuests,
+              !allowCreateNewUser && styles.height
+            )}
             hideBackButton
+            allowCreateNewUser={allowCreateNewUser}
           />
           <VerifiedUsers hideRemoveButton />
         </div>
-        <div className={styles.bottomRow}>
-          <ReserveButton cabin={cabin} classNames={styles.button}>
-            Update Reservation
-          </ReserveButton>
-          <Button isLoading={isLoading} handleClick={handleLeaveGroup}>
-            Leave Group
-          </Button>
-        </div>
+        {!allowCreateNewUser && (
+          <div className={styles.bottomRow}>
+            <ReserveButton cabin={cabin} classNames={styles.button}>
+              Update Reservation
+            </ReserveButton>
+            <Button isLoading={isLoading} handleClick={handleLeaveGroup}>
+              Leave Group
+            </Button>
+          </div>
+        )}
       </Takeover>
     </>
   );

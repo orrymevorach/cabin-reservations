@@ -21,6 +21,7 @@
     "@sentry/nextjs": "^8.27.0",
     "airtable": "^0.12.2",
     "clsx": "^1.2.1",
+    "cookies": "^0.9.1",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
     "firebase": "^10.12.4",

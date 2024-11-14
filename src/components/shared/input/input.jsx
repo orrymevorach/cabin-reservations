@@ -13,6 +13,7 @@ export default function Input({
   placeholder,
   asterisk = '',
   required = false,
+  inputRef,
 }) {
   return (
     <div className={styles.inputContainer}>
@@ -31,6 +32,7 @@ export default function Input({
         size="small"
         placeholder={placeholder}
         required={required}
+        inputRef={inputRef}
       />
     </div>
   );

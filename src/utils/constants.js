@@ -1,5 +1,6 @@
 export const COOKIES = {
   USER_RECORD: 'user_record_id',
+  UID: 'uid',
 };
 
 export const ROUTES = {
@@ -26,6 +27,6 @@ export const BEDS = {
 };
 
 export const AIRTABLE_BASES = {
-  TICKET_PURCHASES: 'Ticket Purchases 2024',
+  TICKET_PURCHASES: 'Ticket Purchases',
   CABINS: 'Cabins',
 };

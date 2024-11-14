@@ -6,7 +6,10 @@
 
 div.addGuests {
   margin: 0;
-  height: 250px;
+  margin-right: 80px;
+  &.height {
+    height: 250px;
+  }
 }
 
 .bottomRow {
