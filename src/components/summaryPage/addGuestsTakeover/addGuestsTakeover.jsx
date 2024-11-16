@@ -1,21 +1,34 @@
 import Takeover from '@/components/shared/takeover/takeover';
 import styles from './addGuestsTakeover.module.scss';
 import AddGuests from '@/components/shared/addGuests/addGuests';
-import Button from '@/components/shared/button/button';
-import ReserveButton from '@/components/shared/reserveButton/reserveButton';
 import { useReservation } from '@/context/reservation-context';
 import { useRouter } from 'next/router';
 import { useUser } from '@/context/user-context';
 import { ROUTES } from '@/utils/constants';
 import VerifiedUsers from '@/components/shared/verifiedUsers/verifiedUsers';
-import { useState } from 'react';
-import { updateGroup } from '@/lib/airtable';
+import {
+  createUser,
+  getCabinById,
+  getUserByEmail,
+  reserveSpotInCabin,
+} from '@/lib/airtable';
 import clsx from 'clsx';
+import {
+  createOrUpdateGroup,
+  verifyEmail,
+} from '@/components/shared/addGuests/inputVerify/inputVerify';
+import { sendConfirmationEmail } from '@/lib/mailgun';
 
 export default function AddGuestsTakeover({ allowCreateNewUser }) {
-  const { dispatch, actions, groupData, cabin } = useReservation();
+  const {
+    dispatch,
+    actions,
+    groupData,
+    cabin,
+    cabinData,
+    numberOfMembersNotConfirmedInCurrentCabin,
+  } = useReservation();
   const { user } = useUser();
-  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
   const handleClose = () => {
@@ -25,23 +38,108 @@ export default function AddGuestsTakeover({ allowCreateNewUser }) {
     });
   };
 
-  const handleLeaveGroup = async () => {
-    setIsLoading(true);
+  async function handleCreateGuest({ email, firstName, lastName, ref }) {
+    // Check that user does not already exist
+    const userResponse = await getUserByEmail({ email });
+    const hasUser = userResponse && userResponse.id;
+    if (hasUser) {
+      return {
+        error:
+          'We already have a ticket associated with this email. Please enter a new email.',
+        user: null,
+      };
+    }
+    // Create ticker for new user
+    const newUser = await createUser({
+      name: `${firstName} ${lastName}`,
+      email,
+      cabinId: cabinData.cabin.id,
+    });
 
-    const remainingMembers = groupData.members.filter(
-      ({ id }) => id !== user.id
-    );
-    const memberRecordIds = remainingMembers.map(({ id }) => id);
-
-    await updateGroup({ groupId: groupData.id, members: memberRecordIds });
-    groupData.id = '';
-    groupData.members = [user];
-    dispatch({
-      type: actions.UPDATE_GROUP,
+    // Add user to existing group, or create new group if none exists
+    const hasGroup = groupData.members?.length;
+    const usersToAdd = hasGroup
+      ? [...groupData.members, newUser]
+      : [user, newUser];
+    const updatedGroupData = await createOrUpdateGroup({
+      users: usersToAdd,
       groupData,
     });
-    setIsLoading(false);
-  };
+
+    // Send confirmation email
+    await sendConfirmationEmail({
+      groupMember: newUser,
+      cabin: cabinData.cabin.id,
+      host: user,
+    });
+
+    // Get updated cabin data
+    const cabin = await getCabinById({ cabinId: cabinData.cabin.id });
+
+    // Update state
+    dispatch({
+      type: actions.UPDATE_GROUP,
+      groupData: updatedGroupData,
+      numberOfMembersNotConfirmedInCurrentCabin:
+        numberOfMembersNotConfirmedInCurrentCabin + 1,
+      cabin,
+    });
+
+    // Add focus on firstname input
+    ref?.current?.focus();
+
+    return { error: null };
+  }
+
+  async function handleAddGuest({ email, ref }) {
+    const userResponse = await getUserByEmail({ email });
+    // Check that user does not already exist, and does not have a group or cabin
+    const { error } = await verifyEmail({ user: userResponse, groupData });
+    if (error) return { error };
+
+    // Add user to existing group, or create new group if none exists
+    const hasGroup = groupData.members?.length;
+    const usersToAdd = hasGroup
+      ? [...groupData.members, userResponse]
+      : [user, userResponse];
+    const updatedGroupData = await createOrUpdateGroup({
+      users: usersToAdd,
+      groupData,
+    });
+
+    // Add user to cabin
+    await reserveSpotInCabin({
+      cabinId: cabinData.cabin.id,
+      attendeeId: userResponse.id,
+    });
+
+    // Send confirmation email
+    await sendConfirmationEmail({
+      groupMember: userResponse,
+      cabin: cabinData.cabin.id,
+      host: user,
+    });
+
+    // Get updated cabin data
+    const cabin = await getCabinById({ cabinId: cabinData.cabin.id });
+
+    // Update state
+    dispatch({
+      type: actions.UPDATE_GROUP,
+      groupData: updatedGroupData,
+      numberOfMembersNotConfirmedInCurrentCabin:
+        numberOfMembersNotConfirmedInCurrentCabin + 1,
+      cabin,
+    });
+
+    // Add focus on email input
+    ref?.current?.focus();
+
+    return { error: null };
+  }
+
+  const handleSubmit = allowCreateNewUser ? handleCreateGuest : handleAddGuest;
+
   return (
     <>
       <Takeover handleClose={handleClose}>
@@ -53,20 +151,11 @@ export default function AddGuestsTakeover({ allowCreateNewUser }) {
               !allowCreateNewUser && styles.height
             )}
             hideBackButton
+            handleSubmit={handleSubmit}
             allowCreateNewUser={allowCreateNewUser}
           />
           <VerifiedUsers hideRemoveButton />
         </div>
-        {!allowCreateNewUser && (
-          <div className={styles.bottomRow}>
-            <ReserveButton cabin={cabin} classNames={styles.button}>
-              Update Reservation
-            </ReserveButton>
-            <Button isLoading={isLoading} handleClick={handleLeaveGroup}>
-              Leave Group
-            </Button>
-          </div>
-        )}
       </Takeover>
     </>
   );

@@ -1,33 +1,23 @@
-import {
-  createGroup,
-  createUser,
-  getCabinById,
-  getUserByEmail,
-  reserveSpotInCabin,
-  updateGroup,
-} from '@/lib/airtable';
+import { createGroup, updateGroup } from '@/lib/airtable';
 import { useState, useRef } from 'react';
 import styles from './inputVerify.module.scss';
 import Button from '@/components/shared/button/button';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Input from '@/components/shared/input/input';
-import { useReservation } from '@/context/reservation-context';
-import { useUser } from '@/context/user-context';
 import clsx from 'clsx';
-import { sendConfirmationEmail } from '@/lib/mailgun';
 
-const createOrUpdateGroup = async ({ user, groupData }) => {
+export const createOrUpdateGroup = async ({ users = [], groupData }) => {
   const hasExistingGroup = !!groupData?.id;
-  const groupRecordIds = groupData.members.map(({ id }) => id);
+  const groupRecordIds = users.map(({ id }) => id);
   if (!hasExistingGroup) {
     const response = await createGroup({
-      groupName: user.name,
+      groupName: users[0].name,
       members: groupRecordIds,
     });
     return {
       id: response.id,
-      members: groupData.members,
+      members: users,
     };
   } else {
     const response = await updateGroup({
@@ -36,24 +26,37 @@ const createOrUpdateGroup = async ({ user, groupData }) => {
     });
     return {
       id: response.id,
-      members: groupData.members,
+      members: users,
     };
   }
 };
 
-export default function InputVerify({ allowCreateNewUser }) {
+export const verifyEmail = async ({ user, groupData }) => {
+  const hasUser = user?.id;
+  const groupEmails = groupData.members.map(({ emailAddress }) => emailAddress);
+  const isRepeatEmail = groupEmails.includes(user.emailAddress);
+  if (isRepeatEmail) {
+    return {
+      error: 'This guest is already in your group. Please enter a new email.',
+    };
+  } else if (!hasUser) {
+    return {
+      error: 'No user found with this email.',
+    };
+  } else if (user.cabin) {
+    return {
+      error: 'This guest is already in a cabin.',
+    };
+  }
+  return { error: null };
+};
+
+export default function InputVerify({ handleSubmit, allowCreateNewUser }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    groupData,
-    dispatch,
-    actions,
-    numberOfMembersNotConfirmedInCurrentCabin,
-  } = useReservation();
-  const { user } = useUser();
   const firstNameRef = useRef();
   const emailRef = useRef();
 
@@ -62,116 +65,29 @@ export default function InputVerify({ allowCreateNewUser }) {
     setError('');
   };
 
-  const verifyEmail = async () => {
+  async function handleSubmitForm(e) {
+    e.preventDefault();
     setIsLoading(true);
-    const userResponse = await getUserByEmail({ email });
-    const hasUser = userResponse && userResponse.id;
-    const groupEmails = groupData.members.map(
-      ({ emailAddress }) => emailAddress
-    );
-    const isRepeatEmail = groupEmails.includes(email);
-    if (isRepeatEmail) {
-      return {
-        error: 'This guest is already in your group. Please enter a new email.',
-      };
-    } else if (!hasUser) {
-      return {
-        error: 'No user found with this email.',
-      };
-    } else if (userResponse.cabin) {
-      return {
-        error: 'This guest is already in a cabin.',
-      };
-    }
-    return { userResponse };
-  };
-
-  const handleAddExistingGuest = async ({ newUser, event }) => {
-    event.preventDefault();
-
-    // Initiate user to add variable. If a user was just created, this will be the newUser
-    let userToAddToGroup = newUser;
-
-    // If no new newUser, verify that the user being added already has a ticket, and reset the userToAddToGroup variable
-    if (!newUser) {
-      const { userResponse, error } = await verifyEmail();
-      if (error) {
-        setError(error);
-        setIsLoading(false);
-        setEmail('');
-        return;
-      }
-      userToAddToGroup = userResponse;
-    }
-
-    // Using member data, create group or update existing group
-    // If a group doesn't exist, include the user who is adding new users to the group, otherwise leave them out because they are already in the members array
-    const groupDataWithNewMembers = {
-      ...groupData,
-      members: groupData?.members?.length
-        ? [...groupData.members, userToAddToGroup]
-        : [...groupData.members, user, userToAddToGroup],
-    };
-    const updatedGroupData = await createOrUpdateGroup({
-      user,
-      groupData: groupDataWithNewMembers,
+    const refToFocus = firstNameRef?.current ? firstNameRef : emailRef;
+    const { error } = await handleSubmit({
+      firstName,
+      lastName,
+      email,
+      ref: refToFocus,
     });
-
-    await reserveSpotInCabin({
-      cabinId: user.cabin.id,
-      attendeeId: userToAddToGroup.id,
-    });
-    await sendConfirmationEmail({
-      groupMember: userToAddToGroup,
-      cabin: user.cabin.id,
-      host: user,
-    });
-
-    const cabin = await getCabinById({ cabinId: user.cabin.id });
-
-    setIsLoading(false);
-    setEmail('');
-    setFirstName('');
-    setLastName('');
-    dispatch({
-      type: actions.UPDATE_GROUP,
-      groupData: updatedGroupData,
-      numberOfMembersNotConfirmedInCurrentCabin:
-        numberOfMembersNotConfirmedInCurrentCabin + 1,
-      cabin,
-    });
-    // If creating new user, focus on first name ref, otherwise focus on email ref
-    firstNameRef?.current
-      ? firstNameRef.current.focus()
-      : emailRef.current.focus();
-  };
-
-  const handleCreateGuest = async ({ event }) => {
-    event.preventDefault();
-    setIsLoading(true);
-    // Check that user does not already exist
-    const userResponse = await getUserByEmail({ email });
-    const hasUser = userResponse && userResponse.id;
-    if (hasUser) {
-      setError(
-        'We already have a ticket associated with this email. Please enter a new email.'
-      );
+    if (error) {
+      setError(error);
       setIsLoading(false);
       return;
     }
-    const newUser = await createUser({
-      name: `${firstName} ${lastName}`,
-      email,
-    });
-    await handleAddExistingGuest({ newUser, event });
-  };
-
-  const handleSubmit = allowCreateNewUser
-    ? handleCreateGuest
-    : handleAddExistingGuest;
+    setFirstName('');
+    setLastName('');
+    setEmail('');
+    setIsLoading(false);
+  }
 
   return (
-    <form onSubmit={e => handleSubmit({ event: e })}>
+    <form onSubmit={e => handleSubmitForm(e)}>
       <div className={clsx(!allowCreateNewUser && styles.row)}>
         {allowCreateNewUser && (
           <>
@@ -185,6 +101,7 @@ export default function InputVerify({ allowCreateNewUser }) {
               value={firstName}
               label="First Name"
               inputRef={firstNameRef}
+              required
             />
             <Input
               handleChange={e =>
@@ -192,6 +109,7 @@ export default function InputVerify({ allowCreateNewUser }) {
               }
               value={lastName}
               label="Last Name"
+              required
             />
           </>
         )}
@@ -206,6 +124,7 @@ export default function InputVerify({ allowCreateNewUser }) {
           label="Email address"
           error={error}
           inputRef={emailRef}
+          required
         />
         <Button isLoading={isLoading} classNames={styles.button}>
           Add Guest <FontAwesomeIcon icon={faPlus} size="sm" />

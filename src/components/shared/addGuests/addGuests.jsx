@@ -17,6 +17,7 @@ export default function AddGuests({
   cabin,
   classNames = '',
   allowCreateNewUser,
+  handleSubmit,
 }) {
   // const { numberOfMembersNotConfirmedInCurrentCabin } = useReservation();
 
@@ -41,7 +42,10 @@ export default function AddGuests({
 
       {!errorMessage ? (
         <div className={styles.input}>
-          <InputVerify allowCreateNewUser={allowCreateNewUser} />
+          <InputVerify
+            handleSubmit={handleSubmit}
+            allowCreateNewUser={allowCreateNewUser}
+          />
         </div>
       ) : (
         <div className={styles.input}>

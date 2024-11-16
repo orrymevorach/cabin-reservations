@@ -8,23 +8,16 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Loader from '../shared/loader/loader';
 import AddGuestsReservePage from './addGuestsReservePage/addGuestsReservePage';
-import SelectCabinTakeover from './selectCabinTakeover/selectCabinTakeover';
 import HeadStaffCabinMessageTakeover from './headStaffCabinMessageTakeover/headStaffCabinMessageTakeover';
 
 const useSetStageBasedOnQuery = () => {
-  const [showSelectCabinTakeover, setShowSelectCabinTakeover] = useState(false);
   const { actions, dispatch } = useReservation();
   const { ADD_GUESTS } = CABIN_SELECTION_STAGES;
   const router = useRouter();
 
   useEffect(() => {
     if (router.isReady) {
-      const { cabin, stage } = router.query;
-      // If no cabin query, prompt redirect to cabin selection page
-      if (!cabin && stage === ADD_GUESTS) {
-        setShowSelectCabinTakeover(true);
-      }
-
+      const { stage } = router.query;
       // If no stage query, set as "add guests" stage
       if (!stage) {
         dispatch({
@@ -41,18 +34,15 @@ const useSetStageBasedOnQuery = () => {
       }
     }
   }, [router, ADD_GUESTS, actions, dispatch]);
-
-  return { showSelectCabinTakeover };
 };
 
 export default function ReservePage() {
   const { currentStage } = useReservation();
   const { ADD_GUESTS, CONFIRMATION } = CABIN_SELECTION_STAGES;
-  const { showSelectCabinTakeover } = useSetStageBasedOnQuery();
+  useSetStageBasedOnQuery();
   if (!currentStage) return <Loader isDotted />;
   return (
     <div className={styles.sideMargins}>
-      {showSelectCabinTakeover && <SelectCabinTakeover />}
       <HeadStaffCabinMessageTakeover />
       <Logo classNames={styles.logo} />
       <div className={styles.container}>

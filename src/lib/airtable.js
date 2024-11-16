@@ -304,7 +304,7 @@ export const addFirebaseUid = async ({ attendeeId, uid }) => {
   return record;
 };
 
-export const createUser = async ({ email, name }) => {
+export const createUser = async ({ email, name, cabinId }) => {
   const randomPassword = generateRandomPassword();
   const { record: airtableResponse } = await createRecord({
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,
@@ -314,6 +314,7 @@ export const createUser = async ({ email, name }) => {
       'Email Address': email,
       Status:
         process.env.NODE_ENV === 'production' ? 'Ticket Purchased' : 'Testing',
+      Cabin: [cabinId],
     },
   });
   return airtableResponse;
