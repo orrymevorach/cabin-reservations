@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
 import { COOKIES, ROUTES } from '@/utils/constants';
+import ForgotPassword from './forgot-password/forgot-password';
 
 const useLoginExistingUserOnPageLoad = () => {
   const router = useRouter();
@@ -33,6 +34,7 @@ export default function LoginPageContainer() {
       </div>
       <div className={styles.column}>
         <Login handleSuccess={handleSuccess} />
+        <ForgotPassword />
       </div>
     </main>
   );

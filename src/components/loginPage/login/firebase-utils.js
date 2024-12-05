@@ -68,7 +68,7 @@ export const sendFirebasePasswordResetEmail = ({ email }) => {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   return sendPasswordResetEmail(auth, email)
-    .then(() => {})
+    .then(res => res)
     .catch(error => {
       return {
         error,
