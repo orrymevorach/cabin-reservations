@@ -18,6 +18,7 @@ import {
   verifyEmail,
 } from '@/components/shared/addGuests/inputVerify/inputVerify';
 import { sendConfirmationEmail } from '@/lib/mailgun';
+import { sendSlackNotification } from '@/lib/slack';
 
 export default function AddGuestsTakeover({ allowCreateNewUser }) {
   const {
@@ -75,6 +76,18 @@ export default function AddGuestsTakeover({ allowCreateNewUser }) {
 
     // Get updated cabin data
     const cabin = await getCabinById({ cabinId: cabinData.cabin.id });
+
+    try {
+      // Slack Notification
+      await sendSlackNotification({
+        originalGuestName: user.name,
+        newGuestName: `${firstName} ${lastName}`,
+        email,
+        cabin: cabin.name,
+      });
+    } catch (error) {
+      console.error('Slack Notification Failed:', error);
+    }
 
     // Update state
     dispatch({
