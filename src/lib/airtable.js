@@ -312,8 +312,7 @@ export const createUser = async ({ email, name, cabinId }) => {
       'Temporary Password': randomPassword,
       Name: name,
       'Email Address': email,
-      Status:
-        process.env.NODE_ENV === 'production' ? 'Ticket Purchased' : 'Testing',
+      Status: process.env.NODE_ENV === 'production' ? 'Cabin Guest' : 'Testing',
       Cabin: [cabinId],
     },
   });
