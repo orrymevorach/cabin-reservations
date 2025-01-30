@@ -2,13 +2,8 @@ import InputVerify from './inputVerify/inputVerify';
 import styles from './addGuests.module.scss';
 import clsx from 'clsx';
 
-const getErrorMessage = ({
-  numberOfOpenBeds,
-  // numberOfMembersNotConfirmedInCurrentCabin,
-}) => {
-  const isCabinFull = numberOfOpenBeds <= 0;
-  // const noAdditionalBeds =
-  //   numberOfMembersNotConfirmedInCurrentCabin >= numberOfOpenBeds;
+const getErrorMessage = ({ numberOfOpenBeds }) => {
+  const isCabinFull = numberOfOpenBeds <= 0; // Non purchased cabin
   if (isCabinFull) return 'No additional beds are available in this cabin.';
   else return;
 };
@@ -19,14 +14,11 @@ export default function AddGuests({
   allowCreateNewUser,
   handleSubmit,
 }) {
-  // const { numberOfMembersNotConfirmedInCurrentCabin } = useReservation();
-
   if (!cabin) return;
   const numberOfOpenBeds = cabin.openBeds;
 
   const errorMessage = getErrorMessage({
     numberOfOpenBeds,
-    // numberOfMembersNotConfirmedInCurrentCabin,
   });
 
   return (
@@ -34,9 +26,8 @@ export default function AddGuests({
       <p className={styles.title}>Add Guests (optional)</p>
       {!allowCreateNewUser && (
         <p className={styles.text}>
-          If you would like to reserve a spot in your cabin on behalf of your
-          friends or partners, please make sure they have purchased a ticket in
-          advance, and verify their email address.
+          In order to reserve a spot in your cabin on behalf of your friends or
+          partners, please make sure they have already purchased a ticket.
         </p>
       )}
 

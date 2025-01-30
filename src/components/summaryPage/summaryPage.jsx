@@ -36,7 +36,12 @@ export default function SummaryPage() {
     isLoading: isUserDataLoading,
   };
 
-  const allowCreateNewUser = !!user?.remainingBalanceProduct;
+  // If a cabin is purchased, we allow users to add guests with free tickets
+  // Once a cabin is half full, users can no longer add guests with free tickets, but they can add guests with purchased tickets
+  const isPurchasedCabin = user?.status === 'Cabin Purchased';
+  const isPurchasedCabinHalfFull =
+    isPurchasedCabin && cabinData.cabin.reservedBeds >= 12;
+  const allowCreateNewUser = isPurchasedCabin && !isPurchasedCabinHalfFull;
 
   return (
     <div className={styles.container}>

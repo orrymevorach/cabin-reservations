@@ -36,7 +36,7 @@ export const sortByLeastAvailability = ({ cabins }) => {
     return 1;
   });
   return sortedByOpenBeds.sort((a, b) => {
-    if (a.availability === 'Open' && a.status !== 'Full') return -1;
+    if (a.availability === 'Open') return -1;
     return 1;
   });
 };
