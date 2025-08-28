@@ -58,7 +58,7 @@ export default function Login({ handleSuccess }) {
     }
 
     const isFirebaseLoginSuccessful = firebaseResponse.user?.uid;
-    const hasFirebaseAccount = user?.firebaseUID;
+    const hasFirebaseAccount = firebaseResponse.user?.uid || user?.firebaseUID;
 
     // Step 1a: If firebase login is successful, handle success
     if (isFirebaseLoginSuccessful) {

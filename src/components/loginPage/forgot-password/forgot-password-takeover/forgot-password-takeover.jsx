@@ -24,8 +24,8 @@ export default function ForgotPasswordTakeover({ handleClose }) {
             A password reset link has been sent to your email.
           </h2>
           <p className={styles.text}>
-            If you do not receive a password reset link to your email, we do not
-            have your email on file. Please reach out to
+            If you do not receive a password reset link in your inbox, check
+            your junk mail. If you still do not see it, please reach out to
             info@highlandsmusicfestival.ca.
           </p>
           <Button handleClick={handleClose} classNames={styles.button}>
