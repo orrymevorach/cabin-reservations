@@ -14,18 +14,19 @@ export default function Reserve({
   user,
   group,
   selectedBeds,
-  hasCabin,
 }) {
-  return (
-    <Takeover hideCloseButton>
-      <p style={{ marginBottom: '20px' }}>
-        Cabin selection is not currently available. We will send out an email to
-        all ticket holders when cabin reservations open up.
-      </p>
-      <Button href={ROUTES.SUMMARY}>Reservation Summary</Button>
-    </Takeover>
-  );
-  if (!hasCabin) return <SelectCabinTakeover />;
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction)
+    return (
+      <Takeover hideCloseButton>
+        <p style={{ marginBottom: '20px' }}>
+          Cabin selection is not currently available. We will send out an email
+          to all ticket holders when cabin reservations open up.
+        </p>
+        <Button href={ROUTES.SUMMARY}>Reservation Summary</Button>
+      </Takeover>
+    );
+
   return (
     <CabinAndUnitDataProvider cabinAndUnitData={cabinAndUnitData}>
       <UserProvider user={user}>
@@ -44,20 +45,15 @@ export default function Reserve({
 
 export async function getServerSideProps(context) {
   const { user } = await getPageLoadData(context);
-  const cabin = user.cabin;
-  if (!cabin) {
-    return {
-      props: {
-        hasCabin: false,
-      },
-    };
-  }
 
   const cabinAndUnitData = await getCabinAndUnitData();
 
-  const currentCabin = cabinAndUnitData.cabins.find(cabin => {
-    return cabin.id === user.cabin[0];
-  });
+  let currentCabin = null;
+  if (user.cabin) {
+    currentCabin = cabinAndUnitData.cabins.find(cabin => {
+      return cabin.id === user.cabin[0];
+    });
+  }
 
   let groupMembers = [];
   let groupId = '';

@@ -8,8 +8,6 @@ import { CabinCategoriesProvider } from '@/context/cabin-categories';
 import { UserProvider } from '@/context/user-context';
 import VisibleSectionProvider from '@/context/visible-section-context';
 import Takeover from '@/components/shared/takeover/takeover';
-import Button from '@/components/shared/button/button';
-import { ROUTES } from '@/utils/constants';
 
 import getCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
 import {
@@ -19,25 +17,23 @@ import {
   getUserByRecordId,
 } from '@/lib/airtable';
 import { BEDS } from '@/utils/constants';
-import SelectCabinTakeover from '@/components/reservePage/selectCabinTakeover/selectCabinTakeover';
 
 export default function CabinSelection({
   cabinAndUnitData,
   user,
   group,
   selectedBeds,
-  hasCabin,
 }) {
-  return (
-    <Takeover hideCloseButton>
-      <p style={{ marginBottom: '20px' }}>
-        Cabin selection is not currently available. We will send out an email to
-        all ticket holders when cabin reservations open up.
-      </p>
-      <Button href={ROUTES.SUMMARY}>Reservation Summary</Button>
-    </Takeover>
-  );
-  if (!hasCabin) return <SelectCabinTakeover />;
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction)
+    return (
+      <Takeover hideCloseButton>
+        <p style={{ marginBottom: '20px' }}>
+          Cabin selection is not currently available. We will send out an email
+          to all ticket holders when cabin reservations open up.
+        </p>
+      </Takeover>
+    );
   return (
     <VisibleSectionProvider>
       <CabinAndUnitDataProvider cabinAndUnitData={cabinAndUnitData}>
@@ -68,20 +64,30 @@ export default function CabinSelection({
 
 export async function getServerSideProps(context) {
   const { user } = await getPageLoadData(context);
-  const cabin = user.cabin;
-  if (!cabin) {
-    return {
-      props: {
-        hasCabin: false,
-      },
-    };
-  }
 
   const cabinAndUnitData = await getCabinAndUnitData();
 
-  const currentCabin = cabinAndUnitData.cabins.find(cabin => {
-    return cabin.id === user.cabin[0];
-  });
+  let currentCabin = null;
+  const selectedBeds = [];
+
+  if (user.cabin) {
+    currentCabin = cabinAndUnitData.cabins.find(
+      cabin => cabin.id === user.cabin[0]
+    );
+    const bedsArray = Object.keys(BEDS);
+    for (let bed of bedsArray) {
+      if (currentCabin[bed] && currentCabin[bed][0]) {
+        const currentBedOccupant = await getBedOccupant({
+          userId: currentCabin[bed][0],
+        });
+        currentCabin[bed] = currentBedOccupant;
+        selectedBeds.push({
+          bedName: bed,
+          ...currentBedOccupant,
+        });
+      }
+    }
+  }
 
   let groupMembers = [];
   let groupId = '';
@@ -97,21 +103,6 @@ export async function getServerSideProps(context) {
     );
   }
 
-  const selectedBeds = [];
-  const bedsArray = Object.keys(BEDS);
-  for (let bed of bedsArray) {
-    if (currentCabin[bed] && currentCabin[bed][0]) {
-      const currentBedOccupant = await getBedOccupant({
-        userId: currentCabin[bed][0],
-      });
-      currentCabin[bed] = currentBedOccupant;
-      selectedBeds.push({
-        bedName: bed,
-        ...currentBedOccupant,
-      });
-    }
-  }
-
   return {
     props: {
       cabinAndUnitData,
@@ -125,7 +116,6 @@ export async function getServerSideProps(context) {
         members: groupMembers,
       },
       selectedBeds,
-      hasCabin: true,
     },
   };
 }

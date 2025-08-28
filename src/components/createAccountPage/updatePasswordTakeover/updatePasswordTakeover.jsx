@@ -63,7 +63,7 @@ export default function UpdatePasswordTakeover({ user, handleClose }) {
           'Firebase UID': response.user.uid,
         },
       });
-      Cookies.set(COOKIES.USER_RECORD, user.id);
+      Cookies.set(COOKIES.USER_RECORD, user.id, { expires: 7 });
       setIsLoading(false);
       router.push(ROUTES.CABIN_SELECTION);
     } catch (error) {

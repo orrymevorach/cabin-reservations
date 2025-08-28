@@ -62,7 +62,7 @@ export default function Login({ handleSuccess }) {
 
     // Step 1a: If firebase login is successful, handle success
     if (isFirebaseLoginSuccessful) {
-      Cookies.set(COOKIES.USER_RECORD, user.id);
+      Cookies.set(COOKIES.USER_RECORD, user.id, { expires: 7 });
       handleSuccess({ email, user });
     }
     // Step 1ab: If login attempt was unsuccessful but user has firebase account, show error (likely incorrect password)
