@@ -24,3 +24,7 @@
   font-family: 'Tan Aesop';
   color: variables.$darkGreen;
 }
+
+@mixin fontGroovy {
+  font-family: 'Shrikhand', cursive;
+}

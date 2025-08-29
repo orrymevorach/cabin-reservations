@@ -4,49 +4,66 @@
 $primaryColor: variables.$darkGreen;
 
 .button {
-  @include mixins.fontPrimary;
-  background-color: $primaryColor;
-  color: white;
-  border: none;
+  @include mixins.fontPrimaryBold;
+  background-color: rgba(255, 255, 255, 0.4);
+  color: variables.$charcoal;
+  box-shadow: #422800 4px 4px 0 0;
   padding: 10px 20px;
-  // font-family: 'Neue Haas Regular';
   font-size: 16px;
   border-radius: variables.$borderRadius;
+  border: 2px solid variables.$charcoal;
   min-width: 100px;
   cursor: pointer;
   transition: 0.1s;
-  border: 2px solid $primaryColor;
   text-align: center;
-  box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2),
-    0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+    transition: 0.2s;
+  }
+
+  &:active {
+    box-shadow: #422800 2px 2px 0 0;
+    transform: translate(2px, 2px);
+  }
   .spinnerIcon {
     animation: rotate 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
   }
-  &:hover {
-    color: $primaryColor;
-    background-color: variables.$beige;
-    transition: 0.1s;
+  &.darkBeige {
+    background-color: variables.$darkBeige;
+    color: variables.$black;
   }
-  &.light {
-    background-color: white;
-    color: $primaryColor;
-    padding: 10px 0;
-    min-width: 0;
+
+  &.gold {
+    background-color: variables.$gold;
+  }
+
+  &.blue {
+    background-color: variables.$blue;
+  }
+
+  &.green {
+    background-color: variables.$lightGreen;
+  }
+  &.darkGreen {
+    background-color: variables.$darkGreen;
+    color: white;
   }
   &.small {
-    padding: 4px 0;
+    padding: 5px 10px 7px;
     min-width: 80px;
-    @include mixins.fontPrimaryLight;
-    margin-top: 10px;
-  }
-  &.inverted {
-    background-color: white;
-    color: variables.$darkGreen;
+    font-size: 13px;
+    box-shadow: #422800 2px 2px 0 0;
   }
   &.disabled {
-    background-color: rgb(85, 84, 84);
+    background-color: red;
     color: white;
+    box-shadow: none;
     border: none;
+    cursor: default;
+    &:active {
+      box-shadow: none;
+      transform: none;
+    }
   }
 }
 

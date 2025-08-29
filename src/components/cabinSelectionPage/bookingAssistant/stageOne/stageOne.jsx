@@ -30,13 +30,19 @@ export default function StageOne({ setStage }) {
         </li>
       </ul>
       <div className={styles.buttonsContainer}>
-        <Button classNames={styles.button} handleClick={() => setStage(3)}>
+        <Button
+          classNames={styles.button}
+          handleClick={() => setStage(3)}
+          isBlue
+        >
           Continue with the Booking Assistant
         </Button>
+
         <Button
           handleClick={() =>
             dispatch({ type: actions.CLOSE_BOOKING_ASSISTANT })
           }
+          isGold
         >
           Skip
         </Button>

@@ -1,7 +1,9 @@
 @use '@variables' as variables;
+@use '@mixins' as mixins;
 
 .outerContainer {
   border-bottom: 1px solid variables.$charcoal;
+  overflow: hidden;
 }
 .innerContainer {
   padding: 43px 0 50px;
@@ -16,7 +18,24 @@
 }
 
 .unitName {
-  font-size: 26px;
+  margin: 20px 0;
+  padding: 20px 0;
+  text-align: center;
+  @include mixins.fontGroovy;
+  font-size: 50px;
+  color: variables.$darkGreen;
+  width: 100%;
+  position: relative;
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    background-color: variables.$lightGreen;
+    height: 100%;
+    width: 500%;
+    z-index: -1;
+  }
 }
 
 .unitContainer {

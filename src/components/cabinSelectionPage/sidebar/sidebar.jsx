@@ -7,6 +7,8 @@ import Filters from '../filters/filters';
 import { FILTERS, useFilters } from '../filters/filters-context';
 import { sortAndFilterUnits } from '../units/units';
 import Button from '@/components/shared/button/button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronUp } from '@fortawesome/free-solid-svg-icons';
 
 function useShowSidebar({ mainSectionRef, setIsSidebarShowing }) {
   useEffect(() => {
@@ -67,6 +69,7 @@ export default function Sidebar({ mainSectionRef }) {
           </ul>
           <Filters isColumn classNames={styles.filters} hideUnitFilter />
           <Button handleClick={scrollToTop} classNames={styles.backToTop}>
+            <FontAwesomeIcon icon={faChevronUp} />
             Back to top
           </Button>
         </nav>

@@ -5,7 +5,7 @@
   color: white;
   font-weight: 500;
   transition: 0.1s;
-  background-color: variables.$darkGreen;
+  background-color: variables.$blue;
 }
 
 .sidebar {
@@ -56,6 +56,10 @@
     width: 100%;
     box-shadow: none;
     border-radius: 0;
+    border-left: none;
+    border-right: none;
+    display: flex;
+    flex-direction: column;
   }
 
   div.filters {

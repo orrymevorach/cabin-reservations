@@ -28,6 +28,12 @@ export default function Button({
   isSmall = false,
   isInverted = false,
   target = '',
+  isDarkBeige = false,
+  isGroovy = false,
+  isGold = false,
+  isBlue = false,
+  isGreen = false,
+  isDarkGreen = false,
 }) {
   const classnames = clsx(
     styles.button,
@@ -35,6 +41,13 @@ export default function Button({
     isLight && styles.light,
     isSmall && styles.small,
     isInverted && styles.inverted,
+    isDisabled && styles.disabled,
+    isDarkBeige && styles.darkBeige,
+    isGroovy && styles.groovy,
+    isGold && styles.gold,
+    isBlue && styles.blue,
+    isGreen && styles.green,
+    isDarkGreen && styles.darkGreen,
     isDisabled && styles.disabled
   );
 

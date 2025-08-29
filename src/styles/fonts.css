@@ -32,3 +32,8 @@
   font-family: 'Neue Haas Heavy';
   src: url('../../asset/Neue Haas/NeueHaasUnicaPro-Heavy.ttf');
 }
+
+@font-face {
+  font-family: 'Shrikhand';
+  src: url('../../asset/Shrikhand/Shrikhand-Regular.ttf');
+}

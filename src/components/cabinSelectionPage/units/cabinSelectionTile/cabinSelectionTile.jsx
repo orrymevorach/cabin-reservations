@@ -26,7 +26,14 @@ export default function CabinSelectionTile({ cabin, handleSelectCabin }) {
             Select
           </Button>
         ) : (
-          <p className={clsx(styles.button, styles.full)}>Full</p>
+          <Button
+            classNames={styles.button}
+            handleClick={() => {}}
+            isSmall
+            isDisabled
+          >
+            Full
+          </Button>
         )}
       </div>
     </li>

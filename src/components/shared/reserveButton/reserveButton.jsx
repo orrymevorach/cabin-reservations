@@ -65,6 +65,7 @@ export default function ReserveButton({ children, cabin, classNames = '' }) {
       handleClick={reserveCabinForGroupMembers}
       isLoading={isLoading}
       classNames={clsx(styles.continueButton, classNames)}
+      isBlue
     >
       {children || 'Confirm reservation'}
     </Button>

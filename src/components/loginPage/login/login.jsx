@@ -130,7 +130,7 @@ export default function Login({ handleSuccess }) {
         label="Password"
         value={password}
       />
-      <Button isLoading={isLoading} classNames={styles.submit}>
+      <Button isLoading={isLoading} classNames={styles.submit} isSmall>
         Log in
       </Button>
     </form>
