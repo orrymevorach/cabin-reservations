@@ -3,6 +3,7 @@ import styles from './cabinSummary.module.scss';
 import CabinCategoryDescriptionTakeover from './cabinCategoryDescriptionTakeover/cabinCategoryDescriptionTakeover';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import Pill from '@/components/shared/pill/pill';
 
 export default function CabinSummary({
   name,
@@ -27,18 +28,12 @@ export default function CabinSummary({
         <div className={styles.pillsContainer}>
           {categoryName && (
             <div className={styles.categoryContainer}>
-              <button
-                onClick={() => setShowCategoryDescription(true)}
-                className={styles.pill}
+              <Pill
+                showInfoIcon
+                handleClick={() => setShowCategoryDescription(true)}
               >
-                <FontAwesomeIcon
-                  icon={faInfoCircle}
-                  className={styles.infoIcon}
-                  color="#2f2f2f"
-                  size="lg"
-                />
                 {categoryName}
-              </button>
+              </Pill>
             </div>
           )}
         </div>

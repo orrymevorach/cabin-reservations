@@ -20,31 +20,6 @@
   margin-top: 10px;
 }
 
-.pill {
-  background-color: rgb(231, 192, 255);
-  display: inline;
-  padding: 4px 8px;
-  border-radius: 10px;
-  @include mixins.fontPrimaryBold;
-  font-size: 14px;
-  border: 2px solid variables.$charcoal;
-  transition: 0.1s;
-  position: relative;
-  color: black;
-  &:hover {
-    background-color: rgb(188, 132, 224);
-    transition: 0.2s;
-  }
-}
-
-.infoIcon {
-  position: absolute;
-  top: -8px;
-  right: -10px;
-  background-color: white;
-  border-radius: 50%;
-}
-
 .additionalInformationTitle {
   margin-bottom: 5px;
   @include mixins.fontPrimary;

@@ -46,10 +46,9 @@ export default function Sidebar() {
     <div className={styles.sidebar} id="sidebar">
       <div className={styles.titleContainer}>
         <p className={styles.title}>Summary</p>
-        <Image src={rainbow} alt="" className={styles.image} />
       </div>
       <ReservationSummary cabinData={cabinData} />
-      <VerifiedUsers hideRemoveButton={true} />
+      <VerifiedUsers />
       {!cabinHasEnoughBeds && (
         <p className={styles.notEnoughBedsText}>
           There are not enough beds in this cabin for your entire group. Please

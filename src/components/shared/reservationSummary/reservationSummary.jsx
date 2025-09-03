@@ -2,6 +2,7 @@ import { useUser } from '@/context/user-context';
 import styles from './reservationSummary.module.scss';
 import { useReservation } from '@/context/reservation-context';
 import { replaceCamelCaseWithSpaces } from '@/utils/string-utils';
+import Pill from '../pill/pill';
 
 export default function ReservationSummary({
   cabinData,
@@ -23,10 +24,6 @@ export default function ReservationSummary({
   return (
     <div className={styles.summaryContainer}>
       <p>
-        <span className={styles.left}>Name:</span>
-        <span className={styles.right}>{user.name}</span>
-      </p>
-      <p>
         <span className={styles.left}>Cabin:</span>
         <span className={styles.right}>{name}</span>
       </p>
@@ -37,7 +34,7 @@ export default function ReservationSummary({
       {category?.length && (
         <p>
           <span className={styles.left}>Category:</span>
-          <span className={styles.right}>{category[0]}</span>
+          <Pill isGold>{category[0]}</Pill>
         </p>
       )}
       {showBedSelection && (
@@ -53,9 +50,13 @@ export default function ReservationSummary({
             Additional information:
           </p>
           <ul className={styles.additionalInformationList}>
-            {additionalInformation.map(detail => (
-              <li key={detail}>{detail}</li>
-            ))}
+            {additionalInformation
+              .filter(detail => detail !== category?.[0])
+              .map(detail => (
+                <li key={detail}>
+                  <Pill classNames={styles.pill}>{detail}</Pill>
+                </li>
+              ))}
           </ul>
         </div>
       )}
