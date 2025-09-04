@@ -63,7 +63,18 @@ export default function CabinSelection({
 }
 
 export async function getServerSideProps(context) {
-  const { user } = await getPageLoadData(context);
+  let user;
+  try {
+    const pageLoadResponse = await getPageLoadData(context);
+    user = pageLoadResponse.user;
+  } catch (error) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
 
   const cabinAndUnitData = await getCabinAndUnitData();
 

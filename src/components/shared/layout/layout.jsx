@@ -44,6 +44,7 @@ export default function Layout({ children }) {
               isShowing: !isSummaryPage && hasCabin,
               url: ROUTES.SUMMARY,
               isAnchor: true,
+              isBlue: true,
             },
             {
               label: 'Log Out',

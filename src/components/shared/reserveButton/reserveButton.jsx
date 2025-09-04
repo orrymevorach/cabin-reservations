@@ -2,7 +2,7 @@ import styles from './reserveButton.module.scss';
 import Button from '@/components/shared/button/button';
 import { useReservation } from '@/context/reservation-context';
 import { CABIN_SELECTION_STAGES } from '@/hooks/useReservation';
-import { reserveSpotInCabin } from '@/lib/airtable';
+import { clearCurrentBedSelection, reserveSpotInCabin } from '@/lib/airtable';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import clsx from 'clsx';
@@ -31,6 +31,7 @@ export default function ReserveButton({ children, cabin, classNames = '' }) {
           userHasNoPrevioulsyReservedCabin ||
           usersExistingCabinIsDifferentThenCurrentCabin
         ) {
+          await clearCurrentBedSelection({ userId: groupMember.id });
           await reserveSpotInCabin({
             cabinId,
             attendeeId: groupMember.id,

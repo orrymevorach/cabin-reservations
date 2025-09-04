@@ -14,6 +14,7 @@ export default function BedSelectionQuestionModal({ handleClose }) {
           href={`${ROUTES.SUMMARY}?stage=${CABIN_SELECTION_STAGES.BED_SELECTION}`}
           isAnchor
           classNames={clsx(styles.button, styles.continueButton)}
+          isBlue
         >
           Continue to bed selection
         </Button>

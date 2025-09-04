@@ -51,7 +51,9 @@ export default function BottomRow({ showBedSelection, setShowBedSelection }) {
             : 'View available beds'}
         </Button>
       </div>
-      <Button handleClick={handleClick}>Continue</Button>
+      <Button isBlue handleClick={handleClick}>
+        Continue
+      </Button>
     </div>
   );
 }
