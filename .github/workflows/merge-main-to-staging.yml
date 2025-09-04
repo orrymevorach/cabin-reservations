@@ -1,0 +1,27 @@
+name: Merge main into staging and deploy staging
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge main into staging
+        run: |
+          git checkout staging
+          git pull origin staging
+          git merge origin/main --no-edit
+          git push origin staging
