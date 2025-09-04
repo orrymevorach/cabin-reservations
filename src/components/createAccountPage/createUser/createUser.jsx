@@ -71,7 +71,7 @@ export default function CreateUser() {
           <Input
             type="password"
             id="set-password"
-            label="Password"
+            label="Temporary Password"
             asterisk="(The one sent to your email)"
             handleChange={handleChangePassword}
             value={password}
