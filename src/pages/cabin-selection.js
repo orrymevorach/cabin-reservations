@@ -24,7 +24,10 @@ export default function CabinSelection({
   group,
   selectedBeds,
 }) {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isProduction =
+    process.env.NODE_ENV === 'production' &&
+    process.env.NEXT_PUBLIC_ENV_URL !==
+      'https://staging--highlands-reservations.netlify.app/';
   if (isProduction)
     return (
       <Takeover hideCloseButton>
