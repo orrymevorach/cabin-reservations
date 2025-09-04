@@ -12,7 +12,9 @@ export default function UnitRow({ unitData }) {
   const [showTakeover, setShowTakeover] = useState(false);
   const [hasAvailability, setHasAvailability] = useState(true);
   const unitName = unitData.name;
-  const unitImage = unitData.image && unitData.image[0];
+  const unitImage =
+    unitData.image && unitData.image[0] && unitData.image[0].thumbnails.large;
+
   const { isDesktop } = useWindowSize();
 
   const ref = useRef();
@@ -60,9 +62,9 @@ export default function UnitRow({ unitData }) {
           />
           {isDesktop && hasAvailability && unitImage ? (
             <Image
-              src={unitImage.url}
-              width={unitImage.width}
-              height={unitImage.height}
+              src={unitImage?.url}
+              width={unitImage?.width}
+              height={unitImage?.height}
               alt={`${unitName} unit`}
               className={styles.unitImage}
             />
