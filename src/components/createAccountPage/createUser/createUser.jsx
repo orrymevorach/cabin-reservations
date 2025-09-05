@@ -60,9 +60,6 @@ export default function CreateUser() {
       await sendTemporaryPasswordEmail({ emailAddress: emailInput });
       setIsPasswordSending(false);
       setIsPasswordSentSuccess(true);
-      setTimeout(() => {
-        setIsPasswordSentSuccess(false);
-      }, 3000);
     } else {
       setError('Please enter a valid email address');
     }
@@ -106,15 +103,18 @@ export default function CreateUser() {
               type="button"
               className={styles.resendButton}
             >
-              Resend temporary password
+              <span>Resend Temporary Password</span>
               {isPasswordSending && (
                 <Loader isDotted classNames={styles.loader} />
               )}
               {!isPasswordSending && isPasswordSentSuccess && (
-                <FontAwesomeIcon
-                  icon={faCheckCircle}
-                  className={styles.checkmark}
-                />
+                <>
+                  <span>Sent!</span>
+                  <FontAwesomeIcon
+                    icon={faCheckCircle}
+                    className={styles.checkmark}
+                  />
+                </>
               )}
             </button>
           </div>
