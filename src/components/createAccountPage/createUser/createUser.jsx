@@ -103,7 +103,7 @@ export default function CreateUser() {
               type="button"
               className={styles.resendButton}
             >
-              <span>Resend Temporary Password</span>
+              {!isPasswordSentSuccess && <span>Resend Temporary Password</span>}
               {isPasswordSending && (
                 <Loader isDotted classNames={styles.loader} />
               )}
