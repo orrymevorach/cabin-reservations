@@ -4,6 +4,8 @@ import Input from '@/components/shared/input/input';
 import Takeover from '@/components/shared/takeover/takeover';
 import { sendFirebasePasswordResetEmail } from '@/components/loginPage/login/firebase-utils';
 import { useState } from 'react';
+import { ROUTES } from '@/utils/constants';
+import Link from 'next/link';
 
 export default function ForgotPasswordTakeover({ handleClose }) {
   const [email, setEmail] = useState('');
@@ -26,13 +28,9 @@ export default function ForgotPasswordTakeover({ handleClose }) {
           </h2>
           <p className={styles.text}>
             If you do not receive a password reset link in your inbox, check
-            your junk mail. If the email is not in your inbox, try creating an
-            account. If you are having issues, please reach out to
-            info@highlandsmusicfestival.ca.
-          </p>
-          <p className={styles.text}>
-            If you do not receive a password reset link in your inbox, check
-            your junk mail. If you still do not see it, please reach out to
+            your junk mail. If the email is not in your inbox, try{' '}
+            <Link href={ROUTES.CREATE_ACCOUNT}>creating an account</Link>. If
+            you are still having issues, please reach out to
             info@highlandsmusicfestival.ca.
           </p>
           <Button handleClick={handleClose} classNames={styles.button}>
