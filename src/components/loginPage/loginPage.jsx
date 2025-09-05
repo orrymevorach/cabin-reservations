@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
 import { COOKIES, ROUTES } from '@/utils/constants';
 import ForgotPassword from './forgot-password/forgot-password';
+import CreateAccountButton from './create-account-button/create-account-button';
 
 const useLoginExistingUserOnPageLoad = () => {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function LoginPageContainer() {
       <div className={styles.column}>
         <Login handleSuccess={handleSuccess} />
         <ForgotPassword />
+        <CreateAccountButton />
       </div>
     </main>
   );

@@ -1,0 +1,10 @@
+@use '@mixins' as mixins;
+
+.link {
+  display: block;
+  margin-top: 5px;
+  @include mixins.fontPrimary;
+  font-size: 14px;
+  color: black;
+  text-decoration: underline;
+}

@@ -49,6 +49,32 @@
 
 .inputContainer {
   margin-bottom: 30px !important;
+  &.passwordInput {
+    margin-bottom: 5px !important;
+  }
+}
+
+.resendButton {
+  @include fontPrimary;
+  position: relative;
+  background: none;
+  border: none;
+  text-decoration: underline;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.loader {
+  position: static !important;
+  transform: none !important;
+  margin-left: 10px;
+}
+
+.checkmark {
+  color: green;
+  margin-left: 10px;
+  margin-top: 3px;
 }
 
 @media screen and (max-width: $mobile) {

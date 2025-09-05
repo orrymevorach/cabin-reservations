@@ -6,6 +6,11 @@ import { useRouter } from 'next/router';
 import { getUserByEmail } from '@/lib/airtable';
 import UpdatePasswordTakeover from '../updatePasswordTakeover/updatePasswordTakeover';
 import { errors } from '@/components/loginPage/login/login';
+import { sendTemporaryPasswordEmail } from '@/lib/mailgun';
+import clsx from 'clsx';
+import Loader from '@/components/shared/loader/loader';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 export default function CreateUser() {
   const [emailInput, setEmailInput] = useState('');
@@ -15,6 +20,8 @@ export default function CreateUser() {
   const router = useRouter();
   const [showTakeover, setShowTakeover] = useState(false);
   const [user, setUser] = useState(null);
+  const [isPasswordSending, setIsPasswordSending] = useState(false);
+  const [isPasswordSentSuccess, setIsPasswordSentSuccess] = useState(false);
 
   useEffect(() => {
     if (router.query.email) {
@@ -47,6 +54,20 @@ export default function CreateUser() {
     }
   };
 
+  const handleSendTemporaryPassword = async () => {
+    if (emailInput) {
+      setIsPasswordSending(true);
+      await sendTemporaryPasswordEmail({ emailAddress: emailInput });
+      setIsPasswordSending(false);
+      setIsPasswordSentSuccess(true);
+      setTimeout(() => {
+        setIsPasswordSentSuccess(false);
+      }, 3000);
+    } else {
+      setError('Please enter a valid email address');
+    }
+  };
+
   return (
     <>
       {showTakeover ? (
@@ -68,17 +89,35 @@ export default function CreateUser() {
             classNames={styles.inputContainer}
             required
           />
-          <Input
-            type="password"
-            id="set-password"
-            label="Temporary Password"
-            asterisk="(The one sent to your email)"
-            handleChange={handleChangePassword}
-            value={password}
-            labelClassNames={styles.label}
-            classNames={styles.inputContainer}
-            required
-          />
+          <div>
+            <Input
+              type="password"
+              id="set-password"
+              label="Temporary Password"
+              asterisk="(The one sent to your email)"
+              handleChange={handleChangePassword}
+              value={password}
+              labelClassNames={styles.label}
+              classNames={clsx(styles.inputContainer, styles.passwordInput)}
+              required
+            />
+            <button
+              onClick={handleSendTemporaryPassword}
+              type="button"
+              className={styles.resendButton}
+            >
+              Resend temporary password
+              {isPasswordSending && (
+                <Loader isDotted classNames={styles.loader} />
+              )}
+              {!isPasswordSending && isPasswordSentSuccess && (
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  className={styles.checkmark}
+                />
+              )}
+            </button>
+          </div>
 
           <Button isLoading={isLoading} classNames={styles.button} isSecondary>
             Submit
