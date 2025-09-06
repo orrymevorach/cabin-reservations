@@ -1,0 +1,44 @@
+@use '@variables' as variables;
+
+.modal {
+  border: 10px solid variables.$gold;
+  outline: 10px solid variables.$blue;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.list {
+  padding-left: 20px;
+
+  li {
+    margin-bottom: 10px;
+  }
+}
+
+.note {
+  font-size: 12px;
+}
+
+.link {
+  color: black;
+  text-decoration: underline;
+}
+
+.instruction {
+  margin: 40px 0 10px;
+}
+
+.contact {
+  margin-top: 20px;
+}
+
+@media screen and (max-width: variables.$mobile) {
+  .modal {
+    padding: 30px 40px;
+  }
+}

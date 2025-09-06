@@ -19,6 +19,7 @@ import {
 } from '@/lib/airtable';
 import { BEDS } from '@/utils/constants';
 import CountdownTo11AM from '@/components/shared/countdown/countdown';
+import NoUserTakeover from '@/components/shared/noUserTakeover/noUserTakeover';
 
 export default function CabinSelection({
   cabinAndUnitData,
@@ -42,6 +43,8 @@ export default function CabinSelection({
   //       </Takeover>
   //     </>
   //   );
+  if (!user) return <NoUserTakeover />;
+
   return (
     <VisibleSectionProvider>
       <CabinAndUnitDataProvider cabinAndUnitData={cabinAndUnitData}>
@@ -81,10 +84,7 @@ export async function getServerSideProps(context) {
   }
   if (!user) {
     return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
+      props: { user: null },
     };
   }
 
