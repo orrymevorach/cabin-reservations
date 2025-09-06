@@ -10,6 +10,7 @@ import { getGroup, getPageLoadData, getUserByRecordId } from '@/lib/airtable';
 import { ROUTES } from '@/utils/constants';
 import styles from '../components/shared/countdown/countdown.module.scss';
 import CountdownToDate from '@/components/shared/countdown/countdown';
+import NoUserTakeover from '@/components/shared/noUserTakeover/noUserTakeover';
 
 export default function Reserve({
   cabinAndUnitData,
@@ -33,6 +34,8 @@ export default function Reserve({
   //     </Takeover>
   //   );
 
+  if (!user) return <NoUserTakeover />;
+
   return (
     <CabinAndUnitDataProvider cabinAndUnitData={cabinAndUnitData}>
       <UserProvider user={user}>
@@ -50,7 +53,19 @@ export default function Reserve({
 }
 
 export async function getServerSideProps(context) {
-  const { user } = await getPageLoadData(context);
+  let user;
+  try {
+    const pageLoadResponse = await getPageLoadData(context);
+    user = pageLoadResponse.user;
+  } catch (error) {
+    console.error('No user data found:', error);
+    user = null;
+  }
+  if (!user) {
+    return {
+      props: { user: null },
+    };
+  }
 
   const cabinAndUnitData = await getCabinAndUnitData();
 
