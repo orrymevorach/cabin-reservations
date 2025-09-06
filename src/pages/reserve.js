@@ -17,7 +17,9 @@ export default function Reserve({
   user,
   group,
   selectedBeds,
+  hasCabinQuery = false,
 }) {
+  if (!hasCabinQuery) return <SelectCabinTakeover />;
   const { ENABLE_COUNTDOWN, ENABLE_RESERVATIONS } = FEATURE_FLAGS;
   if (ENABLE_COUNTDOWN) return <CountdownToDate />;
   if (!ENABLE_RESERVATIONS)
@@ -49,6 +51,8 @@ export default function Reserve({
 }
 
 export async function getServerSideProps(context) {
+  const cabinQuery = context.query.cabin || null;
+  if (!cabinQuery) return { props: { hasCabinQuery: false } };
   let user;
   try {
     const pageLoadResponse = await getPageLoadData(context);
@@ -59,7 +63,7 @@ export async function getServerSideProps(context) {
   }
   if (!user) {
     return {
-      props: { user: null },
+      props: { user: null, hasCabinQuery: true },
     };
   }
 
@@ -102,7 +106,7 @@ export async function getServerSideProps(context) {
         id: groupId,
         members: groupMembers,
       },
-      hasCabin: true,
+      hasCabinQuery: true,
     },
   };
 }
