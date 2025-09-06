@@ -17,21 +17,21 @@ export default function Reserve({
   group,
   selectedBeds,
 }) {
-  const isProduction =
-    process.env.NODE_ENV === 'production' &&
-    process.env.NEXT_PUBLIC_ENV_URL !==
-      'https://staging--highlands-reservations.netlify.app/';
-  if (isProduction)
-    return (
-      <Takeover hideCloseButton modalClassNames={styles.modal}>
-        <CountdownToDate />
-        {/* <p style={{ marginBottom: '20px' }}>
-        Cabin selection is not currently available. We will send out an email to
-        all ticket holders when cabin reservations open up.
-      </p>
-      <Button href={ROUTES.SUMMARY}>Reservation Summary</Button> */}
-      </Takeover>
-    );
+  // const isProduction =
+  //   process.env.NODE_ENV === 'production' &&
+  //   process.env.NEXT_PUBLIC_ENV_URL !==
+  //     'https://staging--highlands-reservations.netlify.app/';
+  // if (isProduction)
+  //   return (
+  //     <Takeover hideCloseButton modalClassNames={styles.modal}>
+  //       <CountdownToDate />
+  //       {/* <p style={{ marginBottom: '20px' }}>
+  //       Cabin selection is not currently available. We will send out an email to
+  //       all ticket holders when cabin reservations open up.
+  //     </p>
+  //     <Button href={ROUTES.SUMMARY}>Reservation Summary</Button> */}
+  //     </Takeover>
+  //   );
 
   return (
     <CabinAndUnitDataProvider cabinAndUnitData={cabinAndUnitData}>
