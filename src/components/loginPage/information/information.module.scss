@@ -11,3 +11,8 @@
   margin: 5px 0 30px 15px;
   padding: 0;
 }
+
+.bold {
+  @include mixins.fontPrimaryBold;
+  font-size: 15px;
+}
