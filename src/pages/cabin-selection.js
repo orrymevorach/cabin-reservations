@@ -106,15 +106,17 @@ export async function getServerSideProps(context) {
   let groupMembers = [];
   let groupId = '';
 
-  if (user.group) {
-    const groupResponse = await getGroup({ groupId: user.group });
-    groupId = user.group[0];
-    groupMembers = await Promise.all(
-      groupResponse.members.map(async memberId => {
-        const member = await getUserByRecordId({ id: memberId });
-        return member;
-      })
-    );
+  if (user.group && user.group.length > 0) {
+    groupId = user.group[0] || '';
+    const groupResponse = await getGroup({ groupId });
+    if (groupResponse?.members) {
+      groupMembers = await Promise.all(
+        groupResponse.members.map(async memberId => {
+          const member = await getUserByRecordId({ id: memberId });
+          return member;
+        })
+      );
+    }
   }
 
   return {

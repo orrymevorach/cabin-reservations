@@ -40,7 +40,18 @@ export default function Summary({
 }
 
 export async function getServerSideProps(context) {
-  const { user } = await getPageLoadData(context);
+  let user;
+  try {
+    const pageLoadResponse = await getPageLoadData(context);
+    user = pageLoadResponse.user;
+  } catch (error) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
   const cabin = user.cabin;
   if (!cabin) {
     return {
@@ -51,37 +62,41 @@ export async function getServerSideProps(context) {
   }
 
   const cabinAndUnitData = await getCabinAndUnitData();
+  let currentCabin = null;
+  const selectedBeds = [];
 
-  const currentCabin = cabinAndUnitData.cabins.find(cabin => {
-    return cabin.id === user.cabin[0];
-  });
+  if (user.cabin) {
+    currentCabin = cabinAndUnitData.cabins.find(
+      cabin => cabin.id === user.cabin[0]
+    );
+    const bedsArray = Object.keys(BEDS);
+    for (let bed of bedsArray) {
+      if (currentCabin[bed] && currentCabin[bed][0]) {
+        const currentBedOccupant = await getBedOccupant({
+          userId: currentCabin[bed][0],
+        });
+        currentCabin[bed] = currentBedOccupant;
+        selectedBeds.push({
+          bedName: bed,
+          ...currentBedOccupant,
+        });
+      }
+    }
+  }
 
   let groupMembers = [];
   let groupId = '';
 
-  if (user.group) {
-    const groupResponse = await getGroup({ groupId: user.group });
-    groupId = user.group[0];
-    groupMembers = await Promise.all(
-      groupResponse.members.map(async memberId => {
-        const member = await getUserByRecordId({ id: memberId });
-        return member;
-      })
-    );
-  }
-
-  const selectedBeds = [];
-  const bedsArray = Object.keys(BEDS);
-  for (let bed of bedsArray) {
-    if (currentCabin[bed] && currentCabin[bed][0]) {
-      const currentBedOccupant = await getBedOccupant({
-        userId: currentCabin[bed][0],
-      });
-      currentCabin[bed] = currentBedOccupant;
-      selectedBeds.push({
-        bedName: bed,
-        ...currentBedOccupant,
-      });
+  if (user.group && user.group.length > 0) {
+    groupId = user.group[0] || '';
+    const groupResponse = await getGroup({ groupId });
+    if (groupResponse?.members) {
+      groupMembers = await Promise.all(
+        groupResponse.members.map(async memberId => {
+          const member = await getUserByRecordId({ id: memberId });
+          return member;
+        })
+      );
     }
   }
 
