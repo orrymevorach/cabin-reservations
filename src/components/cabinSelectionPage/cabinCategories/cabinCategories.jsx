@@ -66,7 +66,7 @@ export default function CabinCategories({
     <>
       {title && <p className={styles.title}>{title}</p>}
       <form action="#" className={styles.stageThree}>
-        {cabinCategories.map(category => (
+        {cabinCategories?.map(category => (
           <CabinCategory
             key={`checkbox-${category.name}`}
             category={category}

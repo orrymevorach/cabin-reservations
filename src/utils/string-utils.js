@@ -12,6 +12,8 @@ export function toCamelCase(str) {
 }
 
 export function isObjectEmpty(obj) {
+  // If obj is null, undefined, or not an object, consider it "empty"
+  if (!obj || typeof obj !== 'object') return true;
   return Object.keys(obj).length === 0;
 }
 
