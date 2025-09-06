@@ -65,15 +65,19 @@ export default function BedSelection({ readOnly = false, cabin }) {
     window.location = '/summary?stage=CONFIRMATION';
   };
 
-  const ConfirmButton = () => (
-    <Button
-      handleClick={handleClick}
-      isLoading={isLoading}
-      classNames={styles.button}
-    >
-      Confirm Selection
-    </Button>
-  );
+  const ConfirmButton = () => {
+    const { isMobile } = useWindowSize();
+    return (
+      <Button
+        handleClick={handleClick}
+        isLoading={isLoading}
+        classNames={styles.button}
+        isGold={isMobile}
+      >
+        Confirm Selection
+      </Button>
+    );
+  };
 
   return (
     <div>

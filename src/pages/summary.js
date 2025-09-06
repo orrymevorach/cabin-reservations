@@ -98,6 +98,10 @@ export async function getServerSideProps(context) {
         })
       );
     }
+  } else {
+    // If the user has no group, we create a group with just them in it.
+    groupId = '';
+    groupMembers = [user];
   }
 
   return {

@@ -35,7 +35,7 @@
   .buttonContainer {
     position: fixed;
     bottom: 0;
-    background-color: white;
+    background-color: variables.$beige;
     width: 100%;
     left: 50%;
     height: 80px;
@@ -44,18 +44,13 @@
     justify-content: center;
     align-items: center;
     animation: slideUp 0.3s linear forwards;
+    border-top: 5px solid variables.$darkGreen;
   }
   .button {
     order: 3;
     margin: 0;
     width: 95%;
     height: 65%;
-    @include mixins.fontPrimaryMedium;
-    font-size: 18px;
-    line-height: 0;
-    letter-spacing: 0.8px;
-    background-color: variables.$orange;
-    border: 1px solid variables.$orange;
   }
   .readOnlyText {
     margin: 10px 0 20px;

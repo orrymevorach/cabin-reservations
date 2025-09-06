@@ -36,6 +36,7 @@ export default function UnitRow({ unitData }) {
                 classNames={styles.showMapButton}
                 handleClick={() => setShowTakeover(true)}
                 isInverted
+                isSmall
               >
                 Show Map
               </Button>
