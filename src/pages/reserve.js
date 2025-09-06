@@ -8,6 +8,8 @@ import { UserProvider } from '@/context/user-context';
 import getCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
 import { getGroup, getPageLoadData, getUserByRecordId } from '@/lib/airtable';
 import { ROUTES } from '@/utils/constants';
+import styles from '../components/shared/countdown/countdown.module.scss';
+import CountdownToDate from '@/components/shared/countdown/countdown';
 
 export default function Reserve({
   cabinAndUnitData,
@@ -21,12 +23,13 @@ export default function Reserve({
       'https://staging--highlands-reservations.netlify.app/';
   if (isProduction)
     return (
-      <Takeover hideCloseButton>
-        <p style={{ marginBottom: '20px' }}>
-          Cabin selection is not currently available. We will send out an email
-          to all ticket holders when cabin reservations open up.
-        </p>
-        <Button href={ROUTES.SUMMARY}>Reservation Summary</Button>
+      <Takeover hideCloseButton modalClassNames={styles.modal}>
+        <CountdownToDate />
+        {/* <p style={{ marginBottom: '20px' }}>
+        Cabin selection is not currently available. We will send out an email to
+        all ticket holders when cabin reservations open up.
+      </p>
+      <Button href={ROUTES.SUMMARY}>Reservation Summary</Button> */}
       </Takeover>
     );
 

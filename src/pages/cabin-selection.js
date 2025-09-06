@@ -8,6 +8,7 @@ import { CabinCategoriesProvider } from '@/context/cabin-categories';
 import { UserProvider } from '@/context/user-context';
 import VisibleSectionProvider from '@/context/visible-section-context';
 import Takeover from '@/components/shared/takeover/takeover';
+import styles from '../components/shared/countdown/countdown.module.scss';
 
 import getCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
 import {
@@ -17,6 +18,7 @@ import {
   getUserByRecordId,
 } from '@/lib/airtable';
 import { BEDS } from '@/utils/constants';
+import CountdownTo11AM from '@/components/shared/countdown/countdown';
 
 export default function CabinSelection({
   cabinAndUnitData,
@@ -30,12 +32,15 @@ export default function CabinSelection({
       'https://staging--highlands-reservations.netlify.app/';
   if (isProduction)
     return (
-      <Takeover hideCloseButton>
-        <p style={{ marginBottom: '20px' }}>
+      <>
+        <Takeover hideCloseButton modalClassNames={styles.modal}>
+          <CountdownTo11AM />
+          {/* <p style={{ marginBottom: '20px' }}>
           Cabin selection is not currently available. We will send out an email
           to all ticket holders when cabin reservations open up.
-        </p>
-      </Takeover>
+        </p> */}
+        </Takeover>
+      </>
     );
   return (
     <VisibleSectionProvider>
