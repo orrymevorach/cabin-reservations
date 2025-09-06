@@ -47,3 +47,16 @@ export const filterOutClosedCabins = ({ cabins }) => {
     return true;
   });
 };
+
+export const sortByCategory = ({ cabins }) => {
+  return cabins.sort((a, b) => {
+    const getPriority = cabin => {
+      if (!cabin.category || !cabin.category[0]) return 3; // lowest priority
+      if (cabin.category[0] === 'Female only') return 0; // highest priority
+      if (cabin.category[0] === 'Anywhere!') return 2; // middle-low
+      return 1; // normal categories
+    };
+
+    return getPriority(a) - getPriority(b);
+  });
+};

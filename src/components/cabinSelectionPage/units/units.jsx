@@ -4,6 +4,7 @@ import { FILTERS, useFilters } from '../filters/filters-context';
 import {
   filterByAvailableBeds,
   filterByCategory,
+  sortByCategory,
   sortByLeastAvailability,
 } from './unitRow/cabinList/filter-utils';
 
@@ -15,6 +16,7 @@ const filterByFilterSelection = ({ cabins, selectedFilters }) => {
     selectedFilters,
   });
   filteredCabins = sortByLeastAvailability({ cabins: filteredCabins });
+  filteredCabins = sortByCategory({ cabins: filteredCabins });
   return filteredCabins;
 };
 

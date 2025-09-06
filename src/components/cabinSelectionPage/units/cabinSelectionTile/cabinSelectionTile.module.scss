@@ -30,6 +30,10 @@
   }
 }
 
+.pill {
+  display: block;
+}
+
 @media screen and (max-width: variables.$tablet) {
   .cabinContainer {
     width: 100%;
