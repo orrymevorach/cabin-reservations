@@ -12,6 +12,7 @@ import {
 } from '@/lib/airtable';
 import { BEDS } from '@/utils/constants';
 import SelectCabinTakeover from '@/components/reservePage/selectCabinTakeover/selectCabinTakeover';
+import NoUserTakeover from '@/components/shared/noUserTakeover/noUserTakeover';
 
 export default function Summary({
   cabinAndUnitData,
@@ -20,6 +21,7 @@ export default function Summary({
   selectedBeds,
   hasCabin,
 }) {
+  if (!user) return <NoUserTakeover />;
   if (!hasCabin) return <SelectCabinTakeover />;
   return (
     <CabinAndUnitDataProvider cabinAndUnitData={cabinAndUnitData}>
@@ -45,13 +47,15 @@ export async function getServerSideProps(context) {
     const pageLoadResponse = await getPageLoadData(context);
     user = pageLoadResponse.user;
   } catch (error) {
+    console.error('No user data found:', error);
+    user = null;
+  }
+  if (!user) {
     return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
+      props: { user: null },
     };
   }
+
   const cabin = user.cabin;
   if (!cabin) {
     return {
