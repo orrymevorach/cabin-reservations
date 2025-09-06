@@ -30,3 +30,8 @@ export const AIRTABLE_BASES = {
   TICKET_PURCHASES: 'Ticket Purchases',
   CABINS: 'Cabins',
 };
+
+export const FEATURE_FLAGS = {
+  ENABLE_RESERVATIONS: true,
+  ENABLE_COUNTDOWN: false,
+};

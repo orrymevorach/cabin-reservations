@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './countdown.module.scss';
 import Loader from '../loader/loader';
+import Takeover from '../takeover/takeover';
 
 function getDeltaParts() {
   const year = 2025;
@@ -49,26 +50,28 @@ export default function CountdownToDate() {
   }
 
   return (
-    <div className={styles.container}>
-      {parts.totalMs === 0 ? (
-        <div className={styles.openContainer}>
-          <Loader isDotted classNames={styles.loader} />
-          <p className={styles.open}>Reservations are opening momentarily.</p>
-          <p>Please refresh your page every few seconds.</p>
-        </div>
-      ) : (
-        <>
-          <p className={styles.text}>Reservations open in:</p>
-          <p className={styles.time}>
-            {parts.days > 0 && (
-              <span className={styles.time}>{parts.days} days</span>
-            )}
-            <span className={styles.time}>{pad(parts.hours)} hrs</span>
-            <span className={styles.time}>{pad(parts.minutes)} min</span>
-            <span className={styles.time}>{pad(parts.seconds)} sec</span>
-          </p>
-        </>
-      )}
-    </div>
+    <Takeover hideCloseButton modalClassNames={styles.modal}>
+      <div className={styles.container}>
+        {parts.totalMs === 0 ? (
+          <div className={styles.openContainer}>
+            <Loader isDotted classNames={styles.loader} />
+            <p className={styles.open}>Reservations are opening momentarily.</p>
+            <p>Please refresh your page every few seconds.</p>
+          </div>
+        ) : (
+          <>
+            <p className={styles.text}>Reservations open in:</p>
+            <p className={styles.time}>
+              {parts.days > 0 && (
+                <span className={styles.time}>{parts.days} days</span>
+              )}
+              <span className={styles.time}>{pad(parts.hours)} hrs</span>
+              <span className={styles.time}>{pad(parts.minutes)} min</span>
+              <span className={styles.time}>{pad(parts.seconds)} sec</span>
+            </p>
+          </>
+        )}
+      </div>
+    </Takeover>
   );
 }

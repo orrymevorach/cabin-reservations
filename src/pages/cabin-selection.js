@@ -17,9 +17,9 @@ import {
   getPageLoadData,
   getUserByRecordId,
 } from '@/lib/airtable';
-import { BEDS } from '@/utils/constants';
-import CountdownTo11AM from '@/components/shared/countdown/countdown';
+import { BEDS, FEATURE_FLAGS } from '@/utils/constants';
 import NoUserTakeover from '@/components/shared/noUserTakeover/noUserTakeover';
+import CountdownToDate from '@/components/shared/countdown/countdown';
 
 export default function CabinSelection({
   cabinAndUnitData,
@@ -27,22 +27,18 @@ export default function CabinSelection({
   group,
   selectedBeds,
 }) {
-  // const isProduction =
-  //   process.env.NODE_ENV === 'production' &&
-  //   process.env.NEXT_PUBLIC_ENV_URL !==
-  //     'https://staging--highlands-reservations.netlify.app/';
-  // if (isProduction)
-  //   return (
-  //     <>
-  //       <Takeover hideCloseButton modalClassNames={styles.modal}>
-  //         <CountdownTo11AM />
-  //         {/* <p style={{ marginBottom: '20px' }}>
-  //         Cabin selection is not currently available. We will send out an email
-  //         to all ticket holders when cabin reservations open up.
-  //       </p> */}
-  //       </Takeover>
-  //     </>
-  //   );
+  const { ENABLE_COUNTDOWN, ENABLE_RESERVATIONS } = FEATURE_FLAGS;
+  if (ENABLE_COUNTDOWN) return <CountdownToDate />;
+  if (!ENABLE_RESERVATIONS)
+    return (
+      <Takeover hideCloseButton modalClassNames={styles.modal}>
+        <p>
+          Cabin selection is not currently available. We will send out an email
+          to all ticket holders when cabin reservations open up.
+        </p>
+      </Takeover>
+    );
+
   if (!user) return <NoUserTakeover />;
 
   return (
