@@ -76,6 +76,10 @@ export async function getServerSideProps(context) {
     const pageLoadResponse = await getPageLoadData(context);
     user = pageLoadResponse.user;
   } catch (error) {
+    console.error('No user data found:', error);
+    user = null;
+  }
+  if (!user) {
     return {
       redirect: {
         destination: '/',
