@@ -196,7 +196,7 @@ export const getUserByEmail = async ({ email }) => {
     if (record.status !== 'Payment Made') return record;
     return null;
   });
-  if (user.length === 0) return {};
+  if (user?.length === 0) return {};
   return user || {};
 };
 
