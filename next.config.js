@@ -31,7 +31,7 @@ const nextConfig = {
       },
       {
         source: '/api/airtable/get-user-by-email',
-        destination: '/api/airtable/get-record',
+        destination: '/api/airtable/get-records-by-field-value',
       },
       {
         source: '/api/airtable/get-user-by-record-id',

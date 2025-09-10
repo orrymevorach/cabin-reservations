@@ -47,6 +47,28 @@ export async function getRecords({
   }
 }
 
+export async function getRecordsByFieldValue({
+  tableId,
+  endpoint = '/get-records-by-field-value',
+  formulaArray,
+}) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tableId, formulaArray }),
+      }
+    ).then(res => res.json());
+    return response;
+  } catch (error) {
+    console.log('error', error);
+  }
+}
+
 export async function getRecord({
   tableId,
   field,
@@ -164,13 +186,18 @@ export const reserveSpotInCabin = async ({ cabinId = '', attendeeId }) => {
 };
 
 export const getUserByEmail = async ({ email }) => {
-  const { record: user } = await getRecord({
+  const { records } = await getRecordsByFieldValue({
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,
-    field: 'Email Address',
-    fieldValue: email,
     endpoint: '/get-user-by-email',
+    formulaArray: [{ fieldName: 'Email Address', fieldValue: email }],
   });
-  return user;
+  if (records.length === 0) return {};
+  const user = records.find(record => {
+    if (record.status !== 'Payment Made') return record;
+    return null;
+  });
+  if (user.length === 0) return {};
+  return user || {};
 };
 
 export const getUserByRecordId = async ({ id }) => {
