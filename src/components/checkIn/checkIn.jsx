@@ -46,7 +46,7 @@ export default function CheckIn({ user }) {
   return (
     <main>
       <Layout>
-        <h2 className={styles.title}>Hi, {user.name}!</h2>
+        <h2 className={styles.title}>Hi, {user?.name}!</h2>
         {stage === stages.FILL_OUT_FORM && (
           <>
             <div className={styles.textContainer}>

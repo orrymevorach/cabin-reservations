@@ -194,7 +194,9 @@ export default function CheckInForm() {
       </div>
       <p>
         If you have any questions, feel free to reach out to
-        info@highlandsmusicfestival.ca
+        <a href="mailto:info@highlandsmusicfestival.ca" className={styles.link}>
+          info@highlandsmusicfestival.ca
+        </a>
       </p>
       <Button classNames={styles.submitButton} isLoading={isFormSubmitting}>
         Continue
