@@ -46,7 +46,7 @@ export default function CheckInForm({ user }) {
       electricVehicle: state.electricVehicle,
       departureTime: state.departureTime,
     });
-    await sendQRCode({ email: user.emailAddress, recordId: user.id });
+    await sendQRCode({ email: user.email, recordId: user.id });
     setIsFormSubmitting(false);
     dispatch({
       type: actions.SET_STAGE,
