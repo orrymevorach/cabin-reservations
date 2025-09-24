@@ -55,7 +55,7 @@ export default function CheckIn({ user }) {
                 arrival.
               </p>
             </div>
-            <CheckInForm />
+            <CheckInForm user={user} />
           </>
         )}
         {stage === stages.SIGN_WAIVER && (

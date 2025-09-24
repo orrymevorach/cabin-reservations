@@ -38,6 +38,11 @@ label.inputLabel {
   margin-bottom: 50px;
 }
 
+.link {
+  text-decoration: underline;
+  color: black;
+}
+
 @media screen and (max-width: variables.$mobile) {
   .container {
     width: 100%;

@@ -32,3 +32,19 @@ export const sendTemporaryPasswordEmail = async ({ emailAddress }) => {
     }
   ).then(res => res.json());
 };
+
+export const sendQRCode = async ({ email, recordId }) => {
+  const res = await fetch(
+    `https://highlandsmusicfestival.ca/api/mailgun/send-qr-codes?email=${email}&recordId=${recordId}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        recordId,
+      }),
+    }
+  ).then(res => res.json());
+};

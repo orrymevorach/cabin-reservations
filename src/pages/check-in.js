@@ -31,6 +31,8 @@ export async function getServerSideProps(context) {
       user: {
         name: user.name || '',
         isCheckedIn: user.checkedIn || false,
+        email: user.emailAddress || '',
+        id: user.id || '',
       },
     },
   };

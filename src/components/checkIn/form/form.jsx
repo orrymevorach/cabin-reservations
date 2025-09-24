@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Textarea } from '@mui/joy';
 import Input from '@/components/shared/input/input';
 import { useRouter } from 'next/router';
+import { sendQRCode } from '@/lib/mailgun';
 
 const arrivalTimesThursday = [
   '4PM - 8PM',
@@ -25,7 +26,7 @@ const arrivalTimesFriday = [
 
 const arrivalDays = ['Thursday', 'Friday', 'Saturday'];
 
-export default function CheckInForm() {
+export default function CheckInForm({ user }) {
   const { state, dispatch, actions, stages } = useCheckIn();
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
@@ -45,6 +46,7 @@ export default function CheckInForm() {
       electricVehicle: state.electricVehicle,
       departureTime: state.departureTime,
     });
+    await sendQRCode({ email: user.emailAddress, recordId: user.id });
     setIsFormSubmitting(false);
     dispatch({
       type: actions.SET_STAGE,
@@ -193,7 +195,7 @@ export default function CheckInForm() {
         />
       </div>
       <p>
-        If you have any questions, feel free to reach out to
+        If you have any questions, feel free to reach out to{' '}
         <a href="mailto:info@highlandsmusicfestival.ca" className={styles.link}>
           info@highlandsmusicfestival.ca
         </a>
