@@ -2,12 +2,13 @@
 
 .textContainer {
   text-align: center;
-  margin: 50px 0 70px;
+  margin-bottom: 70px;
 }
 
 .title {
   @include mixins.fontPrimaryBold;
-  margin-bottom: 10px;
+  margin: 50px 0 10px;
+  text-align: center;
 }
 
 .text {

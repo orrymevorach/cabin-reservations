@@ -286,10 +286,9 @@ export const getGroup = async ({ groupId }) => {
 };
 
 export const checkIn = async ({
-  name,
+  attendee,
   arrivalDay,
   arrivalTime,
-  questions,
   city,
   birthday,
   howDidYouHearAboutHighlands,
@@ -299,13 +298,12 @@ export const checkIn = async ({
   const { record: user } = await createRecord({
     tableId: 'Check In',
     newFields: {
-      Name: name,
+      Attendee: [attendee],
       City: city,
       Birthday: birthday,
       'Arrival Day': arrivalDay,
       'Arrival Time': arrivalTime,
       'How Did You Hear About Highlands': howDidYouHearAboutHighlands,
-      Questions: questions,
       'Does your EV need to be charged?': electricVehicle,
       'Departing before 9AM on Sunday?': departureTime,
     },

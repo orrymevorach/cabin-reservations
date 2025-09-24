@@ -6,6 +6,7 @@ import { checkIn } from '@/lib/airtable';
 import { useState } from 'react';
 import { Textarea } from '@mui/joy';
 import Input from '@/components/shared/input/input';
+import { useRouter } from 'next/router';
 
 const arrivalTimesThursday = [
   '4PM - 8PM',
@@ -28,14 +29,16 @@ export default function CheckInForm() {
   const { state, dispatch, actions, stages } = useCheckIn();
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
+  const router = useRouter();
+  const userId = router.query.id;
+
   const handleSubmit = async e => {
     e.preventDefault();
     setIsFormSubmitting(true);
     await checkIn({
-      name: state.name,
+      attendee: userId,
       arrivalDay: state.arrivalDay,
       arrivalTime: state.arrivalTime,
-      questions: state.questions,
       city: state.city,
       birthday: state.birthday,
       howDidYouHearAboutHighlands: state.howDidYouHearAboutHighlands,
@@ -54,18 +57,6 @@ export default function CheckInForm() {
 
   return (
     <form action="#" className={styles.container} onSubmit={handleSubmit}>
-      <div className={styles.formFieldContainer}>
-        <InputLabel className={styles.inputLabel} id="name-label">
-          Your name
-        </InputLabel>
-        <Input
-          handleChange={e =>
-            dispatch({ type: actions.SET_NAME, name: e.target.value })
-          }
-          value={state.name}
-          classNames={styles.input}
-        />
-      </div>
       <div className={styles.formFieldContainer}>
         <InputLabel className={styles.inputLabel} id="day-label">
           What day do you plan to arrive?
@@ -201,19 +192,10 @@ export default function CheckInForm() {
           minRows={1}
         />
       </div>
-      <div className={styles.formFieldContainer}>
-        <InputLabel className={styles.inputLabel} id="time-label">
-          Do you have any questions for us? Or are you just straight up psyched
-          to get here?
-        </InputLabel>
-        <Textarea
-          value={state.questions}
-          onChange={e =>
-            dispatch({ type: actions.SET_QUESTIONS, questions: e.target.value })
-          }
-          minRows={3}
-        />
-      </div>
+      <p>
+        If you have any questions, feel free to reach out to
+        info@highlandsmusicfestival.ca
+      </p>
       <Button classNames={styles.submitButton} isLoading={isFormSubmitting}>
         Continue
       </Button>
