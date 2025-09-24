@@ -28,7 +28,14 @@ export default function CheckIn({ user }) {
             </p>
             <p className={styles.text}>
               If you did not receive the email, or are experiencing issues,
-              please contact info@highlandsmusicfestival.ca.
+              please contact{' '}
+              <a
+                href="mailto:info@highlandsmusicfestival.ca"
+                className={styles.link}
+              >
+                info@highlandsmusicfestival.ca
+              </a>
+              .
             </p>
           </div>
         </Layout>
