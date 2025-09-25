@@ -295,20 +295,26 @@ export const checkIn = async ({
   electricVehicle,
   departureTime,
 }) => {
-  const { record: user } = await createRecord({
-    tableId: 'Check In',
-    newFields: {
-      Attendee: [attendee],
-      City: city,
-      Birthday: birthday,
-      'Arrival Day': arrivalDay,
-      'Arrival Time': arrivalTime,
-      'How Did You Hear About Highlands': howDidYouHearAboutHighlands,
-      'Does your EV need to be charged?': electricVehicle,
-      'Departing before 9AM on Sunday?': departureTime,
-    },
-  });
-  return user;
+  try {
+    const { record: user } = await createRecord({
+      tableId: 'Check In',
+      newFields: {
+        Attendee: [attendee],
+        City: city,
+        Birthday: birthday,
+        'Arrival Day': arrivalDay,
+        'Arrival Time': arrivalTime,
+        'How Did You Hear About Highlands': howDidYouHearAboutHighlands,
+        'Does your EV need to be charged?': electricVehicle,
+        'Departing before 9AM on Sunday?': departureTime,
+      },
+    });
+    return user;
+  } catch (error) {
+    console.error('Error creating record:', error);
+    // Optionally, throw a custom error or return a meaningful value
+    throw new Error('Failed to create check-in record. Please try again.');
+  }
 };
 
 export const getCabinCategories = async () => {
