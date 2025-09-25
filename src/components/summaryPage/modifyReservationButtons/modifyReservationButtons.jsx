@@ -1,6 +1,5 @@
 import Button from '@/components/shared/button/button';
 import { CABIN_SELECTION_STAGES } from '@/hooks/useReservation';
-import { ROUTES } from '@/utils/constants';
 import styles from './modifyReservationButtons.module.scss';
 import { useRouter } from 'next/router';
 import useAllowBedSelection from '@/hooks/useAllowBedSelection';
@@ -64,7 +63,8 @@ export default function ModifyReservationButtons() {
             Select Beds
           </Button>
         )}
-        {remainingBalanceProductId ? (
+
+        {/* {remainingBalanceProductId ? (
           <Button
             classNames={styles.button}
             handleClick={() => setShowTakeover(true)}
@@ -79,7 +79,7 @@ export default function ModifyReservationButtons() {
           >
             Change Cabin/Unit
           </Button>
-        )}
+        )} */}
 
         {remainingBalanceProductId && (
           <Button

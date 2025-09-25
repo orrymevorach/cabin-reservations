@@ -32,6 +32,6 @@ export const AIRTABLE_BASES = {
 };
 
 export const FEATURE_FLAGS = {
-  ENABLE_RESERVATIONS: true,
+  ENABLE_RESERVATIONS: false,
   ENABLE_COUNTDOWN: false,
 };
