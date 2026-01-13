@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
+    "baseUrl": ".", // Make sure baseUrl is set
     "paths": {
-      "@/*": ["./src/*"],
-      "@variables": ["./src/styles/variables.module.scss"],
-      "@mixins": ["./src/styles/mixins.module.scss"],
-      "context": ["./src/context/*"],
-      "hooks": ["./src/hooks/"],
-      "utils": ["./src/utils/*"],
-      "public": ["./public/*"],
-      "lib": ["lib/"]
+      "@/*": ["src/*"],
+      "@variables": ["src/styles/variables.module.scss"],
+      "@mixins": ["src/styles/mixins.module.scss"],
+      "context/*": ["src/context/*"],
+      "hooks/*": ["src/hooks/*"],
+      "utils/*": ["src/utils/*"],
+      "public/*": ["public/*"],
+      "lib/*": ["lib/*"]
     }
   }
 }
