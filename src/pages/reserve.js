@@ -7,10 +7,11 @@ import { ReservationProvider } from '@/context/reservation-context';
 import { UserProvider } from '@/context/user-context';
 import getCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
 import { getGroup, getPageLoadData, getUserByRecordId } from '@/lib/airtable';
-import { FEATURE_FLAGS } from '@/utils/constants';
+import { FEATURE_FLAGS, ROUTES } from '@/utils/constants';
 import styles from '../components/shared/countdown/countdown.module.scss';
 import CountdownToDate from '@/components/shared/countdown/countdown';
 import NoUserTakeover from '@/components/shared/noUserTakeover/noUserTakeover';
+import Link from 'next/link';
 
 export default function Reserve({
   cabinAndUnitData,
@@ -28,6 +29,11 @@ export default function Reserve({
         <p>
           Cabin selection is not currently available. We will send out an email
           to all ticket holders when cabin reservations open up.
+        </p>
+        <p>
+          If you have purchased a cabin,{' '}
+          <Link href={ROUTES.SUMMARY}>click here</Link> to manage your
+          reservation.
         </p>
       </Takeover>
     );
@@ -86,7 +92,7 @@ export async function getServerSideProps(context) {
       groupResponse.members.map(async memberId => {
         const member = await getUserByRecordId({ id: memberId });
         return member;
-      })
+      }),
     );
   } else {
     // If the user has no group, we create a group with just them in it.

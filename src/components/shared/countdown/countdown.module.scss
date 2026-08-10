@@ -30,6 +30,16 @@
 .modal {
   border: 10px solid variables.$gold;
   outline: 10px solid variables.$blue;
+  p {
+    &:first-of-type {
+      margin-bottom: 15px;
+    }
+  }
+  a,
+  a:active {
+    text-decoration: underline;
+    color: black;
+  }
 }
 
 .openContainer {

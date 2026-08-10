@@ -17,9 +17,10 @@ import {
   getPageLoadData,
   getUserByRecordId,
 } from '@/lib/airtable';
-import { BEDS, FEATURE_FLAGS } from '@/utils/constants';
+import { BEDS, FEATURE_FLAGS, ROUTES } from '@/utils/constants';
 import NoUserTakeover from '@/components/shared/noUserTakeover/noUserTakeover';
 import CountdownToDate from '@/components/shared/countdown/countdown';
+import Link from 'next/link';
 
 export default function CabinSelection({
   cabinAndUnitData,
@@ -35,6 +36,11 @@ export default function CabinSelection({
         <p>
           Cabin selection is not currently available. We will send out an email
           to all ticket holders when cabin reservations open up.
+        </p>
+        <p>
+          If you have purchased a cabin,{' '}
+          <Link href={ROUTES.SUMMARY}>click here</Link> to manage your
+          reservation.
         </p>
       </Takeover>
     );
@@ -91,7 +97,7 @@ export async function getServerSideProps(context) {
 
   if (user.cabin) {
     currentCabin = cabinAndUnitData.cabins.find(
-      cabin => cabin.id === user.cabin[0]
+      cabin => cabin.id === user.cabin[0],
     );
     const bedsArray = Object.keys(BEDS);
     for (let bed of bedsArray) {
@@ -119,7 +125,7 @@ export async function getServerSideProps(context) {
         groupResponse.members.map(async memberId => {
           const member = await getUserByRecordId({ id: memberId });
           return member;
-        })
+        }),
       );
     }
   }
