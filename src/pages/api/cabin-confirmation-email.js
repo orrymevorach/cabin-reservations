@@ -1,5 +1,5 @@
 import { replaceCamelCaseWithSpaces } from '@/utils/string-utils';
-import { sendTransactionalEmail } from '@/lib/mailchimp';
+import { sendEmail } from '@/lib/mailchimp';
 
 export default async function handler(req, res) {
   try {
@@ -19,10 +19,8 @@ export default async function handler(req, res) {
 
     const isHost = groupMember.emailAddress === host.emailAddress;
 
-    await sendTransactionalEmail({
-      fromEmail: 'noreply@highlandsmusicfestival.ca',
-      fromName: 'Highlands Music Festival',
-      to: groupMember.emailAddress,
+    await sendEmail({
+      emailAddress: groupMember.emailAddress,
       subject,
       html: `
       <div>
