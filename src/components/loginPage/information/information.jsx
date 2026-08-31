@@ -8,10 +8,14 @@ export default function Information() {
       </p>
       <p>Here you are able to:</p>
       <ol className={styles.list}>
-        <li>Book a cabin you would like to sleep in</li>
-        <li>Make a reservation on behalf of your friends/partner</li>
+        <li>Book the cabin you would like to stay in</li>
+        <li>Make a reservation for a friend or partner</li>
         <li>Reserve a specific bed in your cabin</li>
-        <li>Make changes to an existing reservation</li>
+        <li>View or make changes to an existing reservation</li>
+        <li>
+          Cabin, Ticket Bundle, and Yurt purchasers can add guests to their
+          group and send them their ticket confirmations
+        </li>
       </ol>
       <p>What you need to log in:</p>
       <ol className={styles.list}>
