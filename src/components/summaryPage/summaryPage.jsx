@@ -12,10 +12,18 @@ import VerifiedUsers from '../shared/verifiedUsers/verifiedUsers';
 import AddGuestsTakeover from './addGuestsTakeover/addGuestsTakeover';
 import ConfirmationTakeover from './confirmationTakeover/confirmationTakeover';
 
+const FREE_TICKET_ALLOWANCES = {
+  'Cabin Purchased': 14,
+  '5 Ticket GA Bundle': 4,
+  '6 Ticket GA Bundle': 5,
+  '7 Ticket GA Bundle': 6,
+};
+
 export default function SummaryPage() {
   const { user, isLoading: isUserDataLoading } = useUser();
   const router = useRouter();
-  const { currentStage, dispatch, actions, cabin } = useReservation();
+  const { currentStage, dispatch, actions, cabin, groupData } =
+    useReservation();
 
   const stageQuery = router.query.stage;
   useEffect(() => {
@@ -32,10 +40,16 @@ export default function SummaryPage() {
 
   // If a cabin is purchased, we allow users to add guests with free tickets
   // Once a cabin is half full, users can no longer add guests with free tickets, but they can add guests with purchased tickets
-  const isPurchasedCabin = user?.status === 'Cabin Purchased';
-  const isPurchasedCabinHalfFull =
-    isPurchasedCabin && cabinData.cabin.reservedBeds >= 12;
-  const allowCreateNewUser = isPurchasedCabin && !isPurchasedCabinHalfFull;
+
+  const freeTicketAllowance = FREE_TICKET_ALLOWANCES[user?.status];
+  const numberOfAddedGuests = Math.max(
+    (groupData?.members?.length || 1) - 1,
+    0,
+  );
+  const hasAvailableBundleTickets =
+    freeTicketAllowance !== undefined &&
+    numberOfAddedGuests < freeTicketAllowance;
+  const allowCreateNewUser = hasAvailableBundleTickets;
 
   return (
     <div className={styles.container}>
