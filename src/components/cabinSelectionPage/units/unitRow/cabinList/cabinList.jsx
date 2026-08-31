@@ -34,28 +34,33 @@ export default function CabinList({ unitData, setHasAvailability }) {
       <ul
         className={clsx(
           styles.cabinListInnerContainer,
-          !hasCabins && styles.noAvailability
+          !hasCabins && styles.noAvailability,
         )}
         ref={cabinListRef}
         onScroll={e => setScrollValue(e.target.scrollTop)}
       >
         {hasCabins ? (
-          cabins.map(cabin => {
-            return (
-              <CabinSelectionTile
-                cabin={cabin}
-                key={`${cabin.unit}-${cabin.name}`}
-                handleSelectCabin={() => handleSubmit(cabin)}
-              />
-            );
-          })
+          cabins
+            .filter(cabin => {
+              if (cabin.name.includes('Head Staff')) return false;
+              return true;
+            })
+            .map(cabin => {
+              return (
+                <CabinSelectionTile
+                  cabin={cabin}
+                  key={`${cabin.unit}-${cabin.name}`}
+                  handleSelectCabin={() => handleSubmit(cabin)}
+                />
+              );
+            })
         ) : (
           <p>There are no cabins in this unit that match your selection.</p>
         )}
       </ul>
       {hasCabins && (
         <button className={styles.scrollDownButton} onClick={handleScrollDown}>
-          <FontAwesomeIcon icon={faChevronCircleDown} size="3x" />
+          <FontAwesomeIcon icon={faChevronCircleDown} size='3x' />
         </button>
       )}
     </div>
