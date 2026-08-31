@@ -6,7 +6,7 @@ import Cabin from './cabin/cabin';
 import { clearCurrentBedSelection, reserveBed } from '@/lib/airtable';
 import Legend from './legend/legend';
 import { useWindowSize } from '@/context/window-size-context';
-import { sendConfirmationEmail } from '@/lib/mailgun';
+import { sendConfirmationEmail } from '@/lib/emails';
 import { BEDS } from '@/utils/constants';
 import { useUser } from '@/context/user-context';
 

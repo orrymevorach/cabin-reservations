@@ -6,7 +6,7 @@ import { clearCurrentBedSelection, reserveSpotInCabin } from '@/lib/airtable';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import clsx from 'clsx';
-import { sendConfirmationEmail } from '@/lib/mailgun';
+import { sendConfirmationEmail } from '@/lib/emails';
 import { useUser } from '@/context/user-context';
 
 export default function ReserveButton({ children, cabin, classNames = '' }) {

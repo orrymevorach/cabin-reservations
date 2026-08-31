@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Textarea } from '@mui/joy';
 import Input from '@/components/shared/input/input';
 import { useRouter } from 'next/router';
-import { sendQRCode } from '@/lib/mailgun';
+import { sendQRCode } from '@/lib/emails';
 
 const arrivalTimesThursday = [
   '4PM - 8PM',
@@ -58,15 +58,15 @@ export default function CheckInForm({ user }) {
     state.arrivalDay === 'Thursday' ? arrivalTimesThursday : arrivalTimesFriday;
 
   return (
-    <form action="#" className={styles.container} onSubmit={handleSubmit}>
+    <form action='#' className={styles.container} onSubmit={handleSubmit}>
       <div className={styles.formFieldContainer}>
-        <InputLabel className={styles.inputLabel} id="day-label">
+        <InputLabel className={styles.inputLabel} id='day-label'>
           What day do you plan to arrive?
         </InputLabel>
         <Select
           required
-          labelId="day-label"
-          id="day"
+          labelId='day-label'
+          id='day'
           value={state.arrivalDay}
           className={styles.dropdown}
           onChange={e =>
@@ -86,13 +86,13 @@ export default function CheckInForm({ user }) {
         </Select>
       </div>
       <div className={styles.formFieldContainer}>
-        <InputLabel className={styles.inputLabel} id="time-label">
+        <InputLabel className={styles.inputLabel} id='time-label'>
           What time do you plan to arrive?
         </InputLabel>
         <Select
           required
-          labelId="time-label"
-          id="time"
+          labelId='time-label'
+          id='time'
           value={state.arrivalTime}
           className={styles.dropdown}
           onChange={e =>
@@ -112,7 +112,7 @@ export default function CheckInForm({ user }) {
         </Select>
       </div>
       <div className={styles.formFieldContainer}>
-        <InputLabel className={styles.inputLabel} id="city-label">
+        <InputLabel className={styles.inputLabel} id='city-label'>
           What city are you coming from?
         </InputLabel>
         <Input
@@ -124,13 +124,13 @@ export default function CheckInForm({ user }) {
         />
       </div>
       <div className={styles.formFieldContainer}>
-        <InputLabel className={styles.inputLabel} id="time-label">
+        <InputLabel className={styles.inputLabel} id='time-label'>
           Are you driving an electric vehicle that needs charging?
         </InputLabel>
         <Select
           required
-          labelId="electric-vehicle"
-          id="electricVehicle"
+          labelId='electric-vehicle'
+          id='electricVehicle'
           value={state.electricVehicle}
           className={styles.dropdown}
           onChange={e =>
@@ -145,13 +145,13 @@ export default function CheckInForm({ user }) {
         </Select>
       </div>
       <div className={styles.formFieldContainer}>
-        <InputLabel className={styles.inputLabel} id="time-label">
+        <InputLabel className={styles.inputLabel} id='time-label'>
           Do you plan to depart at any point before 9:00AM on Sunday?
         </InputLabel>
         <Select
           required
-          labelId="depart-label"
-          id="departureTime"
+          labelId='depart-label'
+          id='departureTime'
           value={state.departureTime}
           className={styles.dropdown}
           onChange={e =>
@@ -166,21 +166,21 @@ export default function CheckInForm({ user }) {
         </Select>
       </div>
       <div className={styles.formFieldContainer}>
-        <InputLabel className={styles.inputLabel} id="birthday-label">
+        <InputLabel className={styles.inputLabel} id='birthday-label'>
           What is your birthday?
         </InputLabel>
         <Input
           handleChange={e =>
             dispatch({ type: actions.SET_BIRTHDAY, birthday: e.target.value })
           }
-          placeholder="MM/DD/YYYY"
+          placeholder='MM/DD/YYYY'
           value={state.birthday}
           classNames={styles.input}
           required
         />
       </div>
       <div className={styles.formFieldContainer}>
-        <InputLabel className={styles.inputLabel} id="time-label">
+        <InputLabel className={styles.inputLabel} id='time-label'>
           How did you hear about Highlands?
         </InputLabel>
         <Textarea
@@ -196,7 +196,7 @@ export default function CheckInForm({ user }) {
       </div>
       <p>
         If you have any questions, feel free to reach out to{' '}
-        <a href="mailto:info@highlandsmusicfestival.ca" className={styles.link}>
+        <a href='mailto:info@highlandsmusicfestival.ca' className={styles.link}>
           info@highlandsmusicfestival.ca
         </a>
       </p>

@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { getUserByEmail } from '@/lib/airtable';
 import UpdatePasswordTakeover from '../updatePasswordTakeover/updatePasswordTakeover';
 import { errors } from '@/components/loginPage/login/login';
-import { sendTemporaryPasswordEmail } from '@/lib/mailgun';
+import { sendTemporaryPasswordEmail } from '@/lib/emails';
 import clsx from 'clsx';
 import Loader from '@/components/shared/loader/loader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -73,13 +73,13 @@ export default function CreateUser() {
           user={user}
         />
       ) : (
-        <form action="#" className={styles.form} onSubmit={handleSubmit}>
+        <form action='#' className={styles.form} onSubmit={handleSubmit}>
           <p className={styles.heading}>Create An Account</p>
           {error && <p className={styles.error}>{error}</p>}
           <Input
-            type="email"
-            id="set-email"
-            label="Email Address"
+            type='email'
+            id='set-email'
+            label='Email Address'
             handleChange={e => setEmailInput(e.target.value)}
             value={emailInput}
             labelClassNames={styles.label}
@@ -88,10 +88,10 @@ export default function CreateUser() {
           />
           <div>
             <Input
-              type="password"
-              id="set-password"
-              label="Temporary Password"
-              asterisk="(The one sent to your email)"
+              type='password'
+              id='set-password'
+              label='Temporary Password'
+              asterisk='(The one sent to your email)'
               handleChange={handleChangePassword}
               value={password}
               labelClassNames={styles.label}
@@ -100,7 +100,7 @@ export default function CreateUser() {
             />
             <button
               onClick={handleSendTemporaryPassword}
-              type="button"
+              type='button'
               className={styles.resendButton}
             >
               {!isPasswordSentSuccess && <span>Resend Temporary Password</span>}

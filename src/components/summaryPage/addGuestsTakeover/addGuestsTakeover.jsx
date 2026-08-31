@@ -17,7 +17,7 @@ import {
   createOrUpdateGroup,
   verifyEmail,
 } from '@/components/shared/addGuests/inputVerify/inputVerify';
-import { sendConfirmationEmail } from '@/lib/mailgun';
+import { sendConfirmationEmail } from '@/lib/emails';
 import { sendSlackNotification } from '@/lib/slack';
 
 export default function AddGuestsTakeover({ allowCreateNewUser }) {

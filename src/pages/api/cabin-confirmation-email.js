@@ -1,5 +1,5 @@
 import { replaceCamelCaseWithSpaces } from '@/utils/string-utils';
-import { sendEmail } from '@/lib/mailchimp';
+import { sendEmail } from '@/lib/emails';
 
 export default async function handler(req, res) {
   try {
