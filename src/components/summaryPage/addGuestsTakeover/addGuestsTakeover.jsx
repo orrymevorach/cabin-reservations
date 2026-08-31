@@ -161,7 +161,7 @@ export default function AddGuestsTakeover({ allowCreateNewUser }) {
             cabin={cabin}
             classNames={clsx(
               styles.addGuests,
-              !allowCreateNewUser && styles.height
+              !allowCreateNewUser && styles.height,
             )}
             hideBackButton
             handleSubmit={handleSubmit}
