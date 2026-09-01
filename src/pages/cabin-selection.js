@@ -10,13 +10,9 @@ import VisibleSectionProvider from '@/context/visible-section-context';
 import Takeover from '@/components/shared/takeover/takeover';
 import styles from '../components/shared/countdown/countdown.module.scss';
 import getCabinAndUnitData from '@/lib/cabins';
-import {
-  getBedOccupant,
-  getGroup,
-  getPageLoadData,
-  getUserByRecordId,
-} from '@/lib/airtable';
-import { BEDS, FEATURE_FLAGS, ROUTES } from '@/utils/constants';
+import { getPageLoadData } from '@/lib/airtable';
+import { getUserReservationData } from '@/lib/cabin-selection';
+import { FEATURE_FLAGS, ROUTES } from '@/utils/constants';
 import NoUserTakeover from '@/components/shared/noUserTakeover/noUserTakeover';
 import CountdownToDate from '@/components/shared/countdown/countdown';
 import Link from 'next/link';
@@ -90,57 +86,17 @@ export async function getServerSideProps(context) {
   }
 
   const cabinAndUnitData = await getCabinAndUnitData();
-
-  let currentCabin = null;
-  const selectedBeds = [];
-
-  if (user.cabin) {
-    currentCabin = cabinAndUnitData.cabins.find(
-      cabin => cabin.id === user.cabin[0],
-    );
-    const bedsArray = Object.keys(BEDS);
-    for (let bed of bedsArray) {
-      if (currentCabin[bed] && currentCabin[bed][0]) {
-        const currentBedOccupant = await getBedOccupant({
-          userId: currentCabin[bed][0],
-        });
-        currentCabin[bed] = currentBedOccupant;
-        selectedBeds.push({
-          bedName: bed,
-          ...currentBedOccupant,
-        });
-      }
-    }
-  }
-
-  let groupMembers = [];
-  let groupId = '';
-
-  if (user.group && user.group.length > 0) {
-    groupId = user.group[0] || '';
-    const groupResponse = await getGroup({ groupId });
-    if (groupResponse?.members) {
-      groupMembers = await Promise.all(
-        groupResponse.members.map(async memberId => {
-          const member = await getUserByRecordId({ id: memberId });
-          return member;
-        }),
-      );
-    }
-  }
+  const {
+    user: resolvedUser,
+    group,
+    selectedBeds,
+  } = await getUserReservationData({ user, cabinAndUnitData });
 
   return {
     props: {
       cabinAndUnitData,
-      user: {
-        ...user,
-        cabin: currentCabin,
-        group: groupMembers,
-      },
-      group: {
-        id: groupId,
-        members: groupMembers,
-      },
+      user: resolvedUser,
+      group,
       selectedBeds,
     },
   };
