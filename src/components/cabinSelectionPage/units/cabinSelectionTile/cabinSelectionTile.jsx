@@ -24,9 +24,9 @@ export default function CabinSelectionTile({ cabin, handleSelectCabin }) {
             Available Beds: {openBeds} of {totalBeds}
           </p>
         )}
-        {category !== 'Anywhere!' &&
-          category !==
-            'Yurtlands'(<Pill classNames={styles.pill}>{category}</Pill>)}
+        {category !== 'Anywhere!' && category !== 'Yurtlands' && (
+          <Pill classNames={styles.pill}>{category}</Pill>
+        )}
 
         {isAvailable ? (
           <Button
