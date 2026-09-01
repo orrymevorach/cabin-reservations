@@ -1,4 +1,3 @@
-import { createGroup, updateGroup } from '@/lib/airtable';
 import { useState, useRef } from 'react';
 import styles from './inputVerify.module.scss';
 import Button from '@/components/shared/button/button';
@@ -6,50 +5,6 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Input from '@/components/shared/input/input';
 import clsx from 'clsx';
-
-export const createOrUpdateGroup = async ({ users = [], groupData }) => {
-  const hasExistingGroup = !!groupData?.id;
-  const groupRecordIds = users.map(({ id }) => id);
-  if (!hasExistingGroup) {
-    const response = await createGroup({
-      groupName: users[0].name,
-      members: groupRecordIds,
-    });
-    return {
-      id: response.id,
-      members: users,
-    };
-  } else {
-    const response = await updateGroup({
-      groupId: groupData.id,
-      members: groupRecordIds,
-    });
-    return {
-      id: response.id,
-      members: users,
-    };
-  }
-};
-
-export const verifyEmail = async ({ user, groupData }) => {
-  const hasUser = user?.id;
-  const groupEmails = groupData.members.map(({ emailAddress }) => emailAddress);
-  const isRepeatEmail = groupEmails.includes(user.emailAddress);
-  if (isRepeatEmail) {
-    return {
-      error: 'This guest is already in your group. Please enter a new email.',
-    };
-  } else if (!hasUser) {
-    return {
-      error: 'No user found with this email.',
-    };
-  } else if (user.cabin) {
-    return {
-      error: 'This guest is already in a cabin.',
-    };
-  }
-  return { error: null };
-};
 
 export default function InputVerify({ handleSubmit, allowCreateNewUser }) {
   const [firstName, setFirstName] = useState('');

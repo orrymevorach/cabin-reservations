@@ -46,7 +46,13 @@ export async function reserveCabin({
   }
 }
 
-export async function addGroupMember({ groupId, hostUserId, memberIds, email }) {
+export async function addGroupMember({
+  groupId,
+  hostUserId,
+  memberIds,
+  email,
+  cabinId,
+}) {
   try {
     const response = await fetch('/api/platform/group', {
       method: 'POST',
@@ -57,6 +63,38 @@ export async function addGroupMember({ groupId, hostUserId, memberIds, email }) 
         hostUserId,
         memberIds,
         email,
+        cabinId,
+      }),
+    }).then(res => res.json());
+    return response;
+  } catch (error) {
+    console.log('error', error);
+    return { message: 'Unable to add guest. Please try again.' };
+  }
+}
+
+export async function createGroupMember({
+  groupId,
+  hostUserId,
+  memberIds,
+  email,
+  firstName,
+  lastName,
+  cabinId,
+}) {
+  try {
+    const response = await fetch('/api/platform/group', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'create',
+        groupId,
+        hostUserId,
+        memberIds,
+        email,
+        firstName,
+        lastName,
+        cabinId,
       }),
     }).then(res => res.json());
     return response;
