@@ -3,12 +3,9 @@ import { CABIN_SELECTION_STAGES } from '@/hooks/useReservation';
 import styles from './modifyReservationButtons.module.scss';
 import { useRouter } from 'next/router';
 import useAllowBedSelection from '@/hooks/useAllowBedSelection';
-import Takeover from '@/components/shared/takeover/takeover';
 import { useUser } from '@/context/user-context';
-import { useState } from 'react';
 
 export default function ModifyReservationButtons() {
-  const [showTakeover, setShowTakeover] = useState(false);
   const router = useRouter();
   const { user } = useUser();
 
@@ -27,18 +24,6 @@ export default function ModifyReservationButtons() {
 
   return (
     <div className={styles.modifyContainer}>
-      {showTakeover && (
-        <Takeover handleClose={() => setShowTakeover(false)}>
-          <p>
-            Since you have prepaid for your cabin, please contact us to change
-            your cabin. Please email us at info@highlandsmusicfestival.ca
-          </p>
-          <p>
-            We apologize for the inconvenince, and look forward to helping you
-            sort this out!
-          </p>
-        </Takeover>
-      )}
       <p className={styles.title}>Modify Your Reservation</p>
       <div className={styles.buttons}>
         <Button
@@ -63,23 +48,6 @@ export default function ModifyReservationButtons() {
             Select Beds
           </Button>
         )}
-
-        {/* {remainingBalanceProductId ? (
-          <Button
-            classNames={styles.button}
-            handleClick={() => setShowTakeover(true)}
-          >
-            Change Cabin/Unit
-          </Button>
-        ) : (
-          <Button
-            classNames={styles.button}
-            isAnchor
-            href={ROUTES.CABIN_SELECTION}
-          >
-            Change Cabin/Unit
-          </Button>
-        )} */}
 
         {remainingBalanceProductId && (
           <Button
