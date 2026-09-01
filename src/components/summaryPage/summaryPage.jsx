@@ -17,6 +17,7 @@ const FREE_TICKET_ALLOWANCES = {
   '5 Ticket GA Bundle': 4,
   '6 Ticket GA Bundle': 5,
   '7 Ticket GA Bundle': 6,
+  Yurt: 1,
 };
 
 export default function SummaryPage() {
