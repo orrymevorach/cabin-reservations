@@ -33,6 +33,7 @@ export default function CabinSelectionTakeover() {
     useCabinSelection();
   const { isMobile } = useWindowSize();
   const [showBedSelection, setShowBedSelection] = useState(false);
+  const isYurtlands = selectedCabin?.unit?.[0] === 'Yurtlands';
 
   return (
     <>
@@ -56,17 +57,19 @@ export default function CabinSelectionTakeover() {
               />
               <div className={styles.right}>
                 <CabinSummary {...selectedCabin} />
-                <div className={styles.overlayText}>
-                  <FontAwesomeIcon
-                    icon={faInfoCircle}
-                    className={styles.infoIcon}
-                    size="xs"
-                  />
-                  <p>
-                    All cabins have the exact same layout, though each cabin may
-                    differ slightly from the images.
-                  </p>
-                </div>
+                {!isYurtlands && (
+                  <div className={styles.overlayText}>
+                    <FontAwesomeIcon
+                      icon={faInfoCircle}
+                      className={styles.infoIcon}
+                      size="xs"
+                    />
+                    <p>
+                      All cabins have the exact same layout, though each cabin
+                      may differ slightly from the images.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -11,6 +11,7 @@ export default function BottomRow({ showBedSelection, setShowBedSelection }) {
   const { selectedCabin, dispatch, actions } = useCabinSelection();
 
   const [isLoading, setIsLoading] = useState(false);
+  const isYurtlands = selectedCabin?.unit?.[0] === 'Yurtlands';
 
   const router = useRouter();
   const handleClick = async () => {
@@ -42,14 +43,16 @@ export default function BottomRow({ showBedSelection, setShowBedSelection }) {
         >
           Close
         </Button>
-        <Button
-          handleClick={() => setShowBedSelection(!showBedSelection)}
-          classNames={styles.viewBedSelectionButton}
-        >
-          {showBedSelection
-            ? 'Back to cabin information'
-            : 'View available beds'}
-        </Button>
+        {!isYurtlands && (
+          <Button
+            handleClick={() => setShowBedSelection(!showBedSelection)}
+            classNames={styles.viewBedSelectionButton}
+          >
+            {showBedSelection
+              ? 'Back to cabin information'
+              : 'View available beds'}
+          </Button>
+        )}
       </div>
       <Button isBlue handleClick={handleClick}>
         Continue

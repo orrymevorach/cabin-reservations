@@ -13,11 +13,19 @@ export default function ReserveButton({ children, cabin, classNames = '' }) {
   const { user } = useUser();
   const { groupData, dispatch, actions, selectedBeds } = useReservation();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const router = useRouter();
   const groupMembers = groupData.members;
   const cabinId = cabin.id;
+  const isYurt = cabin.unit?.[0] === 'Yurtlands';
 
   const reserveCabinForGroupMembers = async () => {
+    if (isYurt && user.status !== 'Yurt') {
+      setError('You must have purchased a Yurt in order to reserve one.');
+      return;
+    }
+
+    setError('');
     setIsLoading(true);
     try {
       for (let i = 0; i < groupMembers.length; i++) {
@@ -62,13 +70,16 @@ export default function ReserveButton({ children, cabin, classNames = '' }) {
     }
   };
   return (
-    <Button
-      handleClick={reserveCabinForGroupMembers}
-      isLoading={isLoading}
-      classNames={clsx(styles.continueButton, classNames)}
-      isBlue
-    >
-      {children || 'Confirm reservation'}
-    </Button>
+    <>
+      {error && <p className={styles.error}>{error}</p>}
+      <Button
+        handleClick={reserveCabinForGroupMembers}
+        isLoading={isLoading}
+        classNames={clsx(styles.continueButton, classNames)}
+        isBlue
+      >
+        {children || 'Confirm reservation'}
+      </Button>
+    </>
   );
 }

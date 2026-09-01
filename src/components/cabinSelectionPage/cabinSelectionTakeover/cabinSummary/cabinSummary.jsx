@@ -14,6 +14,7 @@ export default function CabinSummary({
   const hasAdditionalInformation = additionalInformation?.length > 0;
   const [showCategoryDescription, setShowCategoryDescription] = useState(false);
   const categoryName = category && category.length ? category[0] : null;
+  const accommodationName = unit?.[0] === 'Yurtlands' ? '' : 'Cabin';
 
   return (
     <div className={styles.summaryContainer}>
@@ -24,7 +25,9 @@ export default function CabinSummary({
         />
       )}
       <>
-        <p className={styles.name}>Cabin {name}</p>
+        <p className={styles.name}>
+          {accommodationName} {name}
+        </p>
         <div className={styles.pillsContainer}>
           {categoryName && (
             <div className={styles.categoryContainer}>
@@ -38,7 +41,7 @@ export default function CabinSummary({
           )}
         </div>
         <p className={styles.description}>
-          Cabin {name} is located in the{' '}
+          {accommodationName} {name} is located in the{' '}
           <span className={styles.unit}>{unit}</span> unit.
         </p>
         {hasAdditionalInformation && (
