@@ -3,7 +3,7 @@ import { ReservationProvider } from '@/context/reservation-context';
 import SummaryPage from '@/components/summaryPage/summaryPage';
 import { CabinAndUnitDataProvider } from '@/context/cabin-and-unit-data-context';
 import { UserProvider } from '@/context/user-context';
-import getCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
+import getCabinAndUnitData from '@/lib/cabins';
 import {
   getBedOccupant,
   getGroup,
@@ -71,7 +71,7 @@ export async function getServerSideProps(context) {
 
   if (user.cabin) {
     currentCabin = cabinAndUnitData.cabins.find(
-      cabin => cabin.id === user.cabin[0]
+      cabin => cabin.id === user.cabin[0],
     );
     const bedsArray = Object.keys(BEDS);
     for (let bed of bedsArray) {
@@ -99,7 +99,7 @@ export async function getServerSideProps(context) {
         groupResponse.members.map(async memberId => {
           const member = await getUserByRecordId({ id: memberId });
           return member;
-        })
+        }),
       );
     }
   } else {

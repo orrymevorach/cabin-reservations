@@ -9,8 +9,7 @@ import { UserProvider } from '@/context/user-context';
 import VisibleSectionProvider from '@/context/visible-section-context';
 import Takeover from '@/components/shared/takeover/takeover';
 import styles from '../components/shared/countdown/countdown.module.scss';
-
-import getCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
+import getCabinAndUnitData from '@/lib/cabins';
 import {
   getBedOccupant,
   getGroup,

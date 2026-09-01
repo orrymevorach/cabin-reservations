@@ -1,11 +1,11 @@
 import Button from '@/components/shared/button/button';
-import useGetCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
-import { getFilterCategories } from '../../units/unitRow/cabinList/filter-utils';
+import getCabinAndUnitData from '@/lib/getCabinAndUnitData';
+import { getFilterCategories } from '@/utils/cabin-utils';
 import styles from './categoryButtons.module.scss';
 import { FILTERS } from '../filters-context';
 
 export default function CategoryButtons({ handleChange }) {
-  const { units } = useGetCabinAndUnitData();
+  const { units } = getCabinAndUnitData();
   const filterCategories = getFilterCategories({ unitData: units });
   return (
     <div className={styles.container}>

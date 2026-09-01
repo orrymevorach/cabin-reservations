@@ -6,14 +6,17 @@ import {
   filterByCategory,
   sortByCategory,
   sortByLeastAvailability,
-} from './unitRow/cabinList/filter-utils';
+} from '@/utils/cabin-utils';
 
 const filterByFilterSelection = ({ cabins, selectedFilters }) => {
   let filteredCabins = [];
-  filteredCabins = filterByAvailableBeds({ cabins, selectedFilters });
+  filteredCabins = filterByAvailableBeds({
+    cabins,
+    availableBeds: selectedFilters[FILTERS.AVAILABLE_BEDS],
+  });
   filteredCabins = filterByCategory({
     cabins: filteredCabins,
-    selectedFilters,
+    category: selectedFilters[FILTERS.CATEGORY],
   });
   filteredCabins = sortByLeastAvailability({ cabins: filteredCabins });
   filteredCabins = sortByCategory({ cabins: filteredCabins });

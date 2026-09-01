@@ -5,7 +5,7 @@ import Takeover from '@/components/shared/takeover/takeover';
 import { CabinAndUnitDataProvider } from '@/context/cabin-and-unit-data-context';
 import { ReservationProvider } from '@/context/reservation-context';
 import { UserProvider } from '@/context/user-context';
-import getCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
+import getCabinAndUnitData from '@/lib/cabins';
 import { getGroup, getPageLoadData, getUserByRecordId } from '@/lib/airtable';
 import { FEATURE_FLAGS, ROUTES } from '@/utils/constants';
 import styles from '../components/shared/countdown/countdown.module.scss';
