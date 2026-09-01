@@ -84,3 +84,17 @@ export async function removeGroupMember({ groupId, memberIds, removeUserId }) {
     return { message: 'Unable to remove guest. Please try again.' };
   }
 }
+
+export async function reserveBeds({ cabinId, hostUserId, beds }) {
+  try {
+    const response = await fetch('/api/platform/reserve-bed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cabinId, hostUserId, beds }),
+    }).then(res => res.json());
+    return response;
+  } catch (error) {
+    console.log('error', error);
+    return { message: 'Unable to reserve bed. Please try again.' };
+  }
+}
