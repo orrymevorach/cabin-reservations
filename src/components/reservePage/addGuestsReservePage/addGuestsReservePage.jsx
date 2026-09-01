@@ -4,12 +4,8 @@ import { ROUTES } from '@/utils/constants';
 import styles from './addGuestsReservePage.module.scss';
 import { useReservation } from '@/context/reservation-context';
 import useWindowSize from '@/hooks/useWindowSize';
-import { getUserByEmail } from '@/lib/airtable';
+import { addGroupMember } from '@/lib/platform-api';
 import { useUser } from '@/context/user-context';
-import {
-  createOrUpdateGroup,
-  verifyEmail,
-} from '@/components/shared/addGuests/inputVerify/inputVerify';
 
 export default function AddGuestsReservePage() {
   const {
@@ -24,25 +20,18 @@ export default function AddGuestsReservePage() {
   const { user } = useUser();
 
   async function handleSubmit({ email, ref }) {
-    const userResponse = await getUserByEmail({ email });
-    // Check that user does not already exist, and does not have a group or cabin
-    const { error } = await verifyEmail({ user: userResponse, groupData });
-    if (error) return { error };
-
-    // Add user to existing group, or create new group if none exists
-    const hasGroup = groupData.members?.length;
-    const usersToAdd = hasGroup
-      ? [...groupData.members, userResponse]
-      : [user, userResponse];
-    const updatedGroupData = await createOrUpdateGroup({
-      users: usersToAdd,
-      groupData,
+    const response = await addGroupMember({
+      groupId: groupData.id,
+      hostUserId: user.id,
+      memberIds: groupData.members?.map(({ id }) => id) || [],
+      email,
     });
+    if (response.message) return { error: response.message };
 
     // Update state
     dispatch({
       type: actions.UPDATE_GROUP,
-      groupData: updatedGroupData,
+      groupData: response.group,
       numberOfMembersNotConfirmedInCurrentCabin:
         numberOfMembersNotConfirmedInCurrentCabin + 1,
     });

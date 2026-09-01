@@ -4,7 +4,7 @@ import { faMinusCircle } from '@fortawesome/free-solid-svg-icons';
 import { useUser } from '@/context/user-context';
 import { useReservation } from '@/context/reservation-context';
 import clsx from 'clsx';
-import { updateGroup } from '@/lib/airtable';
+import { removeGroupMember } from '@/lib/platform-api';
 import { useState } from 'react';
 import Loader from '../loader/loader';
 
@@ -21,16 +21,17 @@ const VerifiedUser = ({ currentUser, index, hideRemoveButton }) => {
 
   const handleRemoveUser = async ({ currentUser }) => {
     setIsLoading(true);
-    const remainingMembers = groupData.members.filter(
-      ({ id }) => id !== currentUser.id
-    );
-    const memberRecordIds = remainingMembers.map(({ id }) => id);
+    const memberRecordIds = groupData.members.map(({ id }) => id);
 
-    await updateGroup({ groupId: groupData.id, members: memberRecordIds });
-    groupData.members = remainingMembers;
+    const response = await removeGroupMember({
+      groupId: groupData.id,
+      memberIds: memberRecordIds,
+      removeUserId: currentUser.id,
+    });
+
     dispatch({
       type: actions.UPDATE_GROUP,
-      groupData,
+      groupData: response.group,
       numberOfMembersNotConfirmedInCurrentCabin:
         numberOfMembersNotConfirmedInCurrentCabin - 1,
     });

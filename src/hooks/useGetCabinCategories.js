@@ -1,12 +1,12 @@
-import { getCabinCategories } from '@/lib/airtable';
+import { getCabinCategories } from '@/lib/platform-api';
 import { useEffect, useState } from 'react';
 
 export default function useGetCabinCategories() {
   const [cabinCategories, setCabinCategories] = useState(null);
   useEffect(() => {
     const getCabinCategoryData = async () => {
-      const response = await getCabinCategories({});
-      setCabinCategories(response);
+      const cabinCategories = await getCabinCategories();
+      setCabinCategories(cabinCategories);
     };
     getCabinCategoryData();
   }, []);

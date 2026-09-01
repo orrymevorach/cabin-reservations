@@ -5,8 +5,9 @@ import Takeover from '@/components/shared/takeover/takeover';
 import { CabinAndUnitDataProvider } from '@/context/cabin-and-unit-data-context';
 import { ReservationProvider } from '@/context/reservation-context';
 import { UserProvider } from '@/context/user-context';
-import getCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
-import { getGroup, getPageLoadData, getUserByRecordId } from '@/lib/airtable';
+import getCabinAndUnitData from '@/lib/platform-api';
+import { getPageLoadData } from '@/lib/airtable';
+import { getUserReservationData } from '@/lib/platform-utils';
 import { FEATURE_FLAGS, ROUTES } from '@/utils/constants';
 import styles from '../components/shared/countdown/countdown.module.scss';
 import CountdownToDate from '@/components/shared/countdown/countdown';
@@ -74,44 +75,23 @@ export async function getServerSideProps(context) {
   }
 
   const cabinAndUnitData = await getCabinAndUnitData();
+  const {
+    user: resolvedUser,
+    group,
+    selectedBeds,
+  } = await getUserReservationData({ user, cabinAndUnitData });
 
-  let currentCabin = null;
-  if (user.cabin) {
-    currentCabin = cabinAndUnitData.cabins.find(cabin => {
-      return cabin.id === user.cabin[0];
-    });
-  }
-
-  let groupMembers = [];
-  let groupId = '';
-
-  if (user.group) {
-    const groupResponse = await getGroup({ groupId: user.group });
-    groupId = user.group[0];
-    groupMembers = await Promise.all(
-      groupResponse.members.map(async memberId => {
-        const member = await getUserByRecordId({ id: memberId });
-        return member;
-      }),
-    );
-  } else {
-    // If the user has no group, we create a group with just them in it.
-    groupId = '';
-    groupMembers = [user];
-  }
+  // a user without a formal group yet still counts as a group of themselves
+  const groupWithSelfFallback = group.members.length
+    ? group
+    : { ...group, members: [resolvedUser] };
 
   return {
     props: {
       cabinAndUnitData,
-      user: {
-        ...user,
-        cabin: currentCabin,
-        group: groupMembers,
-      },
-      group: {
-        id: groupId,
-        members: groupMembers,
-      },
+      user: { ...resolvedUser, group: groupWithSelfFallback.members },
+      group: groupWithSelfFallback,
+      selectedBeds,
       hasCabinQuery: true,
     },
   };

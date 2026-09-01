@@ -1,12 +1,15 @@
 import Button from '@/components/shared/button/button';
-import useGetCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
-import { getFilterCategories } from '../../units/unitRow/cabinList/filter-utils';
+import { useCabinAndUnitData } from '@/context/cabin-and-unit-data-context';
+import { getFilterCategories } from '@/utils/cabin-utils';
 import styles from './categoryButtons.module.scss';
 import { FILTERS } from '../filters-context';
 
 export default function CategoryButtons({ handleChange }) {
-  const { units } = useGetCabinAndUnitData();
+  const { units } = useCabinAndUnitData();
   const filterCategories = getFilterCategories({ unitData: units });
+
+  if (!filterCategories.length) return null;
+
   return (
     <div className={styles.container}>
       <p>Popular Selections:</p>
