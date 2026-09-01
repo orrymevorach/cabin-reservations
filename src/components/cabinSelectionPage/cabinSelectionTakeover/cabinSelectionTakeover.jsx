@@ -62,7 +62,7 @@ export default function CabinSelectionTakeover() {
                     <FontAwesomeIcon
                       icon={faInfoCircle}
                       className={styles.infoIcon}
-                      size="xs"
+                      size='xs'
                     />
                     <p>
                       All cabins have the exact same layout, though each cabin

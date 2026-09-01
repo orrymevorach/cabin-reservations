@@ -39,7 +39,7 @@ export async function getRecords({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ tableId, view }),
-      }
+      },
     ).then(res => res.json());
     return response;
   } catch (error) {
@@ -61,7 +61,7 @@ export async function getRecordsByFieldValue({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ tableId, formulaArray }),
-      }
+      },
     ).then(res => res.json());
     return response;
   } catch (error) {
@@ -84,7 +84,7 @@ export async function getRecord({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ tableId, field, fieldValue }),
-      }
+      },
     ).then(res => res.json());
     return response;
   } catch (error) {
@@ -106,7 +106,7 @@ export async function getRecordById({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ tableId, recordId }),
-      }
+      },
     ).then(res => res.json());
     return response;
   } catch (error) {
@@ -129,7 +129,7 @@ export const updateRecord = async ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ tableId, newFields, recordId }),
-      }
+      },
     ).then(res => res.json());
     return response;
   } catch (error) {

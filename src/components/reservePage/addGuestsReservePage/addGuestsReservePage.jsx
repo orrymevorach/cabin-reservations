@@ -58,7 +58,7 @@ export default function AddGuestsReservePage() {
       {isMobile && (
         <>
           <p className={styles.or}>Or</p>
-          <Button classNames={styles.button} href="#sidebar">
+          <Button classNames={styles.button} href='#sidebar'>
             Continue
           </Button>
         </>
