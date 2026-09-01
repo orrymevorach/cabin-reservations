@@ -24,6 +24,10 @@ export default function ReserveButton({ children, cabin, classNames = '' }) {
       setError('You must have purchased a Yurt in order to reserve one.');
       return;
     }
+    if (!isYurt && user.status === 'Yurt') {
+      setError('Yurt ticket holders can only reserve a yurt in Yurtlands.');
+      return;
+    }
 
     setError('');
     setIsLoading(true);
