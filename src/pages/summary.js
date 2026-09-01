@@ -3,7 +3,7 @@ import { ReservationProvider } from '@/context/reservation-context';
 import SummaryPage from '@/components/summaryPage/summaryPage';
 import { CabinAndUnitDataProvider } from '@/context/cabin-and-unit-data-context';
 import { UserProvider } from '@/context/user-context';
-import getCabinAndUnitData from '@/lib/cabins';
+import getCabinAndUnitData from '@/lib/platform-api';
 import {
   getBedOccupant,
   getGroup,

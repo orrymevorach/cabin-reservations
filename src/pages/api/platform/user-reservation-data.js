@@ -1,6 +1,6 @@
-import getCabinAndUnitData from '@/lib/cabins';
+import getCabinAndUnitData from '@/lib/platform-api';
 import { getPageLoadData, getUserByRecordId } from '@/lib/airtable';
-import { getUserReservationData } from '@/lib/cabin-selection';
+import { getUserReservationData } from '@/lib/platform-utils';
 import { isObjectEmpty } from '@/utils/string-utils';
 
 export default async function handler(req, res) {
@@ -24,8 +24,11 @@ export default async function handler(req, res) {
     if (!user) return res.status(200).json({ user: null });
 
     const cabinAndUnitData = await getCabinAndUnitData();
-    const { user: resolvedUser, group, selectedBeds } =
-      await getUserReservationData({ user, cabinAndUnitData });
+    const {
+      user: resolvedUser,
+      group,
+      selectedBeds,
+    } = await getUserReservationData({ user, cabinAndUnitData });
 
     res
       .status(200)

@@ -1,4 +1,4 @@
-import { getCabinCategories } from '@/lib/cabins';
+import { getCabinCategories } from '@/lib/platform-api';
 import { useEffect, useState } from 'react';
 
 export default function useGetCabinCategories() {

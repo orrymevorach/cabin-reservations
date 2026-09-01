@@ -23,7 +23,9 @@ async function resolveGroup({ user }) {
     const groupResponse = await getGroup({ groupId });
     if (groupResponse?.members) {
       members = await Promise.all(
-        groupResponse.members.map(memberId => getUserByRecordId({ id: memberId })),
+        groupResponse.members.map(memberId =>
+          getUserByRecordId({ id: memberId }),
+        ),
       );
     }
   }
@@ -36,8 +38,7 @@ export async function getUserReservationData({ user, cabinAndUnitData }) {
   let currentCabin = null;
   if (user.cabin) {
     currentCabin =
-      cabinAndUnitData.cabins.find(cabin => cabin.id === user.cabin[0]) ||
-      null;
+      cabinAndUnitData.cabins.find(cabin => cabin.id === user.cabin[0]) || null;
   }
 
   const selectedBeds = await resolveSelectedBeds({ cabin: currentCabin });
