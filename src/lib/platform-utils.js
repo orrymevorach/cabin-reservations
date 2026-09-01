@@ -1,6 +1,10 @@
 import { getBedOccupant, getGroup, getUserByRecordId } from '@/lib/airtable';
 import { BEDS } from '@/utils/constants';
 
+export async function resolveGroupMembers({ memberIds }) {
+  return Promise.all(memberIds.map(memberId => getUserByRecordId({ id: memberId })));
+}
+
 async function resolveSelectedBeds({ cabin }) {
   const selectedBeds = [];
   if (!cabin) return selectedBeds;
@@ -22,11 +26,7 @@ async function resolveGroup({ user }) {
     groupId = user.group[0] || '';
     const groupResponse = await getGroup({ groupId });
     if (groupResponse?.members) {
-      members = await Promise.all(
-        groupResponse.members.map(memberId =>
-          getUserByRecordId({ id: memberId }),
-        ),
-      );
+      members = await resolveGroupMembers({ memberIds: groupResponse.members });
     }
   }
   return { id: groupId, members };
