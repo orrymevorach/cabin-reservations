@@ -54,7 +54,7 @@ export default function InputVerify({ handleSubmit, allowCreateNewUser }) {
                 })
               }
               value={firstName}
-              label="First Name"
+              label='First Name'
               inputRef={firstNameRef}
               required
             />
@@ -63,7 +63,7 @@ export default function InputVerify({ handleSubmit, allowCreateNewUser }) {
                 handleChange({ callback: setLastName, value: e.target.value })
               }
               value={lastName}
-              label="Last Name"
+              label='Last Name'
               required
             />
           </>
@@ -76,13 +76,13 @@ export default function InputVerify({ handleSubmit, allowCreateNewUser }) {
             })
           }
           value={email}
-          label="Email address"
+          label='Email address'
           error={error}
           inputRef={emailRef}
           required
         />
         <Button isLoading={isLoading} classNames={styles.button}>
-          Add Guest <FontAwesomeIcon icon={faPlus} size="sm" />
+          Add Guest <FontAwesomeIcon icon={faPlus} size='sm' />
         </Button>
       </div>
     </form>

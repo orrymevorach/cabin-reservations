@@ -42,7 +42,7 @@ const VerifiedUser = ({ currentUser, index, hideRemoveButton }) => {
       <p
         className={clsx(
           styles.verifiedUser,
-          !isLoggedInUser && styles.nonActiveUser
+          !isLoggedInUser && styles.nonActiveUser,
         )}
       >
         <span className={styles.number}>{index + 1}.</span>
@@ -56,7 +56,7 @@ const VerifiedUser = ({ currentUser, index, hideRemoveButton }) => {
           {!isLoading ? (
             <FontAwesomeIcon icon={faMinusCircle} />
           ) : (
-            <Loader isDotted size="lg" classNames={styles.loader} />
+            <Loader isDotted size='lg' classNames={styles.loader} />
           )}
         </button>
       ) : (

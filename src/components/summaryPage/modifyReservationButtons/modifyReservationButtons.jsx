@@ -54,7 +54,7 @@ export default function ModifyReservationButtons() {
             classNames={styles.button}
             isAnchor
             href={`https://highlandsmusicfestival.ca/checkout?productId=${remainingBalanceProductId}`}
-            target="_blank"
+            target='_blank'
           >
             Complete Payment
           </Button>
