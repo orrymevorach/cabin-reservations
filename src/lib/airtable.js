@@ -111,6 +111,7 @@ export async function getRecordById({
     return response;
   } catch (error) {
     console.log('error', error);
+    return { record: null };
   }
 }
 
