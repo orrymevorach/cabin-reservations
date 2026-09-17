@@ -296,6 +296,10 @@ export const checkIn = async ({
   electricVehicle,
   departureTime,
 }) => {
+  const existingAttendee = await getUserByRecordId({ id: attendee });
+  if (existingAttendee?.checkedIn === 'Yes') {
+    return { alreadyCheckedIn: true };
+  }
   try {
     const { record: user } = await createRecord({
       tableId: 'Check In',
@@ -310,12 +314,25 @@ export const checkIn = async ({
         'Departing before 9AM on Sunday?': departureTime,
       },
     });
-    return user;
+    return { user };
   } catch (error) {
-    console.error('Error creating record:', error);
-    // Optionally, throw a custom error or return a meaningful value
-    throw new Error('Failed to create check-in record. Please try again.');
+    console.log('error', error);
   }
+};
+
+export const acceptWaiver = async ({ checkInRecordId }) => {
+  if (!checkInRecordId) {
+    throw new Error('A check-in record ID is required to accept the waiver.');
+  }
+  const { record } = await updateRecord({
+    tableId: 'Check In',
+    recordId: checkInRecordId,
+    newFields: {
+      'Waiver Accepted': true,
+      'Waiver Accepted Date': new Date().toISOString(),
+    },
+  });
+  return record;
 };
 
 export const getCabinCategories = async () => {

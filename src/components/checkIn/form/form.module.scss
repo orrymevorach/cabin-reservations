@@ -9,7 +9,25 @@
 }
 
 .dropdown {
-  width: 100%;
+  @include mixins.fontPrimary;
+  width: 400px !important;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+
+  &:hover,
+  &.Mui-focused {
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.18);
+  }
+
+  :global(.MuiSelect-select) {
+    text-align: center;
+  }
+
+  :global(.MuiOutlinedInput-notchedOutline) {
+    border-color: rgba(0, 0, 0, 0.2);
+  }
 }
 
 .input,
@@ -20,6 +38,17 @@ label.inputLabel {
   text-wrap: wrap;
   text-align: center;
   width: 400px !important;
+}
+
+.input {
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+
+  &:hover,
+  &:focus-within {
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.18);
+  }
 }
 
 .input input {
@@ -36,6 +65,9 @@ label.inputLabel {
 
 .formFieldContainer {
   margin-bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .link {
@@ -43,12 +75,28 @@ label.inputLabel {
   color: black;
 }
 
+.formError {
+  @include mixins.fontPrimaryMedium;
+  color: red;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.fieldError {
+  @include mixins.fontPrimaryLight;
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+  text-align: center;
+}
+
 @media screen and (max-width: variables.$mobile) {
   .container {
     width: 100%;
   }
   .input,
-  label.inputLabel {
+  label.inputLabel,
+  .dropdown {
     font-size: 18px;
     width: 300px !important;
   }
