@@ -9,7 +9,7 @@ import { useUser } from '@/context/user-context';
 import Nav from '../nav/nav';
 
 export const Logo = ({ classNames = ' ' }) => {
-  return <Image src={logo} className={clsx(styles.image, classNames)} alt="" />;
+  return <Image src={logo} className={clsx(styles.image, classNames)} alt='' />;
 };
 
 export default function Layout({ children }) {
@@ -17,8 +17,8 @@ export default function Layout({ children }) {
   const userData = useUser();
   if (!userData)
     return (
-      <div className={styles.container}>
-        <Image src={logo} className={styles.image} alt="" quality={50} />
+      <div className={clsx(styles.container, styles.noUser)}>
+        <Image src={logo} className={styles.image} alt='' quality={50} />
         {children}
       </div>
     );
@@ -55,7 +55,7 @@ export default function Layout({ children }) {
         />
       )}
 
-      <Image src={logo} className={styles.image} alt="" quality={50} />
+      <Image src={logo} className={styles.image} alt='' quality={50} />
       {children}
     </div>
   );
