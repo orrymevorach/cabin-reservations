@@ -44,11 +44,7 @@ export default function AddGuestsTakeover({ allowCreateNewUser }) {
     const userResponse = await getUserByEmail({ email });
     const hasUser = userResponse && userResponse.id;
     if (hasUser) {
-      return {
-        error:
-          'We already have a ticket associated with this email. Please enter a new email.',
-        user: null,
-      };
+      return handleAddGuest({ email, ref });
     }
     // Create ticker for new user
     const newUser = await createUser({
