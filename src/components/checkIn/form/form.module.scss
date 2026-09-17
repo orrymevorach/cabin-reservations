@@ -5,104 +5,195 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 80px;
+  width: calc(100% - 28px);
+  max-width: 680px;
+  margin: -24px auto 80px;
+  padding: 42px 48px 46px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(variables.$black, 0.14);
+  border-top: 5px solid variables.$darkGreen;
+  border-radius: 6px;
+  box-shadow: 0 18px 42px rgba(variables.$black, 0.1);
 }
 
 .dropdown {
   @include mixins.fontPrimary;
-  width: 400px !important;
-  background-color: white;
-  border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease;
+  width: 100% !important;
+  background-color: rgba(255, 255, 255, 0.96);
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(variables.$black, 0.06);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 
   &:hover,
   &.Mui-focused {
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 10px 24px rgba(variables.$black, 0.12);
+    transform: translateY(-1px);
   }
 
   :global(.MuiSelect-select) {
-    text-align: center;
+    @include mixins.fontPrimaryMedium;
+    min-height: 26px;
+    padding: 13px 42px 13px 16px;
+    color: variables.$charcoal;
+    text-align: left;
   }
 
   :global(.MuiOutlinedInput-notchedOutline) {
-    border-color: rgba(0, 0, 0, 0.2);
+    border-color: rgba(variables.$black, 0.18);
+    transition: border-color 0.2s ease;
+  }
+
+  &:hover :global(.MuiOutlinedInput-notchedOutline),
+  &.Mui-focused :global(.MuiOutlinedInput-notchedOutline) {
+    border-color: variables.$darkGreen;
   }
 }
 
 .input,
 label.inputLabel {
   @include mixins.fontPrimary;
-  color: black;
-  margin-bottom: 7px;
+  color: variables.$charcoal;
+  margin-bottom: 9px;
   text-wrap: wrap;
-  text-align: center;
-  width: 400px !important;
+  text-align: left;
+  width: 100% !important;
 }
 
 .input {
-  border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.96);
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(variables.$black, 0.06);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 
   &:hover,
   &:focus-within {
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 10px 24px rgba(variables.$black, 0.12);
+    transform: translateY(-1px);
+  }
+
+  :global(.MuiInputBase-input) {
+    @include mixins.fontPrimaryMedium;
+    min-height: 26px;
+    padding: 13px 16px;
+    color: variables.$charcoal;
+  }
+
+  :global(.MuiOutlinedInput-root) {
+    border-radius: 6px;
+  }
+
+  :global(.MuiOutlinedInput-notchedOutline) {
+    border-color: rgba(variables.$black, 0.18);
+    transition: border-color 0.2s ease;
+  }
+
+  &:hover :global(.MuiOutlinedInput-notchedOutline),
+  &:focus-within :global(.MuiOutlinedInput-notchedOutline) {
+    border-color: variables.$darkGreen;
   }
 }
 
 .input input {
-  text-align: center;
+  text-align: left;
 }
 
 .input::placeholder {
-  text-align: center;
+  text-align: left;
 }
 
 .submitButton {
-  margin-top: 30px;
+  width: min(100%, 360px);
+  margin-top: 8px;
+  padding: 13px 24px;
+  background-color: variables.$darkGreen;
+  color: variables.$white;
+  border-color: variables.$darkGreen;
+  box-shadow: rgba(variables.$black, 0.35) 4px 4px 0 0;
+
+  &:hover {
+    background-color: darken(variables.$darkGreen, 4%);
+  }
 }
 
 .formFieldContainer {
-  margin-bottom: 50px;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 28px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  position: relative;
 }
 
 .link {
   text-decoration: underline;
-  color: black;
+  color: variables.$darkGreen;
+  font-family: inherit;
+  font-weight: bold;
 }
 
 .formError {
   @include mixins.fontPrimaryMedium;
-  color: red;
-  text-align: center;
-  margin-bottom: 20px;
+  width: 100%;
+  max-width: 500px;
+  padding: 12px 14px;
+  color: #8f2f20;
+  text-align: left;
+  margin-bottom: 24px;
+  background: rgba(222, 128, 29, 0.14);
+  border: 1px solid rgba(143, 47, 32, 0.22);
+  border-radius: 5px;
 }
 
 .fieldError {
-  @include mixins.fontPrimaryLight;
-  color: red;
+  @include mixins.fontPrimaryMedium;
+  color: #8f2f20;
   font-size: 14px;
-  margin-top: 5px;
-  text-align: center;
+  margin-top: 8px;
+  text-align: left;
 }
 
 .footer {
+  @include mixins.fontPrimary;
+  max-width: 500px;
+  margin: 6px 0 24px;
+  padding: 16px 18px;
+  background: rgba(variables.$beige, 0.75);
+  border: 1px solid rgba(variables.$black, 0.12);
+  border-radius: 5px;
+  color: variables.$charcoal;
+  font-size: 15px;
+  line-height: 1.45;
   text-align: center;
-  padding: 0 20px;
 }
 
 @media screen and (max-width: variables.$mobile) {
   .container {
-    width: 100%;
+    width: calc(100% - 24px);
+    margin-top: -34px;
+    padding: 30px 18px 34px;
   }
+
   .input,
   label.inputLabel,
   .dropdown {
-    font-size: 18px;
-    width: 300px !important;
+    font-size: 16px;
+    width: 100% !important;
+  }
+
+  .formFieldContainer {
+    margin-bottom: 24px;
+  }
+
+  .submitButton {
+    width: 100%;
+  }
+
+  .footer {
+    padding: 14px;
   }
 }
