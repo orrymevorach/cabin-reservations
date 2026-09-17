@@ -65,7 +65,7 @@ export default function Form({
           />
         ))}
         {footer}
-        <Button classNames={buttonClassNames} isLoading={isLoading}>
+        <Button classNames={buttonClassNames} isLoading={isLoading} isBlue>
           {buttonText}
         </Button>
       </form>

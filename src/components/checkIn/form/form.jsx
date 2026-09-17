@@ -197,7 +197,7 @@ export default function CheckInForm({ onCheckInCreated = () => {} }) {
       buttonText='Continue to waiver'
       noValidate
       footer={
-        <p>
+        <p className={styles.footer}>
           If you have any questions, feel free to reach out to{' '}
           <a
             href='mailto:info@highlandsmusicfestival.ca'
