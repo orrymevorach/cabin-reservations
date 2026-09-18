@@ -12,8 +12,13 @@ export default function CheckInPage({ user }) {
 
 export async function getServerSideProps(context) {
   let user;
-  const userId = context.query.id;
+  const queryId = Array.isArray(context.query.id)
+    ? context.query.id[0]
+    : context.query.id;
+  // remove appended 2026
+  const userId = queryId?.split('_')[0];
   try {
+    if (!userId) throw new Error('Missing check-in user id.');
     const userResponse = await getUserByRecordId({ id: userId });
     user = userResponse;
   } catch (error) {

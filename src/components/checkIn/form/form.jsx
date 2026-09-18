@@ -18,13 +18,14 @@ const arrivalTimesData = {
 
 const arrivalDays = ['Thursday', 'Friday', 'Saturday'];
 
-export default function CheckInForm({ onCheckInCreated = () => {} }) {
+export default function CheckInForm({ user, onCheckInCreated = () => {} }) {
   const { state, dispatch, actions, stages } = useCheckIn();
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
 
   const router = useRouter();
-  const userId = router.query.id;
+  // remove appended 2026
+  const userId = user?.id || router.query.id?.split('_')[0];
 
   const clearError = fieldId => {
     setErrors(currentErrors => {
