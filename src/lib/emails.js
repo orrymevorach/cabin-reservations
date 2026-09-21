@@ -4,18 +4,21 @@ export const sendConfirmationEmail = async ({
   selectedBeds,
   host,
 }) => {
-  const res = await fetch('/api/cabin-confirmation-email', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_ENV_URL}/api/cabin-confirmation-email`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        groupMember,
+        cabin,
+        selectedBeds,
+        host,
+      }),
     },
-    body: JSON.stringify({
-      groupMember,
-      cabin,
-      selectedBeds,
-      host,
-    }),
-  }).then(res => res.json());
+  ).then(res => res.json());
 };
 
 export const sendTemporaryPasswordEmail = async ({ emailAddress }) => {

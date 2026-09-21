@@ -3,14 +3,9 @@ import { ReservationProvider } from '@/context/reservation-context';
 import SummaryPage from '@/components/summaryPage/summaryPage';
 import { CabinAndUnitDataProvider } from '@/context/cabin-and-unit-data-context';
 import { UserProvider } from '@/context/user-context';
-import getCabinAndUnitData from '@/hooks/useGetCabinAndUnitData';
-import {
-  getBedOccupant,
-  getGroup,
-  getPageLoadData,
-  getUserByRecordId,
-} from '@/lib/airtable';
-import { BEDS } from '@/utils/constants';
+import getCabinAndUnitData from '@/lib/platform-api';
+import { getPageLoadData } from '@/lib/airtable';
+import { getUserReservationData } from '@/lib/platform-utils';
 import SelectCabinTakeover from '@/components/reservePage/selectCabinTakeover/selectCabinTakeover';
 import NoUserTakeover from '@/components/shared/noUserTakeover/noUserTakeover';
 
@@ -66,60 +61,22 @@ export async function getServerSideProps(context) {
   }
 
   const cabinAndUnitData = await getCabinAndUnitData();
-  let currentCabin = null;
-  const selectedBeds = [];
+  const {
+    user: resolvedUser,
+    group,
+    selectedBeds,
+  } = await getUserReservationData({ user, cabinAndUnitData });
 
-  if (user.cabin) {
-    currentCabin = cabinAndUnitData.cabins.find(
-      cabin => cabin.id === user.cabin[0]
-    );
-    const bedsArray = Object.keys(BEDS);
-    for (let bed of bedsArray) {
-      if (currentCabin[bed] && currentCabin[bed][0]) {
-        const currentBedOccupant = await getBedOccupant({
-          userId: currentCabin[bed][0],
-        });
-        currentCabin[bed] = currentBedOccupant;
-        selectedBeds.push({
-          bedName: bed,
-          ...currentBedOccupant,
-        });
-      }
-    }
-  }
-
-  let groupMembers = [];
-  let groupId = '';
-
-  if (user.group && user.group.length > 0) {
-    groupId = user.group[0] || '';
-    const groupResponse = await getGroup({ groupId });
-    if (groupResponse?.members) {
-      groupMembers = await Promise.all(
-        groupResponse.members.map(async memberId => {
-          const member = await getUserByRecordId({ id: memberId });
-          return member;
-        })
-      );
-    }
-  } else {
-    // If the user has no group, we create a group with just them in it.
-    groupId = '';
-    groupMembers = [user];
-  }
+  // a user without a formal group yet still counts as a group of themselves
+  const groupWithSelfFallback = group.members.length
+    ? group
+    : { ...group, members: [resolvedUser] };
 
   return {
     props: {
       cabinAndUnitData,
-      user: {
-        ...user,
-        cabin: currentCabin,
-        group: groupMembers,
-      },
-      group: {
-        id: groupId,
-        members: groupMembers,
-      },
+      user: { ...resolvedUser, group: groupWithSelfFallback.members },
+      group: groupWithSelfFallback,
       selectedBeds,
       hasCabin: true,
     },

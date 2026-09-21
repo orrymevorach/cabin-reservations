@@ -45,7 +45,7 @@ export default function Filters({
         <Dropdown
           options={numberOfGuests}
           label={FILTERS.AVAILABLE_BEDS}
-          variant="standard"
+          variant='standard'
           handleChange={event =>
             handleChange({ event, label: 'Available beds' })
           }
@@ -56,7 +56,7 @@ export default function Filters({
           <Dropdown
             options={['All', ...unitNames]}
             label={FILTERS.UNIT}
-            variant="standard"
+            variant='standard'
             handleChange={event => handleChange({ event, label: 'Unit' })}
             defaultValue={router.query[FILTERS.UNIT]}
             classNames={styles.dropdown}
@@ -65,7 +65,7 @@ export default function Filters({
         <Dropdown
           options={['All', ...categoryNames]}
           label={FILTERS.CATEGORY}
-          variant="standard"
+          variant='standard'
           handleChange={event => handleChange({ event, label: 'Category' })}
           defaultValue={router.query[FILTERS.CATEGORY]}
           classNames={styles.dropdown}

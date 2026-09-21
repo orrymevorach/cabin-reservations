@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import { filterOutHeadStaffCabins } from '@/utils/cabin-utils';
 
 export default function CabinList({ unitData, setHasAvailability }) {
   const { dispatch, actions } = useCabinSelection();
@@ -40,20 +41,15 @@ export default function CabinList({ unitData, setHasAvailability }) {
         onScroll={e => setScrollValue(e.target.scrollTop)}
       >
         {hasCabins ? (
-          cabins
-            .filter(cabin => {
-              if (cabin.name.includes('Head Staff')) return false;
-              return true;
-            })
-            .map(cabin => {
-              return (
-                <CabinSelectionTile
-                  cabin={cabin}
-                  key={`${cabin.unit}-${cabin.name}`}
-                  handleSelectCabin={() => handleSubmit(cabin)}
-                />
-              );
-            })
+          filterOutHeadStaffCabins({ cabins }).map(cabin => {
+            return (
+              <CabinSelectionTile
+                cabin={cabin}
+                key={`${cabin.unit}-${cabin.name}`}
+                handleSelectCabin={() => handleSubmit(cabin)}
+              />
+            );
+          })
         ) : (
           <p>There are no cabins in this unit that match your selection.</p>
         )}
