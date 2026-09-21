@@ -7,6 +7,7 @@ import { useUser } from '@/context/user-context';
 import { ROUTES } from '@/utils/constants';
 import VerifiedUsers from '@/components/shared/verifiedUsers/verifiedUsers';
 import { addGroupMember, createGroupMember } from '@/lib/platform-api';
+import { getUserByEmail } from '@/lib/airtable';
 import clsx from 'clsx';
 
 export default function AddGuestsTakeover({ allowCreateNewUser }) {
@@ -29,6 +30,9 @@ export default function AddGuestsTakeover({ allowCreateNewUser }) {
   };
 
   async function handleCreateGuest({ email, firstName, lastName, ref }) {
+    const userResponse = await getUserByEmail({ email });
+    if (userResponse?.id) return handleAddGuest({ email, ref });
+
     const response = await createGroupMember({
       groupId: groupData.id,
       hostUserId: user.id,
@@ -38,7 +42,9 @@ export default function AddGuestsTakeover({ allowCreateNewUser }) {
       lastName,
       cabinId: cabinData.cabin.id,
     });
-    if (response.message) return { error: response.message };
+    if (response.error || response.message) {
+      return { error: response.error || response.message };
+    }
 
     dispatch({
       type: actions.UPDATE_GROUP,

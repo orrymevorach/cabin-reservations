@@ -9,6 +9,9 @@ var airtableBase = new Airtable({
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { tableId, recordId, newFields } = req.body;
+    if (!recordId || typeof recordId !== 'string') {
+      return res.status(400).json('A valid Airtable record ID is required.');
+    }
     try {
       const response = await airtableBase(tableId).update([
         {

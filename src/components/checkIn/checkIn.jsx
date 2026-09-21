@@ -1,10 +1,14 @@
 import Layout from '../shared/layout/layout';
 import CheckInForm from './form/form';
+import Waiver from './waiver/waiver';
 import styles from './checkIn.module.scss';
 import { useCheckIn } from '@/context/check-in-context';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 
 export default function CheckIn({ user }) {
+  const [checkInRecordId, setCheckInRecordId] = useState('');
   const {
     state: { stage },
     stages,
@@ -30,7 +34,7 @@ export default function CheckIn({ user }) {
               If you did not receive the email, or are experiencing issues,
               please contact{' '}
               <a
-                href="mailto:info@highlandsmusicfestival.ca"
+                href='mailto:info@highlandsmusicfestival.ca'
                 className={styles.link}
               >
                 info@highlandsmusicfestival.ca
@@ -55,22 +59,40 @@ export default function CheckIn({ user }) {
                 arrival.
               </p>
             </div>
-            <CheckInForm user={user} />
+            <CheckInForm user={user} onCheckInCreated={setCheckInRecordId} />
           </>
         )}
         {stage === stages.SIGN_WAIVER && (
-          <div>
-            <iframe
-              src="https://docs.google.com/forms/d/e/1FAIpQLScgMu0FynbVLhvjh6EmTsTh0X9je7Gl6t5HUAz9VWezoN4vYw/viewform"
-              frameborder="0"
-              className={styles.iframe}
-            ></iframe>
-          </div>
+          <Waiver checkInRecordId={checkInRecordId} user={user} />
         )}
         {stage === stages.CONFIRMATION && (
           <div className={styles.confirmationContainer}>
+            <div className={styles.confirmationIcon} aria-hidden='true'>
+              <FontAwesomeIcon icon={faCircleCheck} />
+            </div>
+            <p className={styles.confirmationEyebrow}>Check-in complete</p>
+            <h2 className={styles.confirmationTitle}>
+              You&rsquo;re all set for Highlands
+            </h2>
             <p className={styles.confirmationText}>
-              You are checked in, see you at Highlands!
+              Your arrival details and waiver have been saved. We&rsquo;ve
+              emailed your QR code to <strong>{user.email}</strong> for entry.
+            </p>
+            <div className={styles.confirmationDetails}>
+              <div>
+                <span>Where</span>
+                <strong>Camp Walden</strong>
+              </div>
+              <div>
+                <span>When</span>
+                <strong>September 24-27, 2026</strong>
+              </div>
+            </div>
+            <p className={styles.confirmationHelp}>
+              Questions or no QR code? Contact{' '}
+              <a href='mailto:info@highlandsmusicfestival.ca'>
+                info@highlandsmusicfestival.ca
+              </a>
             </p>
           </div>
         )}
