@@ -181,7 +181,7 @@ export const reserveSpotInCabin = async ({ cabinId = '', attendeeId }) => {
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,
     recordId: attendeeId,
     newFields: { Cabin: [cabinId] },
-    endpoint: '/reserve-spot-in-cabin',
+    endpoint: '/update-record',
   });
   return record;
 };
