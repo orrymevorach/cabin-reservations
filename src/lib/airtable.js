@@ -12,16 +12,20 @@ export const createRecord = async ({
   endpoint = '/create-record',
 }) => {
   try {
-    const response = await fetch(`/api/airtable${endpoint}`, {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
+      {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ tableId, newFields }),
-    }).then(res => res.json());
+      },
+    ).then(res => res.json());
     return response;
   } catch (error) {
     console.log('error', error);
+    return { message: error.message || 'Unable to create Airtable record.' };
   }
 };
 
@@ -135,6 +139,7 @@ export const updateRecord = async ({
     return response;
   } catch (error) {
     console.log('error', error);
+    return { message: error.message || 'Unable to update Airtable record.' };
   }
 };
 
@@ -171,7 +176,7 @@ export const getCabinById = async ({ cabinId }) => {
   const { record: cabin } = await getRecordById({
     tableId: 'Cabins',
     recordId: cabinId,
-    endpoint: '/get-cabin-by-id',
+    endpoint: '/get-record-by-id',
   });
   return cabin;
 };
@@ -189,7 +194,7 @@ export const reserveSpotInCabin = async ({ cabinId = '', attendeeId }) => {
 export const getUserByEmail = async ({ email }) => {
   const { records } = await getRecordsByFieldValue({
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,
-    endpoint: '/get-user-by-email',
+    endpoint: '/get-records-by-field-value',
     formulaArray: [{ fieldName: 'Email Address', fieldValue: email }],
   });
   if (records.length === 0) return {};
@@ -205,7 +210,7 @@ export const getUserByRecordId = async ({ id }) => {
   const { record: user } = await getRecordById({
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,
     recordId: id,
-    endpoint: '/get-user-by-record-id',
+    endpoint: '/get-record-by-id',
   });
   return user;
 };
@@ -262,7 +267,7 @@ export const createGroup = async ({ groupName, members }) => {
       'Group Name': groupName,
       Members: members,
     },
-    endpoint: '/create-group',
+    endpoint: '/create-record',
   });
   return group;
 };
@@ -272,7 +277,7 @@ export const updateGroup = async ({ groupId, members }) => {
     tableId: 'Groups',
     recordId: groupId,
     newFields: { Members: members },
-    endpoint: '/update-group',
+    endpoint: '/update-record',
   });
   return groupData;
 };
@@ -281,7 +286,7 @@ export const getGroup = async ({ groupId }) => {
   const { record: groupData } = await getRecordById({
     tableId: 'Groups',
     recordId: groupId,
-    endpoint: '/get-group',
+    endpoint: '/get-record-by-id',
   });
   return groupData;
 };
