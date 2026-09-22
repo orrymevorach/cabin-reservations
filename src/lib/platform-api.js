@@ -148,9 +148,13 @@ export async function syncGuestIntake({ user, arrivalTime, requiresWaiver }) {
     });
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data?.message || 'Unable to sync guest intake.');
+      return {
+        ok: false,
+        message: data?.message || 'Unable to sync guest intake.',
+        data,
+      };
     }
-    return data;
+    return { ok: true, data };
   } catch (error) {
     logSentryError(error, {
       action: 'sync-guest-intake',
@@ -158,6 +162,9 @@ export async function syncGuestIntake({ user, arrivalTime, requiresWaiver }) {
       arrivalTime,
       requiresWaiver,
     });
-    throw error;
+    return {
+      ok: false,
+      message: error.message || 'Unable to sync guest intake.',
+    };
   }
 }

@@ -3,6 +3,9 @@ import { logSentryError } from '@/utils/sentry-utils';
 const GUEST_INTAKE_ENDPOINT = 'https://guest-intake.siimplsoftware.com';
 const GUEST_INTAKE_EVENT_ID = '36cfe48b-0e8c-4d9f-9ae8-cdedaf10640a';
 const GUEST_INTAKE_ORGANIZATION_ID = '4959292d-c43a-4ddd-a585-d6bc8a84f1e8';
+const GUEST_INTAKE_API_KEY = process.env.GUEST_INTAKE_API_KEY;
+const GUEST_INTAKE_AUTH_HEADER =
+  process.env.GUEST_INTAKE_AUTH_HEADER || 'Authorization';
 
 const getNameParts = name => {
   const [firstName = '', ...lastNameParts] = (name || '').trim().split(' ');
@@ -15,6 +18,19 @@ const getNameParts = name => {
 const normalizeNullableValue = value => {
   if (Array.isArray(value)) return value[0] || null;
   return value || null;
+};
+
+const getGuestIntakeAuthHeaders = () => {
+  if (!GUEST_INTAKE_API_KEY) return null;
+  const authValue =
+    GUEST_INTAKE_AUTH_HEADER === 'Authorization' &&
+    !GUEST_INTAKE_API_KEY.includes(' ')
+      ? `Bearer ${GUEST_INTAKE_API_KEY}`
+      : GUEST_INTAKE_API_KEY;
+
+  return {
+    [GUEST_INTAKE_AUTH_HEADER]: authValue,
+  };
 };
 
 export default async function handler(req, res) {
@@ -43,12 +59,26 @@ export default async function handler(req, res) {
     custom1: arrivalTime,
     dietary: null,
   };
+  const authHeaders = getGuestIntakeAuthHeaders();
+
+  if (!authHeaders) {
+    logSentryError(new Error('Guest intake API key is not configured.'), {
+      externalId: payload.external_id,
+      custom1: payload.custom1,
+      requiresWaiver: payload.requires_waiver,
+    });
+    res.status(500).json({
+      message: 'Guest intake auth is not configured.',
+    });
+    return;
+  }
 
   try {
     const response = await fetch(GUEST_INTAKE_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...authHeaders,
       },
       body: JSON.stringify(payload),
     });
