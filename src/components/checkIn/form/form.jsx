@@ -2,8 +2,10 @@ import Form from '@/components/shared/form/form';
 import { useCheckIn } from '@/context/check-in-context';
 import styles from './form.module.scss';
 import { checkIn } from '@/lib/airtable';
+import { syncGuestIntake } from '@/lib/platform-api';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { logSentryError } from '@/utils/sentry-utils';
 
 const arrivalTimesData = {
   Thursday: ['4PM - 8PM', '8PM - 10PM', '10PM - 12AM', 'After midnight'],
@@ -154,27 +156,48 @@ export default function CheckInForm({ user, onCheckInCreated = () => {} }) {
     }
     setErrors({});
     setIsFormSubmitting(true);
-    const { alreadyCheckedIn, user: checkInRecord } = await checkIn({
-      attendee: userId,
-      arrivalDay: state.arrivalDay,
-      arrivalTime: state.arrivalTime,
-      city: state.city,
-      birthday: state.birthday,
-      howDidYouHearAboutHighlands: state.howDidYouHearAboutHighlands,
-      electricVehicle: state.electricVehicle,
-      departureTime: state.departureTime,
-    });
-    if (alreadyCheckedIn) {
-      dispatch({ type: actions.SET_STAGE, stage: stages.CONFIRMATION });
+    try {
+      const { alreadyCheckedIn, user: checkInRecord } = await checkIn({
+        attendee: userId,
+        arrivalDay: state.arrivalDay,
+        arrivalTime: state.arrivalTime,
+        city: state.city,
+        birthday: state.birthday,
+        howDidYouHearAboutHighlands: state.howDidYouHearAboutHighlands,
+        electricVehicle: state.electricVehicle,
+        departureTime: state.departureTime,
+      });
+      if (alreadyCheckedIn) {
+        dispatch({ type: actions.SET_STAGE, stage: stages.CONFIRMATION });
+        return;
+      }
+      await syncGuestIntake({
+        user: {
+          ...user,
+          id: userId,
+          electricCar: state.electricVehicle === 'yes',
+        },
+        arrivalTime: `${state.arrivalDay} ${state.arrivalTime}`,
+        requiresWaiver: true,
+      });
+      onCheckInCreated(checkInRecord.id);
+      dispatch({
+        type: actions.SET_STAGE,
+        stage: stages.SIGN_WAIVER,
+      });
+    } catch (error) {
+      logSentryError(error, {
+        action: 'check-in-form-submit',
+        userId,
+        arrivalDay: state.arrivalDay,
+        arrivalTime: state.arrivalTime,
+      });
+      setErrors({
+        form: 'We could not save your check-in. Please try again or contact the event team.',
+      });
+    } finally {
       setIsFormSubmitting(false);
-      return;
     }
-    onCheckInCreated(checkInRecord.id);
-    dispatch({
-      type: actions.SET_STAGE,
-      stage: stages.SIGN_WAIVER,
-    });
-    setIsFormSubmitting(false);
   };
 
   return (
@@ -190,7 +213,7 @@ export default function CheckInForm({ user, onCheckInCreated = () => {} }) {
       errorClassNames={styles.fieldError}
       formError={
         Object.keys(errors).length > 0
-          ? 'Please fill out all required fields below.'
+          ? errors.form || 'Please fill out all required fields below.'
           : ''
       }
       formErrorClassNames={styles.formError}

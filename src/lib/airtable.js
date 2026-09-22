@@ -181,6 +181,24 @@ export const getCabinById = async ({ cabinId }) => {
   return cabin;
 };
 
+export const getUserCabin = async user => {
+  const cabinName =
+    (Array.isArray(user?.['name(FromCabin)'])
+      ? user['name(FromCabin)'][0]
+      : user?.['name(FromCabin)']) ||
+    user?.cabinName ||
+    null;
+
+  if (cabinName) return cabinName;
+
+  const cabinRecord = user?.cabinRecordId || user?.cabin;
+  const cabinId = Array.isArray(cabinRecord) ? cabinRecord[0] : cabinRecord;
+  if (!cabinId) return null;
+
+  const cabin = await getCabinById({ cabinId });
+  return cabin?.name || null;
+};
+
 export const reserveSpotInCabin = async ({ cabinId = '', attendeeId }) => {
   const { record } = await updateRecord({
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,

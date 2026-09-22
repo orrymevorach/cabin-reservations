@@ -1,3 +1,5 @@
+import { logSentryError } from '@/utils/sentry-utils';
+
 export default async function getCabinAndUnitData() {
   try {
     const response = await fetch(
@@ -134,5 +136,28 @@ export async function reserveBeds({ cabinId, hostUserId, beds }) {
   } catch (error) {
     console.log('error', error);
     return { message: 'Unable to reserve bed. Please try again.' };
+  }
+}
+
+export async function syncGuestIntake({ user, arrivalTime, requiresWaiver }) {
+  try {
+    const response = await fetch('/api/platform/guest-intake', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user, arrivalTime, requiresWaiver }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data?.message || 'Unable to sync guest intake.');
+    }
+    return data;
+  } catch (error) {
+    logSentryError(error, {
+      action: 'sync-guest-intake',
+      userId: user?.id,
+      arrivalTime,
+      requiresWaiver,
+    });
+    throw error;
   }
 }

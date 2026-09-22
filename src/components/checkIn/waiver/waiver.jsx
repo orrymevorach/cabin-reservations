@@ -4,7 +4,9 @@ import Checkbox from '@/components/shared/checkbox/checkbox';
 import styles from './waiver.module.scss';
 import { acceptWaiver } from '@/lib/airtable';
 import { sendQRCode } from '@/lib/emails';
+import { syncGuestIntake } from '@/lib/platform-api';
 import { useCheckIn } from '@/context/check-in-context';
+import { logSentryError } from '@/utils/sentry-utils';
 
 const agreements = [
   {
@@ -66,7 +68,7 @@ const initialAgreementsState = agreements.reduce((state, agreement) => {
 }, {});
 
 export default function Waiver({ checkInRecordId, user }) {
-  const { dispatch, actions, stages } = useCheckIn();
+  const { state, dispatch, actions, stages } = useCheckIn();
   const [agreedTo, setAgreedTo] = useState(initialAgreementsState);
   const [hasConfirmedSubmission, setHasConfirmedSubmission] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -94,9 +96,18 @@ export default function Waiver({ checkInRecordId, user }) {
       if (!updatedRecord) {
         throw new Error('Unable to save waiver acceptance.');
       }
+      await syncGuestIntake({
+        user,
+        requiresWaiver: false,
+      });
       await sendQRCode({ email: user.email, recordId: user.id });
       dispatch({ type: actions.SET_STAGE, stage: stages.CONFIRMATION });
     } catch (error) {
+      logSentryError(error, {
+        action: 'waiver-submit',
+        checkInRecordId,
+        userId: user?.id,
+      });
       setSubmitError(
         'We could not save your waiver. Please try again or contact the event team.',
       );
