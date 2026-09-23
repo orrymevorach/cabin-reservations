@@ -81,7 +81,17 @@ export default function CheckIn({ user }) {
             <div className={styles.confirmationDetails}>
               <div>
                 <span>Where</span>
-                <strong>Camp Walden</strong>
+                <a
+                  href='https://www.google.com/maps/place/Highlands+Music+Festival/data=!4m2!3m1!1s0x0:0xc073b83c8da9dc35?sa=X&ved=1t:2428&ictx=111'
+                  target='_blank'
+                  rel='noreferrer'
+                  className={styles.confirmationLocationLink}
+                >
+                  Camp Walden
+                </a>
+                <small className={styles.confirmationAddress}>
+                  38483 ON-28, Brudenell, Lyndoch and Raglan, ON K0J 2E0
+                </small>
               </div>
               <div>
                 <span>When</span>

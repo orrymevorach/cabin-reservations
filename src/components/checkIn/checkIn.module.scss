@@ -97,6 +97,19 @@
   }
 }
 
+.confirmationLocationLink {
+  @include mixins.fontPrimaryMedium;
+  color: variables.$black;
+  text-decoration: underline;
+}
+
+.confirmationAddress {
+  @include mixins.fontPrimary;
+  color: variables.$black;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 .confirmationHelp {
   @include mixins.fontPrimary;
   margin: 0;
