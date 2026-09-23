@@ -8,19 +8,17 @@ var airtableBase = new Airtable({
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { tableId, recordId, newFields = {}, uid } = req.body;
+    const { tableId, recordId, newFields = {} } = req.body;
 
     if (!recordId || typeof recordId !== 'string') {
       return res.status(400).json({ message: 'A valid Airtable record ID is required.' });
     }
 
-    const firebaseUid = uid ?? newFields['Firebase UID'] ?? '';
-
     try {
       const response = await airtableBase(tableId).update([
         {
           id: recordId,
-          fields: { ...newFields, 'Firebase UID': firebaseUid },
+          fields: { ...newFields, 'Firebase UID': '' },
         },
       ]);
 
