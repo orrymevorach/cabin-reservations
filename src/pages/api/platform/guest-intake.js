@@ -55,7 +55,7 @@ export default async function handler(req, res) {
     last_name: user?.lastName || lastName,
     organization_id: GUEST_INTAKE_ORGANIZATION_ID,
     requires_waiver: Boolean(requiresWaiver),
-    external_id: user?.id,
+    external_id: user?.recordId,
     custom1: arrivalTime,
     dietary: null,
   };

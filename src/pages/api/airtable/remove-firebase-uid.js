@@ -11,7 +11,9 @@ export default async function handler(req, res) {
     const { tableId, recordId, newFields = {} } = req.body;
 
     if (!recordId || typeof recordId !== 'string') {
-      return res.status(400).json({ message: 'A valid Airtable record ID is required.' });
+      return res
+        .status(400)
+        .json({ message: 'A valid Airtable record ID is required.' });
     }
 
     try {
@@ -31,7 +33,9 @@ export default async function handler(req, res) {
 
       res.status(200).json({ record: transformedRecord });
     } catch (err) {
-      res.status(err.statusCode || 500).json({ message: err.message || 'Unable to update Airtable record.' });
+      res
+        .status(err.statusCode || 500)
+        .json({ message: err.message || 'Unable to update Airtable record.' });
     }
   } else {
     res.setHeader('Allow', 'POST');

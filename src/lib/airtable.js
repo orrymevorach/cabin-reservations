@@ -15,11 +15,11 @@ export const createRecord = async ({
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
       {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ tableId, newFields }),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tableId, newFields }),
       },
     ).then(res => res.json());
     return response;

@@ -47,6 +47,7 @@ export async function getServerSideProps(context) {
         email: user.emailAddress || '',
         id: user.id || '',
         cabin,
+        userRecordId: user.recordId,
       },
     },
   };
