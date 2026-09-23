@@ -376,6 +376,16 @@ export const addFirebaseUid = async ({ attendeeId, uid }) => {
   return record;
 };
 
+export const removeFirebaseUid = async ({ attendeeId, uid = '' }) => {
+  const { record } = await updateRecord({
+    tableId: AIRTABLE_BASES.TICKET_PURCHASES,
+    recordId: attendeeId,
+    newFields: { 'Firebase UID': uid },
+    endpoint: '/remove-firebase-uid',
+  });
+  return record;
+};
+
 export const createUser = async ({ email, name, cabinId }) => {
   const randomPassword = generateRandomPassword();
   const { record: airtableResponse } = await createRecord({
