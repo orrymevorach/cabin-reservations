@@ -28,13 +28,18 @@ export default function Reserve({
     return (
       <Takeover hideCloseButton modalClassNames={styles.modal}>
         <p>
-          Cabin selection is not currently available. We will send out an email
-          to all ticket holders when cabin reservations open up.
+          {/* Cabin selection is not currently available. We will send out an email
+          to all ticket holders when cabin reservations open up. */}
+          Cabin reservations are now closed.
         </p>
         <p>
           If you have purchased a cabin,{' '}
           <Link href={ROUTES.SUMMARY}>click here</Link> to manage your
           reservation.
+        </p>
+        <p>
+          If you have not selected a cabin, you will be assigned one when you
+          arrive at Highlands. See you soon!
         </p>
       </Takeover>
     );
