@@ -233,6 +233,11 @@ export const getUserByRecordId = async ({ id }) => {
   return user;
 };
 
+export const getUserCheckIn = async ({ attendeeId }) => {
+  const { records = [] } = (await getRecords({ tableId: 'Check In' })) || {};
+  return records.find(record => record.attendee?.includes(attendeeId)) || null;
+};
+
 export const reserveBed = async ({ userId, bedName, cabinId }) => {
   const { record: cabin } = await updateRecord({
     tableId: 'Cabins',

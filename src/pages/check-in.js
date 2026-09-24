@@ -1,6 +1,10 @@
 import CheckIn from '@/components/checkIn/checkIn';
 import { CheckInProvider } from '@/context/check-in-context';
-import { getUserByRecordId, getUserCabin } from '@/lib/airtable';
+import {
+  getUserByRecordId,
+  getUserCabin,
+  getUserCheckIn,
+} from '@/lib/airtable';
 import { logSentryError } from '@/utils/sentry-utils';
 
 export default function CheckInPage({ user }) {
@@ -24,6 +28,9 @@ export async function getServerSideProps(context) {
     const userResponse = await getUserByRecordId({ id: userId });
     user = userResponse;
     cabin = await getUserCabin(user);
+    if (user.checkedIn === 'Yes') {
+      user.checkIn = await getUserCheckIn({ attendeeId: userId });
+    }
   } catch (error) {
     logSentryError(error, {
       action: 'check-in-page-load',
@@ -48,6 +55,8 @@ export async function getServerSideProps(context) {
         id: user.id || '',
         cabin,
         userRecordId: user.recordId,
+        checkInRecordId: user.checkIn?.id || '',
+        hasAcceptedWaiver: user.checkIn?.waiverAccepted || false,
       },
     },
   };

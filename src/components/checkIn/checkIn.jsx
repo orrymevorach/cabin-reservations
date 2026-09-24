@@ -8,7 +8,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 
 export default function CheckIn({ user }) {
-  const [checkInRecordId, setCheckInRecordId] = useState('');
+  const [checkInRecordId, setCheckInRecordId] = useState(
+    user?.checkInRecordId || '',
+  );
   const {
     state: { stage },
     stages,
@@ -18,7 +20,12 @@ export default function CheckIn({ user }) {
 
   useEffect(() => {
     if (user && user.isCheckedIn === 'Yes') {
-      dispatch({ type: actions.SET_STAGE, stage: stages.CONFIRMATION });
+      dispatch({
+        type: actions.SET_STAGE,
+        stage: user.hasAcceptedWaiver
+          ? stages.CONFIRMATION
+          : stages.SIGN_WAIVER,
+      });
     }
   }, [user, dispatch, actions, stages]);
 
