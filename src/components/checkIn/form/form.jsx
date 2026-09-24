@@ -10,6 +10,7 @@ import { logSentryError } from '@/utils/sentry-utils';
 const arrivalTimesData = {
   Thursday: ['4PM - 7PM', '7PM - 9PM', 'After 9PM'],
   Friday: ['9AM - 12PM', '12PM - 4PM', '4PM - 9PM', 'After 9PM'],
+  Saturday: ['9AM - 12PM', '12PM - 4PM', '4PM - 9PM', 'After 9PM'],
 };
 
 const arrivalDays = ['Thursday', 'Friday', 'Saturday'];
