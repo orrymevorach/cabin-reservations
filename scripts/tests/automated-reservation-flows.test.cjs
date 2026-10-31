@@ -561,7 +561,7 @@ test('reserves an open cabin, selects a bed, submits check-in, and accepts the w
 
   const bedResponse = await postJson('/api/platform/reserve-bed', {
     cabinId: testCabin.id,
-    hostUserId: host.id,
+    reservingAttendeeId: host.id,
     beds: [{ userId: guest.id, bedName: 'frontBunkLeft' }],
   });
   assert.equal(bedResponse.status, 200);
@@ -573,7 +573,7 @@ test('reserves an open cabin, selects a bed, submits check-in, and accepts the w
     (updatedCabin.fields['Front Bunk Left'] || []).includes(guest.id),
   );
 
-  const checkInResponse = await postJson('/api/airtable/create-record', {
+  const checkInResponse = await postJson('/api/platform/create-check-in', {
     tableId: 'Check In',
     newFields: { Attendee: [guest.id] },
   });
