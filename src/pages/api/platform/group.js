@@ -1,15 +1,23 @@
 import {
   createGroup,
+  createPurchasedTicketGuest,
   createUser,
   getCabinById,
+  getGroup,
+  getPurchasedTicketAllocation,
   getUserByEmail,
   getUserByRecordId,
   reserveSpotInCabin,
   updateGroup,
 } from '@/lib/airtable';
 import { resolveGroupMembers } from '@/lib/platform-utils';
-import { sendConfirmationEmail } from '@/lib/emails';
+import {
+  sendConfirmationEmail,
+  sendTemporaryPasswordEmail,
+} from '@/lib/emails';
 import { sendSlackNotification } from '@/lib/slack';
+import Cookies from 'cookies';
+import { COOKIES } from '@/utils/constants';
 
 function verifyGuest({ guest, existingMemberEmails }) {
   if (!guest?.id) return 'No user found with this email.';
@@ -68,6 +76,7 @@ async function addMember({
   // adding a guest from the summary page immediately places them in the cabin;
   // adding a guest before a cabin is reserved (reserve page) does not
   let cabin = null;
+  // A post-reservation assignment must use the purchaser's cabin and an available bed.
   if (cabinId) {
     await reserveSpotInCabin({ cabinId, attendeeId: guest.id });
     cabin = await getCabinById({ cabinId });
@@ -82,7 +91,7 @@ async function addMember({
   return { group, cabin };
 }
 
-async function createMember({
+async function createCabinGuest({
   groupId,
   hostUserId,
   memberIds,
@@ -133,6 +142,134 @@ async function createMember({
   return { group, cabin };
 }
 
+async function assignPurchasedTicketToGuest({
+  groupId,
+  hostUserId,
+  email,
+  firstName,
+  lastName,
+  cabinId,
+}) {
+  const hasValidGuestDetails = Boolean(
+    typeof email === 'string' &&
+    typeof firstName === 'string' &&
+    typeof lastName === 'string' &&
+    email.trim() &&
+    firstName.trim() &&
+    lastName.trim(),
+  );
+  if (!hasValidGuestDetails) {
+    return { error: 'Guest name and email are required.' };
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
+  if (!isEmailValid) return { error: 'Enter a valid guest email address.' };
+
+  const name = `${firstName.trim()} ${lastName.trim()}`;
+  const host = await getUserByRecordId({ id: hostUserId });
+  if (!host?.id) return { error: 'Unable to find the ticket purchaser.' };
+
+  const purchaserGroupId = host.group?.[0] || null;
+  if ((groupId || null) !== purchaserGroupId) {
+    return { error: 'Unable to verify your reservation group.' };
+  }
+  const storedGroup = purchaserGroupId
+    ? await getGroup({ groupId: purchaserGroupId })
+    : null;
+  if (purchaserGroupId && !storedGroup?.id) {
+    return { error: 'Unable to verify your reservation group.' };
+  }
+  const verifiedMemberIds = storedGroup?.members || [hostUserId];
+  if (!verifiedMemberIds.includes(hostUserId)) {
+    return { error: 'Unable to verify your reservation group.' };
+  }
+
+  const allocation = await getPurchasedTicketAllocation({ user: host });
+  if (allocation.remainingTicketCount <= 0) {
+    return { error: 'There are no unassigned purchased tickets available.' };
+  }
+
+  const existingGuest = await getUserByEmail({ email: normalizedEmail });
+  if (existingGuest?.id) {
+    return {
+      error:
+        'We already have a ticket associated with this email. Please add that guest using their ticket email.',
+    };
+  }
+
+  const existingMembers = await resolveGroupMembers({
+    memberIds: verifiedMemberIds,
+  });
+  const doesEmailAlreadyBelongToGroup = existingMembers.some(
+    member => member.emailAddress?.toLowerCase() === normalizedEmail,
+  );
+  if (doesEmailAlreadyBelongToGroup) {
+    return { error: 'This guest is already in your group.' };
+  }
+
+  let cabin = null;
+  if (cabinId) {
+    const hostCabinId = host.cabin?.[0];
+    if (hostCabinId !== cabinId) {
+      return { error: 'Unable to verify your cabin reservation.' };
+    }
+
+    cabin = await getCabinById({ cabinId });
+    const openBedCount = Number(cabin?.openBeds);
+    if (!cabin || !Number.isFinite(openBedCount) || openBedCount < 1) {
+      return { error: 'No additional beds are available in this cabin.' };
+    }
+  }
+
+  const { guest } = await createPurchasedTicketGuest({
+    host,
+    email: normalizedEmail,
+    name,
+    cabinId,
+    placeholderRecord: allocation.placeholderRecords[0],
+    isBundlePurchase: allocation.isBundlePurchase,
+  });
+  const group = await addToGroup({
+    groupId: purchaserGroupId,
+    hostUserId,
+    memberIds: verifiedMemberIds,
+    newMemberId: guest.id,
+    groupName: host.name,
+  });
+
+  if (cabinId) {
+    await sendConfirmationEmail({
+      groupMember: guest,
+      cabin,
+      selectedBeds: [],
+      host,
+    });
+  }
+
+  const passwordEmailResponse = await sendTemporaryPasswordEmail({
+    emailAddress: normalizedEmail,
+  });
+  if (passwordEmailResponse?.error) {
+    throw new Error('Unable to send purchased ticket account credentials.');
+  }
+
+  try {
+    await sendSlackNotification({
+      originalGuestName: host.name,
+      newGuestName: name,
+      email: normalizedEmail,
+      cabin: cabin?.name || '',
+    });
+  } catch (slackError) {
+    console.error('Slack notification failed:', slackError);
+  }
+
+  const { remainingTicketCount: remainingPurchasedTicketCount } =
+    await getPurchasedTicketAllocation({ user: host });
+  return { group, cabin, remainingPurchasedTicketCount };
+}
+
 async function removeMember({ groupId, memberIds, removeUserId }) {
   const remainingMemberIds = memberIds.filter(id => id !== removeUserId);
   const groupResponse = await updateGroup({
@@ -149,6 +286,11 @@ export default async function handler(req, res) {
     return res.status(405).end('Method Not Allowed');
   }
 
+  // Supported actions:
+  // 'add-existing-ticket-holder',
+  // 'create-cabin-guest',
+  // 'assign-purchased-ticket',
+  // 'remove-group-member'.
   try {
     const {
       action,
@@ -163,7 +305,7 @@ export default async function handler(req, res) {
     } = req.body;
 
     let result;
-    if (action === 'add') {
+    if (action === 'add-existing-ticket-holder') {
       result = await addMember({
         groupId,
         hostUserId,
@@ -171,8 +313,8 @@ export default async function handler(req, res) {
         email,
         cabinId,
       });
-    } else if (action === 'create') {
-      result = await createMember({
+    } else if (action === 'create-cabin-guest') {
+      result = await createCabinGuest({
         groupId,
         hostUserId,
         memberIds,
@@ -181,7 +323,25 @@ export default async function handler(req, res) {
         lastName,
         cabinId,
       });
-    } else if (action === 'remove') {
+      // Spend a paid slot, claim or create its ticket record, and email the guest.
+    } else if (action === 'assign-purchased-ticket') {
+      const cookies = new Cookies(req, res);
+      const authenticatedUserId = cookies.get(COOKIES.USER_RECORD);
+      if (authenticatedUserId !== hostUserId) {
+        return res.status(403).json({
+          message: 'You must be signed in as the ticket purchaser.',
+        });
+      }
+
+      result = await assignPurchasedTicketToGuest({
+        groupId,
+        hostUserId,
+        email,
+        firstName,
+        lastName,
+        cabinId,
+      });
+    } else if (action === 'remove-group-member') {
       result = await removeMember({ groupId, memberIds, removeUserId });
     } else {
       return res.status(400).json({ message: 'Unsupported action.' });

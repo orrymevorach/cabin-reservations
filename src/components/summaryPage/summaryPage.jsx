@@ -23,8 +23,14 @@ const FREE_TICKET_ALLOWANCES = {
 export default function SummaryPage() {
   const { user, isLoading: isUserDataLoading } = useUser();
   const router = useRouter();
-  const { currentStage, dispatch, actions, cabin, groupData } =
-    useReservation();
+  const {
+    currentStage,
+    dispatch,
+    actions,
+    cabin,
+    groupData,
+    remainingPurchasedTicketCount,
+  } = useReservation();
 
   const stageQuery = router.query.stage;
   useEffect(() => {
@@ -47,15 +53,18 @@ export default function SummaryPage() {
     (groupData?.members?.length || 1) - 1,
     0,
   );
-  const hasAvailableBundleTickets =
+  const canCreateGuestWithinIncludedTicketAllowance =
     freeTicketAllowance !== undefined &&
     numberOfAddedGuests < freeTicketAllowance;
-  const allowCreateNewUser = hasAvailableBundleTickets;
-
   return (
     <div className={styles.container}>
       {currentStage === CABIN_SELECTION_STAGES.ADD_GUESTS && (
-        <AddGuestsTakeover allowCreateNewUser={allowCreateNewUser} />
+        <AddGuestsTakeover
+          canCreateGuestWithinIncludedTicketAllowance={
+            canCreateGuestWithinIncludedTicketAllowance
+          }
+          remainingPurchasedTicketCount={remainingPurchasedTicketCount}
+        />
       )}
       {currentStage === CABIN_SELECTION_STAGES.BED_SELECTION && (
         <BedSelectionTakeover />

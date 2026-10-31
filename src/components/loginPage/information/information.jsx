@@ -13,8 +13,9 @@ export default function Information() {
         <li>Reserve a specific bed in your cabin</li>
         <li>View or make changes to an existing reservation</li>
         <li>
-          Cabin, Ticket Bundle, and Yurt purchasers can add guests to their
-          group and send them their ticket confirmations
+          Cabin and Yurt purchasers can add guests with included tickets.
+          Ticket bundle and multiple-ticket purchasers can assign their
+          remaining purchased tickets to guests.
         </li>
       </ol>
       <p>What you need to log in:</p>

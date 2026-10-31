@@ -4,15 +4,7 @@ import Loader from '../loader/loader';
 import Takeover from '../takeover/takeover';
 
 function getDeltaParts() {
-  const year = 2025;
-  const month = 8; // September (0-based)
-  const day = 6;
-  const hour = 11;
-  const minute = 0;
-
-  // Convert target EST/EDT time into a fixed UTC timestamp
-  // Sept 6, 2025 is daylight saving time (EDT = UTC-4)
-  const targetDate = new Date(Date.UTC(year, month, day, hour + 4, minute, 0));
+  const targetDate = new Date('2026-11-01T19:00:00Z');
 
   const currentDateAndTime = new Date();
 
@@ -36,6 +28,7 @@ function getDeltaParts() {
 export default function CountdownToDate() {
   const [parts, setParts] = useState(() => getDeltaParts());
 
+  // Refresh the displayed remaining time once per second while the countdown is visible.
   useEffect(() => {
     const id = setInterval(() => {
       const delta = getDeltaParts();
@@ -55,19 +48,40 @@ export default function CountdownToDate() {
         {parts.totalMs === 0 ? (
           <div className={styles.openContainer}>
             <Loader isDotted classNames={styles.loader} />
-            <p className={styles.open}>Reservations are opening momentarily.</p>
-            <p>Please refresh your page every few seconds.</p>
+            <p className={styles.eyebrow}>Highlands Music Festival</p>
+            <h1 className={styles.heading}>Reservations are opening</h1>
+            <p className={styles.note}>
+              Please refresh your page in a few moments.
+            </p>
           </div>
         ) : (
           <>
-            <p className={styles.text}>Reservations open in:</p>
-            <p className={styles.time}>
+            <p className={styles.eyebrow}>Highlands Music Festival</p>
+            <h1 className={styles.heading}>Cabin Reservations</h1>
+            <p className={styles.text}>Open in</p>
+            <div className={styles.timer} role='timer' aria-live='off'>
               {parts.days > 0 && (
-                <span className={styles.time}>{parts.days} days</span>
+                <div className={styles.timeUnit}>
+                  <span className={styles.number}>{parts.days}</span>
+                  <span className={styles.label}>Days</span>
+                </div>
               )}
-              <span className={styles.time}>{pad(parts.hours)} hrs</span>
-              <span className={styles.time}>{pad(parts.minutes)} min</span>
-              <span className={styles.time}>{pad(parts.seconds)} sec</span>
+              <div className={styles.timeUnit}>
+                <span className={styles.number}>{pad(parts.hours)}</span>
+                <span className={styles.label}>Hours</span>
+              </div>
+              <div className={styles.timeUnit}>
+                <span className={styles.number}>{pad(parts.minutes)}</span>
+                <span className={styles.label}>Minutes</span>
+              </div>
+              <div className={styles.timeUnit}>
+                <span className={styles.number}>{pad(parts.seconds)}</span>
+                <span className={styles.label}>Seconds</span>
+              </div>
+            </div>
+            <p className={styles.dateNote}>
+              <span className={styles.date}>Sunday, November 1</span>
+              <span className={styles.dateTime}>2:00 p.m. EST</span>
             </p>
           </>
         )}

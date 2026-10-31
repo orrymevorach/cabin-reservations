@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Input from '@/components/shared/input/input';
 import clsx from 'clsx';
 
-export default function InputVerify({ handleSubmit, allowCreateNewUser }) {
+export default function InputVerify({ handleSubmit, canCreateNewUser }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -43,8 +43,8 @@ export default function InputVerify({ handleSubmit, allowCreateNewUser }) {
 
   return (
     <form onSubmit={e => handleSubmitForm(e)}>
-      <div className={clsx(!allowCreateNewUser && styles.row)}>
-        {allowCreateNewUser && (
+      <div className={clsx(!canCreateNewUser && styles.row)}>
+        {canCreateNewUser && (
           <>
             <Input
               handleChange={e =>

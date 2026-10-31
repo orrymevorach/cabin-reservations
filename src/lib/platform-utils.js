@@ -1,4 +1,9 @@
-import { getBedOccupant, getGroup, getUserByRecordId } from '@/lib/airtable';
+import {
+  getBedOccupant,
+  getGroup,
+  getPurchasedTicketAllocation,
+  getUserByRecordId,
+} from '@/lib/airtable';
 import { BEDS } from '@/utils/constants';
 
 export async function resolveGroupMembers({ memberIds }) {
@@ -45,9 +50,16 @@ export async function getUserReservationData({ user, cabinAndUnitData }) {
 
   const selectedBeds = await resolveSelectedBeds({ cabin: currentCabin });
   const group = await resolveGroup({ user });
+  const { remainingTicketCount: remainingPurchasedTicketCount } =
+    await getPurchasedTicketAllocation({ user });
 
   return {
-    user: { ...user, cabin: currentCabin, group: group.members },
+    user: {
+      ...user,
+      cabin: currentCabin,
+      group: group.members,
+      remainingPurchasedTicketCount,
+    },
     group,
     selectedBeds,
   };

@@ -2,44 +2,155 @@
 @use '@variables' as variables;
 
 .container {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 20px;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 56px 42px;
+  overflow: hidden;
+  border-radius: 20px;
+  background:
+    radial-gradient(
+      circle at 50% 0,
+      rgba(variables.$blue, 0.2),
+      transparent 55%
+    ),
+    linear-gradient(145deg, #fffdfa 0%, variables.$beige 100%);
+  text-align: center;
 }
 
-.text,
-.open {
+.container::before,
+.container::after {
+  position: absolute;
+  z-index: -1;
+  width: 170px;
+  height: 170px;
+  border: 1px solid rgba(variables.$darkGreen, 0.12);
+  border-radius: 50%;
+  content: '';
+}
+
+.container::before {
+  top: -105px;
+  left: -90px;
+}
+
+.container::after {
+  right: -100px;
+  bottom: -120px;
+  width: 220px;
+  height: 220px;
+}
+
+.eyebrow {
   margin: 0;
-  margin-bottom: 10px;
+  color: variables.$mediumGreen;
   @include mixins.fontPrimaryBold;
-  font-size: 20px;
-  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
-.time {
-  font-size: 30px;
-  margin-left: 5px;
+.heading {
+  margin: 12px 0 0;
+  color: variables.$darkGreen;
+  @include mixins.fontSecondary;
+  font-size: 42px;
+  font-weight: normal;
+  line-height: 1.15;
+}
+
+.text {
+  margin: 18px 0 0;
+  color: variables.$charcoal;
+  @include mixins.fontPrimary;
+  font-size: 17px;
+}
+
+.timer {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 560px;
+  margin: 28px 0 22px;
+}
+
+.timeUnit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 18px 8px 15px;
+  border: 1px solid rgba(variables.$darkGreen, 0.16);
+  border-radius: 14px;
+  background-color: rgba(variables.$white, 0.82);
+  box-shadow: 0 8px 20px rgba(variables.$darkGreen, 0.08);
+}
+
+.number {
+  color: variables.$darkGreen;
   @include mixins.fontPrimaryBold;
-  text-align: center;
-  &:first-child {
-    margin-left: 0;
-  }
+  font-size: 42px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.label {
+  margin-top: 9px;
+  color: variables.$mediumGreen;
+  @include mixins.fontPrimaryBold;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.note {
+  margin: 0;
+  color: variables.$charcoal;
+  @include mixins.fontPrimary;
+  font-size: 14px;
+}
+
+.dateNote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 0;
+  padding: 12px 22px;
+  border: 1px solid rgba(variables.$gold, 0.75);
+  border-radius: 999px;
+  background-color: rgba(variables.$gold, 0.18);
+}
+
+.date {
+  color: variables.$darkGreen;
+  @include mixins.fontPrimaryBold;
+  font-size: 19px;
+}
+
+.dateTime {
+  padding-left: 16px;
+  border-left: 1px solid rgba(variables.$darkGreen, 0.25);
+  color: variables.$charcoal;
+  @include mixins.fontPrimaryMedium;
+  font-size: 16px;
+  white-space: nowrap;
 }
 
 .modal {
-  border: 10px solid variables.$gold;
-  outline: 10px solid variables.$blue;
-  p {
-    &:first-of-type {
-      margin-bottom: 15px;
-    }
-  }
-  a,
-  a:active {
-    text-decoration: underline;
-    color: black;
-  }
+  width: 720px;
+  max-width: calc(100vw - 48px);
+  padding: 12px;
+  border: 3px solid variables.$gold;
+  outline: 2px solid variables.$blue;
+  box-shadow: 0 24px 70px rgba(variables.$charcoal, 0.3);
 }
 
 .openContainer {
@@ -47,24 +158,72 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 12px;
 }
 
 .loader {
   position: static;
-  margin-bottom: 30px;
-  margin-left: 20px;
+  margin: 0 0 12px;
 }
 
 @media screen and (max-width: variables.$mobile) {
-  .text,
-  .open {
-    font-size: 16px;
+  .modal {
+    max-width: calc(100vw - 36px);
+    padding: 8px;
   }
 
-  .time {
-    font-size: 20px;
+  .container {
+    padding: 42px 24px;
   }
-  .modal {
-    padding-bottom: 30px;
+
+  .heading {
+    font-size: 34px;
+  }
+
+  .dateNote {
+    gap: 10px;
+    padding: 11px 16px;
+  }
+
+  .date {
+    font-size: 17px;
+  }
+
+  .dateTime {
+    padding-left: 10px;
+    font-size: 14px;
+  }
+
+  .timer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 360px;
+  }
+
+  .number {
+    font-size: 36px;
+  }
+}
+
+@media screen and (max-width: 420px) {
+  .container {
+    padding: 34px 16px;
+  }
+
+  .heading {
+    font-size: 30px;
+  }
+
+  .dateNote {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .dateTime {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .timeUnit {
+    padding: 16px 6px 13px;
   }
 }

@@ -11,7 +11,8 @@ const getErrorMessage = ({ numberOfOpenBeds }) => {
 export default function AddGuests({
   cabin,
   classNames = '',
-  allowCreateNewUser,
+  canCreateNewUser,
+  remainingPurchasedTicketCount = 0,
   handleSubmit,
 }) {
   if (!cabin) return;
@@ -24,7 +25,15 @@ export default function AddGuests({
   return (
     <div className={clsx(styles.container, classNames)}>
       <p className={styles.title}>Add Guests (optional)</p>
-      {!allowCreateNewUser && (
+      {remainingPurchasedTicketCount > 0 && (
+        <p className={styles.text}>
+          You have {remainingPurchasedTicketCount} purchased{' '}
+          {remainingPurchasedTicketCount === 1 ? 'ticket' : 'tickets'} available
+          to assign. Enter each guest&apos;s name and email to assign a ticket
+          and send them their access details.
+        </p>
+      )}
+      {!canCreateNewUser && (
         <p className={styles.text}>
           In order to reserve a spot in your cabin on behalf of your friends or
           partners, please make sure they have already purchased a ticket.
@@ -35,7 +44,7 @@ export default function AddGuests({
         <div className={styles.input}>
           <InputVerify
             handleSubmit={handleSubmit}
-            allowCreateNewUser={allowCreateNewUser}
+            canCreateNewUser={canCreateNewUser}
           />
         </div>
       ) : (

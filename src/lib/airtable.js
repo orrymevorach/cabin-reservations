@@ -224,6 +224,192 @@ export const getUserByEmail = async ({ email }) => {
   return user || {};
 };
 
+const isTicketPurchaserStatus = status =>
+  Boolean(
+    status === 'Ticket Purchased' ||
+      (status?.toLowerCase().includes('bundle') &&
+        !status.toLowerCase().includes('guest')),
+  );
+const isPurchasedTicketGuestStatus = status =>
+  status === 'Ticket Purchased' || status === 'Bundle Guest';
+
+export const getPurchasedTicketAllocation = async ({ user }) => {
+  if (!user?.id || !user?.name || !user?.emailAddress) {
+    return {
+      remainingTicketCount: 0,
+      placeholderRecords: [],
+      isBundlePurchase: false,
+    };
+  }
+
+  const buyerResponse = await getRecordsByFieldValue({
+    tableId: AIRTABLE_BASES.TICKET_PURCHASES,
+    endpoint: '/get-records-by-field-value',
+    formulaArray: [
+      { fieldName: 'Email Address', fieldValue: user.emailAddress },
+    ],
+  });
+
+  if (!Array.isArray(buyerResponse?.records)) {
+    throw new Error('Unable to verify purchased ticket records.');
+  }
+
+  const normalizeValue = value => String(value || '').trim().toLowerCase();
+  const purchaserName = normalizeValue(user.name);
+  const purchaserEmail = normalizeValue(user.emailAddress);
+  const buyerTicketRecords = buyerResponse.records.filter(record => {
+    const hasMatchingName = normalizeValue(record.name) === purchaserName;
+    const doesHaveMatchingEmail =
+      normalizeValue(record.emailAddress) === purchaserEmail;
+    const doesHaveTicketStatus = isTicketPurchaserStatus(
+      record.status,
+    );
+
+    return (
+      hasMatchingName &&
+      doesHaveMatchingEmail &&
+      doesHaveTicketStatus
+    );
+  });
+  const buyerRecords = buyerTicketRecords.filter(record => {
+    const hasPurchasedQuantity = Number(record.quantity) > 0;
+    const hasNoPurchaserAttribution = !record.purchaser;
+    return hasPurchasedQuantity || hasNoPurchaserAttribution;
+  });
+  if (buyerRecords.length === 0) {
+    return {
+      remainingTicketCount: 0,
+      placeholderRecords: [],
+      isBundlePurchase: false,
+    };
+  }
+  const purchasedTicketCount = buyerRecords.reduce(
+    (total, record) =>
+      total + (Number(record.quantity) > 0 ? Number(record.quantity) : 1),
+    0,
+  );
+  const buyerTicketCount = buyerRecords.length;
+  const isBundlePurchase = buyerRecords.some(({ status }) =>
+    status?.toLowerCase().includes('bundle'),
+  );
+  if (purchasedTicketCount <= buyerTicketCount) {
+    return {
+      remainingTicketCount: 0,
+      placeholderRecords: [],
+      isBundlePurchase,
+    };
+  }
+
+  const purchaserResponse = await getRecordsByFieldValue({
+    tableId: AIRTABLE_BASES.TICKET_PURCHASES,
+    endpoint: '/get-records-by-field-value',
+    formulaArray: [{ fieldName: 'Purchaser', fieldValue: user.name }],
+  });
+  if (!Array.isArray(purchaserResponse?.records)) {
+    throw new Error('Unable to verify purchased ticket assignments.');
+  }
+
+  const buyerRecordIds = new Set(buyerRecords.map(({ id }) => id));
+  const purchaserTicketRecords = purchaserResponse.records.filter(record => {
+    const isNotBuyerRecord = !buyerRecordIds.has(record.id);
+    return isNotBuyerRecord && isPurchasedTicketGuestStatus(record.status);
+  });
+  // Blank checkout rows share the buyer's identity; keep them available to claim.
+  const isPlaceholderRecord = record => {
+    const isNotBuyerRecord = !buyerRecordIds.has(record.id);
+    const hasTicketGuestStatus = isPurchasedTicketGuestStatus(record.status);
+    const hasPurchaserName = normalizeValue(record.name) === purchaserName;
+    const hasPurchaserEmail =
+      normalizeValue(record.emailAddress) === purchaserEmail;
+    return (
+      isNotBuyerRecord &&
+      hasTicketGuestStatus &&
+      hasPurchaserName &&
+      hasPurchaserEmail
+    );
+  };
+  const placeholderRecords = [
+    ...purchaserTicketRecords.filter(isPlaceholderRecord),
+    ...buyerTicketRecords.filter(isPlaceholderRecord),
+  ].filter(
+    (record, index, records) =>
+      records.findIndex(({ id }) => id === record.id) === index,
+  );
+  const placeholderRecordIds = new Set(placeholderRecords.map(({ id }) => id));
+  const assignedGuestCount = purchaserTicketRecords.filter(
+    ({ id }) => !placeholderRecordIds.has(id),
+  ).length;
+  const remainingTicketCount = Math.max(
+    purchasedTicketCount - buyerTicketCount - assignedGuestCount,
+    0,
+  );
+
+  return {
+    remainingTicketCount,
+    placeholderRecords,
+    isBundlePurchase,
+  };
+};
+
+export const createPurchasedTicketGuest = async ({
+  host,
+  email,
+  name,
+  cabinId,
+  placeholderRecord,
+  isBundlePurchase,
+}) => {
+  const temporaryPassword = generateRandomPassword();
+  const newFields = {
+    Name: name,
+    'Email Address': email,
+    'Temporary Password': temporaryPassword,
+    Purchaser: host.name,
+    ...(cabinId && { Cabin: [cabinId] }),
+  };
+  let guest;
+
+  // Claim an existing paid GA row instead of issuing another ticket.
+  if (placeholderRecord) {
+    const updateResponse = await updateRecord({
+      tableId: AIRTABLE_BASES.TICKET_PURCHASES,
+      recordId: placeholderRecord.id,
+      newFields,
+      endpoint: '/update-record',
+    });
+    guest = updateResponse?.record;
+  } else {
+    const createResponse = await createRecord({
+      tableId: AIRTABLE_BASES.TICKET_PURCHASES,
+      newFields: {
+        ...newFields,
+        ...(!isBundlePurchase && {
+          amount: 0,
+          'Full Ticket Price': 0,
+        }),
+        Status:
+          process.env.NODE_ENV === 'production'
+            ? isBundlePurchase
+              ? 'Bundle Guest'
+              : 'Ticket Purchased'
+            : 'Testing',
+        ...(host.productID?.length && { 'Product ID': host.productID }),
+        ...(host.subscriptionId?.length && {
+          'Subscription Id': host.subscriptionId,
+        }),
+      },
+      endpoint: '/create-record',
+    });
+    guest = createResponse?.record;
+  }
+
+  if (!guest?.id) {
+    throw new Error('Unable to create the purchased ticket guest record.');
+  }
+
+  return { guest };
+};
+
 export const getUserByRecordId = async ({ id }) => {
   const { record: user } = await getRecordById({
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,

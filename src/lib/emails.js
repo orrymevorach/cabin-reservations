@@ -22,18 +22,18 @@ export const sendConfirmationEmail = async ({
 };
 
 export const sendTemporaryPasswordEmail = async ({ emailAddress }) => {
+  const queryEmailAddress = encodeURIComponent(emailAddress);
   const res = await fetch(
-    `https://highlandsmusicfestival.ca/api/email-templates/send-cabin-reservation-email?emailAddress=${emailAddress}`,
+    `https://highlandsmusicfestival.ca/api/email-templates/send-cabin-reservation-email?emailAddress=${queryEmailAddress}`,
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        emailAddress,
-      }),
+      body: JSON.stringify({ emailAddress }),
     },
   ).then(res => res.json());
+  return res;
 };
 
 export const sendQRCode = async ({ email, recordId }) => {

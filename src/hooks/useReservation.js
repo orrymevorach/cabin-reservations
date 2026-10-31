@@ -24,6 +24,9 @@ const reducer = (state, action) => {
         numberOfMembersNotConfirmedInCurrentCabin:
           action.numberOfMembersNotConfirmedInCurrentCabin,
         cabin: action.cabin,
+        remainingPurchasedTicketCount:
+          action.remainingPurchasedTicketCount ??
+          state.remainingPurchasedTicketCount,
       };
     case SET_SELECTION_STAGE:
       return {
@@ -65,6 +68,7 @@ export const useReservationReducer = ({
     groupData: group,
     numberOfMembersNotConfirmedInCurrentCabin: 0,
     cabin: user.cabin,
+    remainingPurchasedTicketCount: user.remainingPurchasedTicketCount || 0,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);

@@ -11,7 +11,10 @@ export default async function handler(req, res) {
     const { tableId, formulaArray } = req.body;
     const formula = formulaArray
       .map(({ fieldName, fieldValue }) => {
-        return `{${fieldName}} = "${fieldValue}"`;
+        const escapedFieldValue = String(fieldValue ?? '')
+          .replace(/\\/g, '\\\\')
+          .replace(/"/g, '\\"');
+        return `{${fieldName}} = "${escapedFieldValue}"`;
       })
       .join(', ');
 

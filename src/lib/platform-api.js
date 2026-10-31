@@ -60,7 +60,7 @@ export async function addGroupMember({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'add',
+        action: 'add-existing-ticket-holder',
         groupId,
         hostUserId,
         memberIds,
@@ -89,7 +89,7 @@ export async function createGroupMember({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'create',
+        action: 'create-cabin-guest',
         groupId,
         hostUserId,
         memberIds,
@@ -106,13 +106,44 @@ export async function createGroupMember({
   }
 }
 
+export async function assignPurchasedTicketToGroupMember({
+  groupId,
+  hostUserId,
+  email,
+  firstName,
+  lastName,
+  cabinId,
+}) {
+  try {
+    const response = await fetch('/api/platform/group', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'assign-purchased-ticket',
+        groupId,
+        hostUserId,
+        email,
+        firstName,
+        lastName,
+        cabinId,
+      }),
+    }).then(res => res.json());
+    return response;
+  } catch (error) {
+    console.log('error', error);
+    return {
+      message: 'Unable to assign your purchased ticket. Please try again.',
+    };
+  }
+}
+
 export async function removeGroupMember({ groupId, memberIds, removeUserId }) {
   try {
     const response = await fetch('/api/platform/group', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'remove',
+        action: 'remove-group-member',
         groupId,
         memberIds,
         removeUserId,
