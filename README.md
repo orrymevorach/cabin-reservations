@@ -22,6 +22,20 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
+## Automated Reservations Tests
+
+The automated reservation tests use the [duplicated Airtable test base](https://airtable.com/appFe9v1pu6BLVxeD).
+
+The test suite and supporting scripts are in [scripts/tests/](./scripts/tests). Run them with `npm run test:automated-reservations`.
+
+### Optional Tests Before Pushing
+
+Run `npm run hooks:install` once per clone to enable the [pre-push hook](./.githooks/pre-push). Command-line pushes will ask whether to run the automated reservation tests first.
+
+- Answer `y` to run the suite. A failed run cancels the push.
+- Answer `n` or press Enter to push without running the suite.
+- Pushes without an interactive terminal skip the prompt and print a notice.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

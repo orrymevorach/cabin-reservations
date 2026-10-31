@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import styles from './countdown.module.scss';
 import Loader from '../loader/loader';
 import Takeover from '../takeover/takeover';
@@ -45,10 +46,17 @@ export default function CountdownToDate() {
   return (
     <Takeover hideCloseButton modalClassNames={styles.modal}>
       <div className={styles.container}>
+        <Image
+          className={styles.logo}
+          src='/Logo-1200px-No-Bkgd-min.png'
+          alt='Highlands Music Festival'
+          width={300}
+          height={79}
+          priority
+        />
         {parts.totalMs === 0 ? (
           <div className={styles.openContainer}>
             <Loader isDotted classNames={styles.loader} />
-            <p className={styles.eyebrow}>Highlands Music Festival</p>
             <h1 className={styles.heading}>Reservations are opening</h1>
             <p className={styles.note}>
               Please refresh your page in a few moments.
@@ -56,7 +64,6 @@ export default function CountdownToDate() {
           </div>
         ) : (
           <>
-            <p className={styles.eyebrow}>Highlands Music Festival</p>
             <h1 className={styles.heading}>Cabin Reservations</h1>
             <p className={styles.text}>Open in</p>
             <div className={styles.timer} role='timer' aria-live='off'>

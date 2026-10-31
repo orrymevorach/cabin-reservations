@@ -46,13 +46,11 @@
   height: 220px;
 }
 
-.eyebrow {
-  margin: 0;
-  color: variables.$mediumGreen;
-  @include mixins.fontPrimaryBold;
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+.logo {
+  display: block;
+  width: 230px;
+  height: auto;
+  margin-bottom: 20px;
 }
 
 .heading {

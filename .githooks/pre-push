@@ -1,0 +1,33 @@
+#!/bin/sh
+
+if ! ( : < /dev/tty ) 2>/dev/null; then
+  printf '%s\n' 'No interactive terminal; skipping the automated reservations test prompt.' >&2
+  exit 0
+fi
+
+while :; do
+  printf '%s' 'Run the automated reservations tests before pushing? [y/N] ' > /dev/tty
+  if ! IFS= read -r answer < /dev/tty; then
+    printf '\n%s\n' 'Could not read your answer; push cancelled.' >&2
+    exit 1
+  fi
+
+  case "$answer" in
+    y|Y|yes|YES|Yes)
+      project_root=$(git rev-parse --show-toplevel) || exit 1
+      cd "$project_root" || exit 1
+      if npm run test:automated-reservations < /dev/tty; then
+        exit 0
+      fi
+      printf '%s\n' 'Automated reservations tests failed; push cancelled.' >&2
+      exit 1
+      ;;
+    n|N|no|NO|No|'')
+      printf '%s\n' 'Skipping automated reservations tests.' >&2
+      exit 0
+      ;;
+    *)
+      printf '%s\n' 'Please answer yes or no.' > /dev/tty
+      ;;
+  esac
+done

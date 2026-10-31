@@ -108,9 +108,27 @@ async function createCabinGuest({
     };
   }
 
+  const host = await getUserByRecordId({ id: hostUserId });
+  if (!host?.id || host.cabin?.[0] !== cabinId) {
+    return { error: 'Unable to verify your cabin reservation.' };
+  }
+
+  const cabin = await getCabinById({ cabinId });
+  if (!cabin) return { error: 'Unable to verify your cabin reservation.' };
+
+  const isYurtCabin = cabin.unit?.[0] === 'Yurtlands';
+  const isYurtPurchaser = host.status === 'Yurt';
+  if (isYurtCabin !== isYurtPurchaser) {
+    return { error: 'Unable to verify your cabin reservation.' };
+  }
+
+  const openBedCount = Number(cabin.openBeds);
+  if (!Number.isFinite(openBedCount) || openBedCount < 1) {
+    return { error: 'No additional beds are available in this cabin.' };
+  }
+
   const name = `${firstName} ${lastName}`;
   const newGuest = await createUser({ email, name, cabinId });
-  const host = await getUserByRecordId({ id: hostUserId });
 
   const group = await addToGroup({
     groupId,
@@ -120,7 +138,6 @@ async function createCabinGuest({
     groupName: host.name,
   });
 
-  const cabin = await getCabinById({ cabinId });
   await sendConfirmationEmail({
     groupMember: newGuest,
     cabin,
