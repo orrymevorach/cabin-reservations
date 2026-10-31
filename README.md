@@ -22,6 +22,35 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
+## Inactive Tickets
+
+Successful email/password login calls `/api/airtable/add-firebase-uid` with the
+Firebase ID token. The server verifies it through Firebase Authentication,
+queries Ticket Purchases once using the verified email, and attaches the verified
+UID only if the active ticket has no UID. A different existing UID is rejected.
+The operation uses the existing Firebase web API key and Airtable server credentials.
+Failed Firebase sign-in retains the ticket lookup/create-account guidance.
+The `/api/airtable/add-firebase-uid` route owns ticket lookup and UID assignment
+directly and requires an ID token; arbitrary record-ID/UID writes through that
+route are no longer supported.
+
+The admin dashboard archives purchases using `Status = Archived` on Airtable's
+`Ticket Purchases` table. Both `Archived` and `Refunded` are inactive statuses.
+Reservation attendee lookups and purchased-ticket allocation exclude both.
+Generic Airtable read APIs return all records regardless of status; ticket access
+rules are applied by the reservation helpers. Inactive tickets cannot update
+their reservation record, attach an account UID, or create a check-in.
+Cabin reservation, bed reservation, and guest-assignment operations validate the
+attendee records they already load before writing changes. They share
+`throwIfReservationTicketIsInvalid` rather than routing through an extra ticket-update
+API. The generic `/api/airtable/update-record` route does not apply ticket-status rules.
+Check-in creation uses `/api/platform/create-check-in` to validate attendee ticket
+eligibility before calling the generic Airtable create handler. The generic
+`/api/airtable/create-record` route does not apply check-in or ticket-status rules.
+The dashboard also clears group/cabin/bed links when
+archiving. Deploy these API changes before enabling dashboard archiving. Restoring
+a record in Airtable does not restore its former reservation assignments.
+
 ## Automated Reservations Tests
 
 The automated reservation tests use the [duplicated Airtable test base](https://airtable.com/appFe9v1pu6BLVxeD).

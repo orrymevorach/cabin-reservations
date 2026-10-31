@@ -5,6 +5,7 @@ import {
   reserveSpotInCabin,
 } from '@/lib/airtable';
 import { sendConfirmationEmail } from '@/lib/emails';
+import { throwIfReservationTicketIsInvalid } from '@/utils/ticket-utils';
 
 // mirrors the confirm-reservation logic from reserveButton.jsx, but enforces
 // the yurt/head-staff/capacity rules server-side instead of trusting the client
@@ -38,6 +39,8 @@ export default async function handler(req, res) {
     const groupMembers = await Promise.all(
       groupMemberIds.map(id => getUserByRecordId({ id })),
     );
+    throwIfReservationTicketIsInvalid(host);
+    groupMembers.forEach(throwIfReservationTicketIsInvalid);
 
     const isYurt = cabin.unit?.[0] === 'Yurtlands';
     if (isYurt && host.status !== 'Yurt') {

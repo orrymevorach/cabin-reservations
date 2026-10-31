@@ -18,6 +18,7 @@ import {
 import { sendSlackNotification } from '@/lib/slack';
 import Cookies from 'cookies';
 import { COOKIES } from '@/utils/constants';
+import { throwIfReservationTicketIsInvalid } from '@/utils/ticket-utils';
 
 function verifyGuest({ guest, existingMemberEmails }) {
   if (!guest?.id) return 'No user found with this email.';
@@ -65,6 +66,7 @@ async function addMember({
   if (error) return { error };
 
   const host = await getUserByRecordId({ id: hostUserId });
+  throwIfReservationTicketIsInvalid(host);
   const group = await addToGroup({
     groupId,
     hostUserId,

@@ -14,6 +14,10 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        source: '/api/airtable/create-check-in',
+        destination: '/api/platform/create-check-in',
+      },
+      {
         source: '/api/airtable/get-cabin',
         destination: '/api/airtable/get-record',
       },
@@ -72,10 +76,6 @@ const nextConfig = {
       {
         source: '/api/airtable/get-user-by-uid',
         destination: '/api/airtable/get-record',
-      },
-      {
-        source: '/api/airtable/add-firebase-uid',
-        destination: '/api/airtable/update-record',
       },
     ];
   },

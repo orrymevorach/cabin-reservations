@@ -46,7 +46,7 @@ export default function BedSelection({ readOnly = false, cabin }) {
 
     const response = await reserveBeds({
       cabinId: cabin.id || cabin[0], // After a bed is selected and then removed, the cabin data is removed and we only get the record id inside of the array
-      hostUserId: user.id,
+      reservingAttendeeId: user.id,
       beds: bedsToReserve,
     });
 

@@ -5,6 +5,7 @@ import {
 } from '@/utils/string-utils';
 import { BEDS, AIRTABLE_BASES, COOKIES } from '@/utils/constants';
 import Cookies from 'cookies';
+import { throwIfReservationTicketIsInvalid, isInactiveTicketStatus } from '@/utils/ticket-utils';
 
 export const createRecord = async ({
   tableId,
@@ -217,7 +218,7 @@ export const getUserByEmail = async ({ email }) => {
   });
   if (records.length === 0) return {};
   const user = records.find(record => {
-    if (record.status !== 'Payment Made') return record;
+    if (record.status !== 'Payment Made' && !isInactiveTicketStatus(record.status)) return record;
     return null;
   });
   if (user?.length === 0) return {};
@@ -261,9 +262,8 @@ export const getPurchasedTicketAllocation = async ({ user }) => {
     const hasMatchingName = normalizeValue(record.name) === purchaserName;
     const doesHaveMatchingEmail =
       normalizeValue(record.emailAddress) === purchaserEmail;
-    const doesHaveTicketStatus = isTicketPurchaserStatus(
-      record.status,
-    );
+    const doesHaveTicketStatus = !isInactiveTicketStatus(record.status) &&
+      isTicketPurchaserStatus(record.status);
 
     return (
       hasMatchingName &&
@@ -312,7 +312,8 @@ export const getPurchasedTicketAllocation = async ({ user }) => {
   const buyerRecordIds = new Set(buyerRecords.map(({ id }) => id));
   const purchaserTicketRecords = purchaserResponse.records.filter(record => {
     const isNotBuyerRecord = !buyerRecordIds.has(record.id);
-    return isNotBuyerRecord && isPurchasedTicketGuestStatus(record.status);
+    return isNotBuyerRecord && !isInactiveTicketStatus(record.status) &&
+      isPurchasedTicketGuestStatus(record.status);
   });
   // Blank checkout rows share the buyer's identity; keep them available to claim.
   const isPlaceholderRecord = record => {
@@ -371,6 +372,8 @@ export const createPurchasedTicketGuest = async ({
 
   // Claim an existing paid GA row instead of issuing another ticket.
   if (placeholderRecord) {
+    throwIfReservationTicketIsInvalid(host);
+    throwIfReservationTicketIsInvalid(placeholderRecord);
     const updateResponse = await updateRecord({
       tableId: AIRTABLE_BASES.TICKET_PURCHASES,
       recordId: placeholderRecord.id,
@@ -416,7 +419,7 @@ export const getUserByRecordId = async ({ id }) => {
     recordId: id,
     endpoint: '/get-record-by-id',
   });
-  return user;
+  return isInactiveTicketStatus(user?.status) ? {} : user;
 };
 
 export const getUserCheckIn = async ({ attendeeId }) => {
@@ -443,7 +446,7 @@ export const getBedOccupant = async ({ userId }) => {
     recordId: userId,
     endpoint: '/get-bed-occupant',
   });
-  return currentBedOccupant;
+  return isInactiveTicketStatus(currentBedOccupant?.status) ? {} : currentBedOccupant;
 };
 
 export const clearCurrentBedSelection = async ({ userId }) => {
@@ -511,12 +514,16 @@ export const checkIn = async ({
   departureTime,
 }) => {
   const existingAttendee = await getUserByRecordId({ id: attendee });
+  if (!existingAttendee?.id) {
+    throw new Error('An active ticket is required to check in.');
+  }
   if (existingAttendee?.checkedIn === 'Yes') {
     return { alreadyCheckedIn: true };
   }
   try {
     const { record: user } = await createRecord({
       tableId: 'Check In',
+      endpoint: '/create-check-in',
       newFields: {
         Attendee: [attendee],
         City: city,
@@ -555,16 +562,6 @@ export const getCabinCategories = async () => {
     endpoint: '/get-cabin-categories',
   });
   return cabins;
-};
-
-export const addFirebaseUid = async ({ attendeeId, uid }) => {
-  const { record } = await updateRecord({
-    tableId: AIRTABLE_BASES.TICKET_PURCHASES,
-    recordId: attendeeId,
-    newFields: { 'Firebase UID': uid },
-    endpoint: '/add-firebase-uid',
-  });
-  return record;
 };
 
 export const removeFirebaseUid = async ({ attendeeId, uid = '' }) => {

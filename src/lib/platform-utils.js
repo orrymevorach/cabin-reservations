@@ -7,9 +7,10 @@ import {
 import { BEDS } from '@/utils/constants';
 
 export async function resolveGroupMembers({ memberIds }) {
-  return Promise.all(
+  const members = await Promise.all(
     memberIds.map(memberId => getUserByRecordId({ id: memberId })),
   );
+  return members.filter(member => member?.id);
 }
 
 async function resolveSelectedBeds({ cabin }) {

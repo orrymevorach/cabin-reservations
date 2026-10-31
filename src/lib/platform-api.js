@@ -1,5 +1,18 @@
 import { logSentryError } from '@/utils/sentry-utils';
 
+export async function getAttendeeAndAssignFirebaseUid({ idToken }) {
+  const response = await fetch('/api/airtable/add-firebase-uid', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken }),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || 'Unable to link your ticket to your account.');
+  }
+  return result.user;
+}
+
 export default async function getCabinAndUnitData() {
   try {
     const response = await fetch(
@@ -156,12 +169,12 @@ export async function removeGroupMember({ groupId, memberIds, removeUserId }) {
   }
 }
 
-export async function reserveBeds({ cabinId, hostUserId, beds }) {
+export async function reserveBeds({ cabinId, reservingAttendeeId, beds }) {
   try {
     const response = await fetch('/api/platform/reserve-bed', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cabinId, hostUserId, beds }),
+      body: JSON.stringify({ cabinId, reservingAttendeeId, beds }),
     }).then(res => res.json());
     return response;
   } catch (error) {
