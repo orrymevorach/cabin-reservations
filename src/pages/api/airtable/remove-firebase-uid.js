@@ -1,3 +1,4 @@
+import { logSentryApiError } from '@/utils/sentry-utils';
 import { transformFields } from '../../../lib/airtable';
 const Airtable = require('airtable');
 
@@ -33,6 +34,12 @@ export default async function handler(req, res) {
 
       res.status(200).json({ record: transformedRecord });
     } catch (err) {
+      await logSentryApiError({
+        error: err,
+        req,
+        action: 'airtable-remove-firebase-uid',
+        extra: { tableId, recordId },
+      });
       res
         .status(err.statusCode || 500)
         .json({ message: err.message || 'Unable to update Airtable record.' });

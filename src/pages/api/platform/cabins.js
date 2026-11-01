@@ -1,3 +1,4 @@
+import { logSentryApiError } from '@/utils/sentry-utils';
 import { getCabins, getUnits } from '@/lib/airtable';
 import {
   filterOutClosedCabins,
@@ -55,7 +56,12 @@ export default async function handler(req, res) {
 
     res.status(200).json({ units: filteredUnits, cabins: cabinResponse });
   } catch (err) {
-    console.log('error', err);
+    await logSentryApiError({
+      error: err,
+      req,
+      action: 'load-cabins',
+      extra: { unit: req.query?.unit },
+    });
     res.status(err.statusCode || 500).json({ message: err.message });
   }
 }

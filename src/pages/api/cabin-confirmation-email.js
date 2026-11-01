@@ -1,3 +1,4 @@
+import { logSentryApiError } from '@/utils/sentry-utils';
 import { replaceCamelCaseWithSpaces } from '@/utils/string-utils';
 import { sendEmail } from '@/lib/emails';
 
@@ -19,7 +20,7 @@ export default async function handler(req, res) {
 
     const isHost = groupMember.emailAddress === host.emailAddress;
 
-    await sendEmail({
+    const { response: emailResponse, data: emailResult } = await sendEmail({
       emailAddress: groupMember.emailAddress,
       subject,
       html: `
@@ -49,8 +50,25 @@ export default async function handler(req, res) {
       `,
     });
 
+    // The Mailchimp endpoint reports failures in its response instead of throwing, so treat any non-OK result as a failed confirmation email.
+    if (!emailResponse?.ok) {
+      throw new Error(
+        `Cabin confirmation email failed: ${emailResult?.error || `status ${emailResponse?.status}`}`,
+      );
+    }
+
     res.status(200).json({});
-  } catch {
+  } catch (error) {
+    await logSentryApiError({
+      error,
+      req,
+      action: 'send-cabin-confirmation-email',
+      extra: {
+        cabinId: req.body?.cabin?.id,
+        groupMemberId: req.body?.groupMember?.id,
+        hostId: req.body?.host?.id,
+      },
+    });
     res.status(500).json({ error: 'Unable to send cabin confirmation email.' });
   }
 }

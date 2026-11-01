@@ -1,3 +1,4 @@
+import { logSentryApiError } from '@/utils/sentry-utils';
 const { WebClient } = require('@slack/web-api');
 
 require('dotenv').config({ path: '.env.local' });
@@ -20,7 +21,11 @@ export default async function handler(req, res) {
     });
     res.status(200).json({ success: true });
   } catch (error) {
-    console.error('Error sending message:', error);
-    res.status(400).json({ error });
+    await logSentryApiError({
+      error,
+      req,
+      action: 'send-cabin-slack-notification',
+    });
+    res.status(500).json({ error: 'Unable to send Slack notification.' });
   }
 }

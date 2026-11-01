@@ -1,3 +1,4 @@
+import { logSentryApiError } from '@/utils/sentry-utils';
 import { transformFields } from '../../../lib/airtable';
 const Airtable = require('airtable');
 
@@ -39,7 +40,15 @@ export default async function handler(req, res) {
 
       res.status(200).json({ records: recordsWithIds });
     } catch (err) {
-      console.log('Error:', err);
+      await logSentryApiError({
+        error: err,
+        req,
+        action: 'airtable-get-records-by-field-value',
+        extra: {
+          tableId,
+          fieldNames: formulaArray.map(({ fieldName }) => fieldName),
+        },
+      });
       res.status(err.statusCode || 500).json(err.message);
     }
   } else {

@@ -1,3 +1,4 @@
+import { logSentryApiError } from '@/utils/sentry-utils';
 import { getCabinCategories } from '@/lib/airtable';
 
 export default async function handler(req, res) {
@@ -10,7 +11,12 @@ export default async function handler(req, res) {
     const cabinCategories = await getCabinCategories({});
     res.status(200).json({ cabinCategories });
   } catch (err) {
-    console.log('error', err);
+    await logSentryApiError({
+      error: err,
+      req,
+      action: 'load-cabin-categories',
+      extra: {},
+    });
     res.status(err.statusCode || 500).json({ message: err.message });
   }
 }

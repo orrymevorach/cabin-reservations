@@ -20,7 +20,7 @@ export default async function getCabinAndUnitData() {
     ).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'load-cabin-and-unit-data' });
     return { units: [], cabins: [] };
   }
 }
@@ -32,7 +32,7 @@ export async function getCabinCategories() {
     ).then(res => res.json());
     return cabinCategories;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'load-cabin-categories' });
     return [];
   }
 }
@@ -56,7 +56,7 @@ export async function reserveCabin({
     }).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'reserve-cabin-request' });
     return { message: 'Unable to reserve cabin. Please try again.' };
   }
 }
@@ -83,7 +83,7 @@ export async function addGroupMember({
     }).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'add-group-member-request' });
     return { message: 'Unable to add guest. Please try again.' };
   }
 }
@@ -114,7 +114,7 @@ export async function createGroupMember({
     }).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'create-group-member-request' });
     return { message: 'Unable to add guest. Please try again.' };
   }
 }
@@ -143,7 +143,7 @@ export async function assignPurchasedTicketToGroupMember({
     }).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'assign-purchased-ticket-request' });
     return {
       message: 'Unable to assign your purchased ticket. Please try again.',
     };
@@ -164,7 +164,7 @@ export async function removeGroupMember({ groupId, memberIds, removeUserId }) {
     }).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'remove-group-member-request' });
     return { message: 'Unable to remove guest. Please try again.' };
   }
 }
@@ -178,7 +178,7 @@ export async function reserveBeds({ cabinId, reservingAttendeeId, beds }) {
     }).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'reserve-beds-request' });
     return { message: 'Unable to reserve bed. Please try again.' };
   }
 }

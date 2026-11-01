@@ -1,3 +1,4 @@
+import { logSentryApiError } from '@/utils/sentry-utils';
 import { getUserByEmail } from '@/lib/airtable';
 import { isObjectEmpty } from '@/utils/string-utils';
 
@@ -16,7 +17,12 @@ export default async function handler(req, res) {
     const user = await getUserByEmail({ email });
     res.status(200).json({ user: isObjectEmpty(user) ? null : user });
   } catch (err) {
-    console.log('error', err);
+    await logSentryApiError({
+      error: err,
+      req,
+      action: 'load-user-by-email',
+      extra: {},
+    });
     res.status(err.statusCode || 500).json({ message: err.message });
   }
 }

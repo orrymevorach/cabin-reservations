@@ -1,3 +1,4 @@
+import { logSentryApiError } from '@/utils/sentry-utils';
 import { transformFields } from '../../../lib/airtable';
 const Airtable = require('airtable');
 
@@ -18,6 +19,12 @@ export default async function handler(req, res) {
 
       res.status(200).json({ record: recordObj });
     } catch (err) {
+      await logSentryApiError({
+        error: err,
+        req,
+        action: 'airtable-get-record-by-id',
+        extra: { tableId, recordId },
+      });
       res.status(err.statusCode || 500).json(err.message);
     }
   } else {

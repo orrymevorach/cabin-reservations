@@ -1,3 +1,4 @@
+import { logSentryApiError } from '@/utils/sentry-utils';
 import getCabinAndUnitData from '@/lib/platform-api';
 import { getPageLoadData, getUserByRecordId } from '@/lib/airtable';
 import { getUserReservationData } from '@/lib/platform-utils';
@@ -34,7 +35,12 @@ export default async function handler(req, res) {
       .status(200)
       .json({ cabinAndUnitData, user: resolvedUser, group, selectedBeds });
   } catch (err) {
-    console.log('error', err);
+    await logSentryApiError({
+      error: err,
+      req,
+      action: 'load-user-reservation-data',
+      extra: { userId: req.query?.userId },
+    });
     res.status(err.statusCode || 500).json({ message: err.message });
   }
 }

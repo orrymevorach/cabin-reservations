@@ -7,6 +7,7 @@ import { useState } from 'react';
 import clsx from 'clsx';
 import { useUser } from '@/context/user-context';
 import { reserveCabin } from '@/lib/platform-api';
+import { logSentryError } from '@/utils/sentry-utils';
 
 export default function ReserveButton({ children, cabin, classNames = '' }) {
   const { user } = useUser();
@@ -47,7 +48,7 @@ export default function ReserveButton({ children, cabin, classNames = '' }) {
       });
       setIsLoading(false);
     } catch (error) {
-      console.error(error);
+      logSentryError(error, { action: 'confirm-cabin-reservation' });
       setIsLoading(false);
     }
   };

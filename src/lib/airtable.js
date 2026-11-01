@@ -5,6 +5,7 @@ import {
 } from '@/utils/string-utils';
 import { BEDS, AIRTABLE_BASES, COOKIES } from '@/utils/constants';
 import Cookies from 'cookies';
+import { logSentryError } from '@/utils/sentry-utils';
 import { throwIfReservationTicketIsInvalid, isInactiveTicketStatus } from '@/utils/ticket-utils';
 
 export const createRecord = async ({
@@ -25,7 +26,7 @@ export const createRecord = async ({
     ).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'airtable-create-record-request' });
     return { message: error.message || 'Unable to create Airtable record.' };
   }
 };
@@ -48,7 +49,7 @@ export async function getRecords({
     ).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'airtable-get-records-request' });
   }
 }
 
@@ -70,7 +71,7 @@ export async function getRecordsByFieldValue({
     ).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'airtable-get-records-by-field-value-request' });
   }
 }
 
@@ -93,7 +94,7 @@ export async function getRecord({
     ).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'airtable-get-record-request' });
   }
 }
 
@@ -115,7 +116,7 @@ export async function getRecordById({
     ).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'airtable-get-record-by-id-request' });
     return { record: null };
   }
 }
@@ -139,7 +140,7 @@ export const updateRecord = async ({
     ).then(res => res.json());
     return response;
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'airtable-update-record-request' });
     return { message: error.message || 'Unable to update Airtable record.' };
   }
 };
@@ -537,7 +538,7 @@ export const checkIn = async ({
     });
     return { user };
   } catch (error) {
-    console.log('error', error);
+    logSentryError(error, { action: 'create-check-in' });
   }
 };
 
