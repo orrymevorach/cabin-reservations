@@ -467,6 +467,9 @@ export const createPurchasedTicketGuest = async ({
     'Temporary Password': temporaryPassword,
     Purchaser: host.name,
     ...(cabinId && { Cabin: [cabinId] }),
+    // Match checkout, which saves the order's code on every guest. A claimed paid row keeps the code from its own order.
+    ...(host.discountCode &&
+      !placeholderRecord?.discountCode && { discountCode: host.discountCode }),
   };
   let guest;
 
@@ -674,7 +677,7 @@ export const removeFirebaseUid = async ({ attendeeId, uid = '' }) => {
   return record;
 };
 
-export const createUser = async ({ email, name, cabinId }) => {
+export const createUser = async ({ email, name, cabinId, discountCode }) => {
   const randomPassword = generateRandomPassword();
   const { record: airtableResponse } = await createRecord({
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,
@@ -684,6 +687,7 @@ export const createUser = async ({ email, name, cabinId }) => {
       'Email Address': email,
       Status: process.env.NODE_ENV === 'production' ? 'Cabin Guest' : 'Testing',
       Cabin: [cabinId],
+      ...(discountCode && { discountCode }),
     },
   });
   return airtableResponse;

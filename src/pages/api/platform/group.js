@@ -156,7 +156,12 @@ async function createCabinGuest({
   }
 
   const name = `${firstName} ${lastName}`;
-  const newGuest = await createUser({ email, name, cabinId });
+  const newGuest = await createUser({
+    email,
+    name,
+    cabinId,
+    discountCode: host.discountCode,
+  });
 
   const group = await addToGroup({
     groupId,
