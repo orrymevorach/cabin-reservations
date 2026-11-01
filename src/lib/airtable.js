@@ -6,6 +6,7 @@ import {
 import { BEDS, AIRTABLE_BASES, COOKIES, ROUTES } from '@/utils/constants';
 import Cookies from 'cookies';
 import { logSentryError } from '@/utils/sentry-utils';
+import { ticketLookupErrorMessage } from '@/utils/api-error-utils';
 import { throwIfReservationTicketIsInvalid, isInactiveTicketStatus } from '@/utils/ticket-utils';
 
 export const createRecord = async ({
@@ -103,6 +104,17 @@ export async function getRecordById({
   recordId,
   endpoint = '/get-record-by-id',
 }) {
+  // Skip the Airtable request when a caller has no record ID (for example, a
+  // guest with no linked ticket), and report it with the table and endpoint so
+  // the calling code can be found in Sentry.
+  if (!recordId) {
+    logSentryError(new Error(`Missing Airtable record ID for ${tableId}`), {
+      action: 'airtable-get-record-by-id-request',
+      tableId,
+      endpoint,
+    });
+    return { record: null };
+  }
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
@@ -212,11 +224,17 @@ export const reserveSpotInCabin = async ({ cabinId = '', attendeeId }) => {
 };
 
 export const getUserByEmail = async ({ email }) => {
-  const { records } = await getRecordsByFieldValue({
+  const response = await getRecordsByFieldValue({
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,
     endpoint: '/get-records-by-field-value',
     formulaArray: [{ fieldName: 'Email Address', fieldValue: email }],
   });
+  const records = response?.records;
+  // A failed lookup must not be treated as "no ticket", so login, account creation and Add Guest show a retry message
+  // instead of telling a ticket holder that their email is not on file.
+  if (!Array.isArray(records)) {
+    throw new Error(ticketLookupErrorMessage);
+  }
   if (records.length === 0) return {};
   const user = records.find(record => {
     if (record.status !== 'Payment Made' && !isInactiveTicketStatus(record.status)) return record;

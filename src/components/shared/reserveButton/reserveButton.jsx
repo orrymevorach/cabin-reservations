@@ -49,6 +49,9 @@ export default function ReserveButton({ children, cabin, classNames = '' }) {
       setIsLoading(false);
     } catch (error) {
       logSentryError(error, { action: 'confirm-cabin-reservation' });
+      setError(
+        'Something went wrong confirming your reservation. Please try again.',
+      );
       setIsLoading(false);
     }
   };

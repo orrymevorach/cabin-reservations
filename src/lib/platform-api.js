@@ -1,12 +1,22 @@
 import { logSentryError } from '@/utils/sentry-utils';
+import { ticketLookupErrorMessage } from '@/utils/api-error-utils';
 
 export async function getAttendeeAndAssignFirebaseUid({ idToken }) {
-  const response = await fetch('/api/airtable/add-firebase-uid', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ idToken }),
-  });
-  const result = await response.json();
+  let response;
+  let result;
+  try {
+    response = await fetch('/api/airtable/add-firebase-uid', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    });
+    result = await response.json();
+  } catch (error) {
+    // Network failures and non-JSON responses (for example a function timeout) reach the login form,
+    // so replace browser messages like "Failed to fetch" with a retry message.
+    logSentryError(error, { action: 'add-firebase-uid-request' });
+    throw new Error(ticketLookupErrorMessage);
+  }
   if (!response.ok) {
     throw new Error(result.message || 'Unable to link your ticket to your account.');
   }

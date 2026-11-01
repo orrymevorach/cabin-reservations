@@ -12,6 +12,7 @@ import {
   errors,
 } from '@/components/loginPage/login/firebase-utils';
 import { updateRecord } from '@/lib/airtable';
+import { logSentryError } from '@/utils/sentry-utils';
 
 export default function UpdatePasswordTakeover({ user, handleClose }) {
   const [password, setPassword] = useState('');
@@ -70,9 +71,11 @@ export default function UpdatePasswordTakeover({ user, handleClose }) {
         : ROUTES.CABIN_SELECTION;
       router.push(destination);
     } catch (error) {
+      logSentryError(error, { action: 'create-firebase-account' });
       const errorMessage =
         errors[error.error]?.message || errors.GENERIC.message;
       setError(errorMessage);
+      setIsLoading(false);
     }
   };
   return (

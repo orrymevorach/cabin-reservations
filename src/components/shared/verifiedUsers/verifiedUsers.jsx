@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { removeGroupMember } from '@/lib/platform-api';
 import { useState } from 'react';
 import Loader from '../loader/loader';
+import { logSentryError } from '@/utils/sentry-utils';
 
 const VerifiedUser = ({ currentUser, index, hideRemoveButton }) => {
   const {
@@ -18,24 +19,44 @@ const VerifiedUser = ({ currentUser, index, hideRemoveButton }) => {
   const { user } = useUser();
   const isLoggedInUser = currentUser.name === user.name;
   const [isLoading, setIsLoading] = useState(false);
+  const [removeError, setRemoveError] = useState('');
 
   const handleRemoveUser = async ({ currentUser }) => {
+    setRemoveError('');
     setIsLoading(true);
-    const memberRecordIds = groupData.members.map(({ id }) => id);
+    try {
+      const memberRecordIds = groupData.members.map(({ id }) => id);
 
-    const response = await removeGroupMember({
-      groupId: groupData.id,
-      memberIds: memberRecordIds,
-      removeUserId: currentUser.id,
-    });
+      const response = await removeGroupMember({
+        groupId: groupData.id,
+        memberIds: memberRecordIds,
+        removeUserId: currentUser.id,
+      });
 
-    dispatch({
-      type: actions.UPDATE_GROUP,
-      groupData: response.group,
-      numberOfMembersNotConfirmedInCurrentCabin:
-        numberOfMembersNotConfirmedInCurrentCabin - 1,
-    });
-    setIsLoading(false);
+      // Keep the current group list when the removal fails, so the page does not replace it with an empty group.
+      if (!response?.group) {
+        setRemoveError(
+          response?.message || 'Unable to remove this guest. Please try again.',
+        );
+        return;
+      }
+
+      dispatch({
+        type: actions.UPDATE_GROUP,
+        groupData: response.group,
+        numberOfMembersNotConfirmedInCurrentCabin:
+          numberOfMembersNotConfirmedInCurrentCabin - 1,
+      });
+    } catch (error) {
+      logSentryError(error, {
+        action: 'remove-group-member',
+        groupId: groupData?.id,
+        removeUserId: currentUser?.id,
+      });
+      setRemoveError('Unable to remove this guest. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
   return (
     <div className={styles.verifiedUserContainer}>
@@ -61,6 +82,11 @@ const VerifiedUser = ({ currentUser, index, hideRemoveButton }) => {
         </button>
       ) : (
         ''
+      )}
+      {removeError && (
+        <p className={styles.removeError} role='alert'>
+          {removeError}
+        </p>
       )}
     </div>
   );

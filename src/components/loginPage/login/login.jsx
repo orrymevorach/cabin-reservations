@@ -53,7 +53,11 @@ export default function Login({ handleSuccess }) {
         return;
       }
     } catch (error) {
-      setError(error.message || errors.GENERIC);
+      // Firebase errors carry a code and a technical message, so map them to the login error copy.
+      const errorMessage = error.code
+        ? firebaseErrors[error.code]?.message || errors.GENERIC
+        : error.message || errors.GENERIC;
+      setError(errorMessage);
       setIsLoading(false);
       return;
     }

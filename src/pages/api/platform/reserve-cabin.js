@@ -1,4 +1,5 @@
 import { logSentryApiError } from '@/utils/sentry-utils';
+import { getGuestErrorMessage } from '@/utils/api-error-utils';
 import {
   clearCurrentBedSelection,
   getCabinById,
@@ -108,6 +109,8 @@ export default async function handler(req, res) {
         groupMemberIds: req.body?.groupMemberIds,
       },
     });
-    res.status(err.statusCode || 500).json({ message: err.message });
+    res
+      .status(err.statusCode || 500)
+      .json({ message: getGuestErrorMessage(err) });
   }
 }

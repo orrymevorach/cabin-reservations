@@ -5,6 +5,8 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Input from '@/components/shared/input/input';
 import clsx from 'clsx';
+import { logSentryError } from '@/utils/sentry-utils';
+import { unexpectedErrorMessage } from '@/utils/api-error-utils';
 
 export default function InputVerify({ handleSubmit, canCreateNewUser }) {
   const [firstName, setFirstName] = useState('');
@@ -24,21 +26,27 @@ export default function InputVerify({ handleSubmit, canCreateNewUser }) {
     e.preventDefault();
     setIsLoading(true);
     const refToFocus = firstNameRef?.current ? firstNameRef : emailRef;
-    const { error } = await handleSubmit({
-      firstName,
-      lastName,
-      email,
-      ref: refToFocus,
-    });
-    if (error) {
-      setError(error);
+    try {
+      const { error } = await handleSubmit({
+        firstName,
+        lastName,
+        email,
+        ref: refToFocus,
+      });
+      if (error) {
+        setError(error);
+        return;
+      }
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+    } catch (error) {
+      // Keep the typed guest details so the host can retry after a failed ticket lookup or request.
+      logSentryError(error, { action: 'add-guest-to-group' });
+      setError(unexpectedErrorMessage);
+    } finally {
       setIsLoading(false);
-      return;
     }
-    setFirstName('');
-    setLastName('');
-    setEmail('');
-    setIsLoading(false);
   }
 
   return (

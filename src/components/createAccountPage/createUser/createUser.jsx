@@ -11,6 +11,8 @@ import clsx from 'clsx';
 import Loader from '@/components/shared/loader/loader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { logSentryError } from '@/utils/sentry-utils';
+import { ticketLookupErrorMessage } from '@/utils/api-error-utils';
 
 export default function CreateUser() {
   const [emailInput, setEmailInput] = useState('');
@@ -38,30 +40,48 @@ export default function CreateUser() {
   const handleSubmit = async e => {
     e.preventDefault();
     setIsLoading(true);
-    const userData = await getUserByEmail({ email: emailInput });
-    if (!userData.id) {
-      setIsLoading(false);
-      setError(errors.USER_NOT_FOUND);
-      return;
-    } else if (password !== userData.temporaryPassword) {
-      setIsLoading(false);
-      setError(errors.PASSWORD_DOES_NOT_MATCH);
-      return;
-    } else if (password === userData.temporaryPassword) {
-      setIsLoading(false);
+    try {
+      const userData = await getUserByEmail({ email: emailInput });
+      if (!userData.id) {
+        setError(errors.USER_NOT_FOUND);
+        return;
+      } else if (password !== userData.temporaryPassword) {
+        setError(errors.PASSWORD_DOES_NOT_MATCH);
+        return;
+      }
       setUser(userData);
       setShowTakeover(true);
+    } catch (error) {
+      logSentryError(error, { action: 'verify-temporary-password' });
+      setError(ticketLookupErrorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSendTemporaryPassword = async () => {
-    if (emailInput) {
-      setIsPasswordSending(true);
-      await sendTemporaryPasswordEmail({ emailAddress: emailInput });
-      setIsPasswordSending(false);
-      setIsPasswordSentSuccess(true);
-    } else {
+    if (!emailInput) {
       setError('Please enter a valid email address');
+      return;
+    }
+    setError('');
+    setIsPasswordSending(true);
+    try {
+      const response = await sendTemporaryPasswordEmail({
+        emailAddress: emailInput,
+      });
+      // Only show "Sent!" when the email endpoint confirms the send, so a failed send prompts the guest to retry.
+      if (!response?.success) {
+        throw new Error(response?.error || 'Temporary password email failed');
+      }
+      setIsPasswordSentSuccess(true);
+    } catch (error) {
+      logSentryError(error, { action: 'resend-temporary-password' });
+      setError(
+        'We could not send your temporary password. Please try again, or contact info@highlandsmusicfestival.ca if the problem continues.',
+      );
+    } finally {
+      setIsPasswordSending(false);
     }
   };
 

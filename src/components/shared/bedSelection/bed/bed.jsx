@@ -11,6 +11,7 @@ import { useUser } from '@/context/user-context';
 import BedDropdown from './bed-dropdown/bed-dropdown';
 import { clearCurrentBedSelection, getUserByRecordId } from '@/lib/airtable';
 import Loader from '../../loader/loader';
+import { logSentryError } from '@/utils/sentry-utils';
 
 const filterOutUsersWithSelectedBeds = ({ members, selectedBeds }) => {
   return members
@@ -51,6 +52,7 @@ export default function Bed({
   const [currentUser, setCurrentUser] = useState('');
   const [placeOnHold, setPlaceOnHold] = useState(false);
   const [isRemoveLoading, setIsRemoveLoading] = useState(false);
+  const [removeError, setRemoveError] = useState('');
 
   // Filter out names with selected beds
   const usersWithoutSelectedBeds = filterOutUsersWithSelectedBeds({
@@ -93,20 +95,45 @@ export default function Bed({
   }, [currentBedOccupantInCurrentGroup, cabin, bedName]);
 
   const handleRemove = async () => {
+    setRemoveError('');
     setIsRemoveLoading(true);
-    const currentUserData = members.find(({ name }) => currentUser === name);
-    const updatedBeds = selectedBeds.filter(({ name }) => name !== currentUser);
-    await clearCurrentBedSelection({ userId: currentUserData.id });
-    // Getting user to have up to date cabin data
-    const userData = await getUserByRecordId({ id: user.id });
-    setCurrentUser();
-    setPlaceOnHold(false);
-    dispatchUser({ type: userActions.LOG_IN, userData });
-    dispatch({
-      type: actions.SELECT_BEDS,
-      selectedBeds: updatedBeds,
-    });
-    setIsRemoveLoading(false);
+    try {
+      const currentUserData = members.find(({ name }) => currentUser === name);
+      if (!currentUserData) {
+        throw new Error(`Unable to find group member "${currentUser}"`);
+      }
+      const updatedBeds = selectedBeds.filter(
+        ({ name }) => name !== currentUser,
+      );
+      const clearedUser = await clearCurrentBedSelection({
+        userId: currentUserData.id,
+      });
+      // The bed stays assigned in Airtable when the update fails, so keep the guest's name on the bed.
+      if (!clearedUser) {
+        throw new Error('Unable to clear bed selection');
+      }
+      // Getting user to have up to date cabin data
+      const userData = await getUserByRecordId({ id: user.id });
+      setCurrentUser();
+      setPlaceOnHold(false);
+      // Skip replacing the logged-in user when the refresh fails, so the page keeps the existing user data instead of an empty user.
+      if (userData?.id) {
+        dispatchUser({ type: userActions.LOG_IN, userData });
+      }
+      dispatch({
+        type: actions.SELECT_BEDS,
+        selectedBeds: updatedBeds,
+      });
+    } catch (error) {
+      logSentryError(error, {
+        action: 'remove-bed-selection',
+        bedName,
+        cabinId: cabin?.id,
+      });
+      setRemoveError('Unable to remove this guest. Please try again.');
+    } finally {
+      setIsRemoveLoading(false);
+    }
   };
 
   const BedIcon = () => (
@@ -157,6 +184,9 @@ export default function Bed({
             </button>
           )}
           {currentUser}
+          {removeError && (
+            <span className={styles.removeError}>{removeError}</span>
+          )}
         </p>
       ) : (
         isRemoveLoading && (

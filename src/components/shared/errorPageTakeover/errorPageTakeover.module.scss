@@ -1,0 +1,49 @@
+@use '@variables' as variables;
+
+.modal {
+  border: 10px solid variables.$gold;
+  outline: 10px solid variables.$blue;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.instruction {
+  margin: 40px 0 10px;
+}
+
+.list {
+  padding-left: 20px;
+}
+
+.listItem {
+  margin-bottom: 10px;
+}
+
+.link,
+.linkButton {
+  color: black;
+  text-decoration: underline;
+}
+
+.linkButton {
+  padding: 0;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.contact {
+  margin-top: 20px;
+}
+
+@media screen and (max-width: variables.$mobile) {
+  .modal {
+    padding: 30px 40px;
+  }
+}

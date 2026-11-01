@@ -12,7 +12,15 @@
 
 .verifiedUserContainer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+}
+
+.removeError {
+  flex-basis: 100%;
+  margin: 2px 0 6px 30px;
+  color: red;
+  font-size: 12px;
 }
 
 .number {

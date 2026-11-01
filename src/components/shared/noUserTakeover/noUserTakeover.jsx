@@ -1,39 +1,12 @@
-import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import Takeover from '../takeover/takeover';
-import { COOKIES, FEATURE_FLAGS, ROUTES } from '@/utils/constants';
-import Cookies from 'js-cookie';
-import { signOutOfFirebase } from '@/components/loginPage/login/firebase-utils';
+import { FEATURE_FLAGS, ROUTES } from '@/utils/constants';
+import useLogInAgain from '@/hooks/useLogInAgain';
 import styles from './noUserTakeover.module.scss';
 
 export default function NoUserTakeover() {
   const { ENABLE_RESERVATIONS } = FEATURE_FLAGS;
-  const router = useRouter();
-  const [isLoggingInAgain, setIsLoggingInAgain] = useState(false);
-
-  const handleLoginAgain = async event => {
-    event.preventDefault();
-    if (isLoggingInAgain) return;
-    setIsLoggingInAgain(true);
-
-    try {
-      const signOutResponse = await signOutOfFirebase();
-      if (signOutResponse?.error) {
-        console.error('Unable to sign out of Firebase:', signOutResponse.error);
-      }
-    } catch (error) {
-      console.error('Unable to sign out of Firebase:', error);
-    } finally {
-      const cookieNames = Object.keys(Cookies.get());
-      cookieNames.forEach(cookieName => {
-        Cookies.remove(cookieName, { path: '/' });
-      });
-      Cookies.remove(COOKIES.USER_RECORD, { path: '/' });
-      Cookies.remove(COOKIES.UID, { path: '/' });
-      await router.replace(ROUTES.HOME);
-    }
-  };
+  const { isLoggingInAgain, handleLogInAgain } = useLogInAgain();
 
   return (
     <Takeover modalClassNames={styles.modal} hideCloseButton>
@@ -61,7 +34,7 @@ export default function NoUserTakeover() {
                 <a
                   href={ROUTES.HOME}
                   className={styles.link}
-                  onClick={handleLoginAgain}
+                  onClick={handleLogInAgain}
                   aria-disabled={isLoggingInAgain}
                 >
                   {isLoggingInAgain ? 'logging out' : 'logging in'}
