@@ -22,6 +22,18 @@ globalThis.fetch = async (input, init) => {
     return originalFetch(input, init);
   }
 
+  // Server code must query Airtable directly. A request from the server back to this site's
+  // /api/airtable routes caused the "fetch failed" errors in production, so fail it here and the
+  // reservation flow under test returns an error instead of passing.
+  if (pathname.startsWith('/api/airtable/')) {
+    return new Response(
+      JSON.stringify({
+        message: `Server code called ${pathname} instead of querying Airtable directly.`,
+      }),
+      { status: 503, headers: { 'Content-Type': 'application/json' } },
+    );
+  }
+
   if (stubbedPaths.has(pathname)) {
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

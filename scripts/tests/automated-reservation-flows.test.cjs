@@ -39,6 +39,7 @@ async function createTicket({
   quantity,
   purchaser,
   cabinId,
+  discountCode,
 }) {
   const fields = {
     Name: name,
@@ -49,6 +50,7 @@ async function createTicket({
   if (quantity !== undefined) fields.Quantity = quantity;
   if (purchaser) fields.Purchaser = purchaser;
   if (cabinId) fields.Cabin = [cabinId];
+  if (discountCode) fields.discountCode = discountCode;
 
   return airtableRequest({
     method: 'POST',
@@ -57,14 +59,26 @@ async function createTicket({
   });
 }
 
-async function createHost({ label, status, quantity, cabinId }) {
+async function createHost({
+  label,
+  status,
+  quantity,
+  cabinId,
+  discountCode,
+  shouldCreateGroup = true,
+}) {
   const identity = nextFixtureIdentity(label);
   const hostRecord = await createTicket({
     ...identity,
     status,
     quantity,
     cabinId,
+    discountCode,
   });
+  if (!shouldCreateGroup) {
+    return { ...identity, id: hostRecord.id, groupId: null };
+  }
+
   const groupName = `${testGroupPrefix}${runId} ${label}`;
   const groupRecord = await airtableRequest({
     method: 'POST',
@@ -108,6 +122,56 @@ async function createAssignedTicket({ host, label, status }) {
 
 async function createCabinGuestIdentity(label) {
   return nextFixtureIdentity(label);
+}
+
+// Airtable creates at most 10 records per request.
+async function createGroupGuestTickets({ host, label, count }) {
+  const guestIds = [];
+  for (let index = 0; index < count; index += 10) {
+    const batchSize = Math.min(10, count - index);
+    const response = await airtableRequest({
+      method: 'POST',
+      table: 'Ticket Purchases',
+      body: {
+        records: Array.from({ length: batchSize }, (_, batchIndex) => {
+          const identity = nextFixtureIdentity(`${label}-${index + batchIndex}`);
+          return {
+            fields: {
+              Name: identity.name,
+              'Email Address': identity.emailAddress,
+              'Temporary Password': temporaryPassword,
+              Status: 'Cabin Guest',
+            },
+          };
+        }),
+        typecast: true,
+      },
+    });
+    guestIds.push(...response.records.map(({ id }) => id));
+  }
+
+  await airtableRequest({
+    method: 'PATCH',
+    table: 'Groups',
+    recordId: host.groupId,
+    body: { fields: { Members: [host.id, ...guestIds] }, typecast: true },
+  });
+  return guestIds;
+}
+
+async function createIncludedCabinGuest({ host, label, cabinId }) {
+  const guest = await createCabinGuestIdentity(label);
+  const response = await postJson('/api/platform/group', {
+    action: 'create-cabin-guest',
+    groupId: host.groupId,
+    hostUserId: host.id,
+    memberIds: await getGroupMemberIds(host),
+    email: guest.emailAddress,
+    firstName: 'Automation',
+    lastName: label,
+    cabinId,
+  });
+  return { guest, response };
 }
 
 async function postJson(pathname, body, { cookie } = {}) {
@@ -207,6 +271,28 @@ async function chooseOpenYurt() {
   });
 
   assert.ok(candidate, 'The test base needs an open Yurtlands yurt with two beds.');
+  return candidate;
+}
+
+// Yurts hold the purchaser plus two included guests, so the Cabins "Total Beds" formula must give Yurtlands 3 beds.
+async function chooseEmptyYurtForThreePeople({ excludedCabinId }) {
+  const cabinRecords = await listAirtableRecords('Cabins');
+  const candidate = cabinRecords.find(({ id, fields = {} }) => {
+    const cabinUnitName = Array.isArray(fields.Unit)
+      ? fields.Unit[0]
+      : fields.Unit;
+    return (
+      id !== excludedCabinId &&
+      fields.Availability === 'Open' &&
+      String(cabinUnitName || '').toLowerCase() === 'yurtlands' &&
+      Number(fields['Open Beds']) >= 3
+    );
+  });
+
+  assert.ok(
+    candidate,
+    'The test base needs an open yurt with three beds. Update the Yurtlands value in the Cabins "Total Beds" formula to 3.',
+  );
   return candidate;
 }
 
@@ -369,6 +455,7 @@ test('creates a cabin guest without a ticket and rejects creating one for an exi
   const createdGuest = await getTicketByEmail(freeGuest.emailAddress);
   assert.equal(createdGuest.fields.Status, 'Cabin Guest');
   assert.deepEqual(createdGuest.fields.Cabin, [testCabin.id]);
+  assert.equal(createdGuest.fields.discountCode, undefined);
 
   const ticketedGuest = await createAssignedTicket({
     host,
@@ -396,6 +483,7 @@ test('adds an already-assigned multi-ticket guest, claims a blank paid placehold
     label: 'multi-ticket-placeholder-host',
     status: 'Ticket Purchased',
     quantity: 3,
+    discountCode: 'AUTOMATED HOST CODE',
   });
   const alreadyAssignedGuest = await createAssignedTicket({
     host,
@@ -413,6 +501,7 @@ test('adds an already-assigned multi-ticket guest, claims a blank paid placehold
     emailAddress: host.emailAddress,
     status: 'Ticket Purchased',
     purchaser: host.name,
+    discountCode: 'AUTOMATED PLACEHOLDER CODE',
   });
   const beforeAssignment = await getReservationData(host.id);
   assert.equal(beforeAssignment.user.remainingPurchasedTicketCount, 1);
@@ -428,6 +517,8 @@ test('adds an already-assigned multi-ticket guest, claims a blank paid placehold
   assert.equal(claimedTicket.fields['Email Address'], guest.emailAddress);
   assert.equal(claimedTicket.fields.Purchaser, host.name);
   assert.equal(claimedTicket.fields.Status, 'Ticket Purchased');
+  // The claimed ticket was paid for in its own order, so it keeps that order's code.
+  assert.equal(claimedTicket.fields.discountCode, 'AUTOMATED PLACEHOLDER CODE');
   assert.equal(await getTicketByEmail(guest.emailAddress).then(({ id }) => id), placeholder.id);
 
   const { response: overAllocationResponse } = await assignPurchasedTicket({
@@ -446,6 +537,7 @@ test('adds an assigned bundle guest, assigns an unused bundle slot, and blocks o
     label: 'bundle-host',
     status: 'Ticket Bundle',
     quantity: 3,
+    discountCode: 'AUTOMATED BUNDLE CODE',
   });
   const alreadyAssignedGuest = await createAssignedTicket({
     host,
@@ -472,6 +564,7 @@ test('adds an assigned bundle guest, assigns an unused bundle slot, and blocks o
   const assignedBundleGuest = await getTicketByEmail(guest.emailAddress);
   assert.equal(assignedBundleGuest.fields.Status, 'Bundle Guest');
   assert.equal(assignedBundleGuest.fields.Purchaser, host.name);
+  assert.equal(assignedBundleGuest.fields.discountCode, 'AUTOMATED BUNDLE CODE');
 
   const { response: overAllocationResponse } = await assignPurchasedTicket({
     host,
@@ -489,6 +582,7 @@ test('assigns a new multi-ticket guest when no guest ticket has been assigned ye
     label: 'multi-ticket-unassigned-host',
     status: 'Ticket Purchased',
     quantity: 2,
+    discountCode: 'AUTOMATED MULTI TICKET CODE',
   });
   const { guest, response } = await assignPurchasedTicket({
     host,
@@ -500,6 +594,10 @@ test('assigns a new multi-ticket guest when no guest ticket has been assigned ye
   const assignedGuest = await getTicketByEmail(guest.emailAddress);
   assert.equal(assignedGuest.fields.Status, 'Ticket Purchased');
   assert.equal(assignedGuest.fields.Purchaser, host.name);
+  assert.equal(
+    assignedGuest.fields.discountCode,
+    'AUTOMATED MULTI TICKET CODE',
+  );
 });
 
 test('rejects purchased-ticket assignment when the purchaser has no remaining slots', async () => {
@@ -615,4 +713,161 @@ test('removes a group member without deleting their purchased ticket', async () 
   assert.equal(removeResponse.status, 200);
   assert.deepEqual(await getGroupMemberIds(host), [host.id]);
   assert.equal((await getTicketRecord(guest.id)).fields.Status, 'Ticket Purchased');
+});
+
+test('lets a Yurt holder add two included guests with the purchaser discount code and blocks a third', async () => {
+  const yurtForThreePeople = await chooseEmptyYurtForThreePeople({
+    excludedCabinId: testYurt.id,
+  });
+  const host = await createHost({
+    label: 'yurt-allowance-host',
+    status: 'Yurt',
+    discountCode: 'AUTOMATED YURT CODE',
+  });
+  const reserveResponse = await postJson('/api/platform/reserve-cabin', {
+    cabinId: yurtForThreePeople.id,
+    hostUserId: host.id,
+    groupMemberIds: [host.id],
+    selectedBeds: [],
+  });
+  assert.equal(reserveResponse.status, 200);
+
+  for (const label of ['yurt-allowance-guest-1', 'yurt-allowance-guest-2']) {
+    const { guest, response } = await createIncludedCabinGuest({
+      host,
+      label,
+      cabinId: yurtForThreePeople.id,
+    });
+    assert.equal(response.status, 200, JSON.stringify(response.body));
+    const createdGuest = await getTicketByEmail(guest.emailAddress);
+    assert.equal(createdGuest.fields.Status, 'Cabin Guest');
+    assert.deepEqual(createdGuest.fields.Cabin, [yurtForThreePeople.id]);
+    assert.equal(createdGuest.fields.discountCode, 'AUTOMATED YURT CODE');
+  }
+  assert.equal((await getGroupMemberIds(host)).length, 3);
+
+  const { guest: extraGuest, response: extraGuestResponse } =
+    await createIncludedCabinGuest({
+      host,
+      label: 'yurt-allowance-guest-3',
+      cabinId: yurtForThreePeople.id,
+    });
+  assert.equal(extraGuestResponse.status, 422);
+  assert.match(
+    extraGuestResponse.body.message,
+    /added all of the guests included/i,
+  );
+  assert.equal(await getTicketByEmail(extraGuest.emailAddress), undefined);
+});
+
+test('blocks a 15th included cabin guest using the saved group, not the member list sent by the browser', async () => {
+  const host = await createHost({
+    label: 'cabin-allowance-host',
+    status: 'Cabin Purchased',
+    cabinId: testCabin.id,
+  });
+  await createGroupGuestTickets({
+    host,
+    label: 'cabin-allowance-existing-guest',
+    count: 14,
+  });
+
+  const extraGuest = await createCabinGuestIdentity('cabin-allowance-extra');
+  const response = await postJson('/api/platform/group', {
+    action: 'create-cabin-guest',
+    groupId: host.groupId,
+    hostUserId: host.id,
+    memberIds: [host.id],
+    email: extraGuest.emailAddress,
+    firstName: 'Automation',
+    lastName: 'CabinAllowanceExtra',
+    cabinId: testCabin.id,
+  });
+
+  assert.equal(response.status, 422);
+  assert.match(response.body.message, /added all of the guests included/i);
+  assert.equal(await getTicketByEmail(extraGuest.emailAddress), undefined);
+  assert.equal((await getGroupMemberIds(host)).length, 15);
+});
+
+test('rejects a purchaser adding their own ticket, with or without a saved group', async () => {
+  const hostWithGroup = await createHost({
+    label: 'own-ticket-group-host',
+    status: 'Cabin Purchased',
+  });
+  const groupResponse = await addExistingTicketHolder({
+    host: hostWithGroup,
+    guest: hostWithGroup,
+  });
+  assert.equal(groupResponse.status, 422);
+  assert.match(groupResponse.body.message, /your own ticket/i);
+  assert.deepEqual(await getGroupMemberIds(hostWithGroup), [hostWithGroup.id]);
+
+  // Without this check Airtable rejected a new group listing the purchaser twice and the request crashed.
+  const hostWithoutGroup = await createHost({
+    label: 'own-ticket-no-group-host',
+    status: 'Yurt',
+    shouldCreateGroup: false,
+  });
+  const noGroupResponse = await postJson('/api/platform/group', {
+    action: 'add-existing-ticket-holder',
+    groupId: null,
+    hostUserId: hostWithoutGroup.id,
+    memberIds: [],
+    email: hostWithoutGroup.emailAddress,
+  });
+  assert.equal(noGroupResponse.status, 422);
+  assert.match(noGroupResponse.body.message, /your own ticket/i);
+  assert.equal(
+    (await getTicketRecord(hostWithoutGroup.id)).fields.Group,
+    undefined,
+  );
+});
+
+test('rejects adding guests for an archived ticket with a guest-facing message', async () => {
+  const host = await createHost({
+    label: 'archived-host',
+    status: 'Archived',
+  });
+  const guest = await createAssignedTicket({
+    host,
+    label: 'archived-host-guest',
+    status: 'Ticket Purchased',
+  });
+
+  const response = await addExistingTicketHolder({ host, guest });
+
+  assert.equal(response.status, 410);
+  assert.match(response.body.message, /no longer valid/i);
+  assert.deepEqual(await getGroupMemberIds(host), [host.id]);
+});
+
+test('loads the summary page for a signed-in purchaser and sends an archived ticket back to login', async () => {
+  const host = await createHost({
+    label: 'summary-page-host',
+    status: 'Cabin Purchased',
+    cabinId: testCabin.id,
+  });
+  const summaryResponse = await fetch(`${appUrl}/summary`, {
+    headers: { Cookie: `user_record_id=${host.id}` },
+    redirect: 'manual',
+  });
+  assert.equal(summaryResponse.status, 200);
+  assert.match(await summaryResponse.text(), new RegExp(host.name));
+
+  const archivedHost = await createHost({
+    label: 'summary-page-archived-host',
+    status: 'Archived',
+    shouldCreateGroup: false,
+  });
+  const archivedResponse = await fetch(`${appUrl}/summary`, {
+    headers: { Cookie: `user_record_id=${archivedHost.id}` },
+    redirect: 'manual',
+  });
+  assert.equal(archivedResponse.status, 307);
+  assert.equal(archivedResponse.headers.get('location'), '/');
+  assert.match(
+    archivedResponse.headers.get('set-cookie') || '',
+    /user_record_id=;/,
+  );
 });
