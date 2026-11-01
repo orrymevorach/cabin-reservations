@@ -1,7 +1,7 @@
 // Guests a cabin or yurt purchaser can add without buying more tickets. Bundle tickets are counted from Airtable instead.
 const FREE_TICKET_ALLOWANCES = {
   'Cabin Purchased': 14,
-  Yurt: 1,
+  Yurt: 2,
 };
 
 export function hasIncludedGuestTicketRemaining({
