@@ -5,15 +5,45 @@ import {
 } from '@/utils/string-utils';
 import { BEDS, AIRTABLE_BASES, COOKIES, ROUTES } from '@/utils/constants';
 import Cookies from 'cookies';
-import { logSentryError } from '@/utils/sentry-utils';
+import { logSentryApiError, logSentryError } from '@/utils/sentry-utils';
 import { ticketLookupErrorMessage } from '@/utils/api-error-utils';
 import { throwIfReservationTicketIsInvalid, isInactiveTicketStatus } from '@/utils/ticket-utils';
+
+const isServer = () => typeof window === 'undefined';
+
+// Server code (API routes and server-rendered pages) queries Airtable directly instead of sending an
+// HTTP request back to this site's /api/airtable routes. That round trip started a second serverless
+// function for every lookup and failed with "fetch failed" when Netlify closed the reused connection.
+// The typeof check stays inline so browser bundles leave out the server module and the Airtable token.
+const loadAirtableServer = () =>
+  typeof window === 'undefined' ? import('@/lib/airtable-server') : null;
+
+// Report a failed server request to Sentry and return { message }, the same result shape the browser
+// gets from a failed /api/airtable route, so callers handle both failures the same way.
+async function runServerAirtableRequest({ action, extra, request }) {
+  try {
+    const airtableServer = await loadAirtableServer();
+    return await request(airtableServer);
+  } catch (error) {
+    await logSentryApiError({ error, action, extra });
+    return { message: error?.message || 'Unable to reach Airtable.' };
+  }
+}
 
 export const createRecord = async ({
   tableId,
   newFields,
   endpoint = '/create-record',
 }) => {
+  if (isServer()) {
+    return runServerAirtableRequest({
+      action: 'airtable-create-record',
+      extra: { tableId },
+      request: async ({ createAirtableRecord }) => ({
+        record: await createAirtableRecord({ tableId, newFields }),
+      }),
+    });
+  }
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
@@ -37,6 +67,15 @@ export async function getRecords({
   endpoint = '/get-records',
   view = 'Grid view',
 }) {
+  if (isServer()) {
+    return runServerAirtableRequest({
+      action: 'airtable-get-records',
+      extra: { tableId, view },
+      request: async ({ getAirtableRecords }) => ({
+        records: await getAirtableRecords({ tableId, view }),
+      }),
+    });
+  }
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
@@ -59,6 +98,21 @@ export async function getRecordsByFieldValue({
   endpoint = '/get-records-by-field-value',
   formulaArray,
 }) {
+  if (isServer()) {
+    return runServerAirtableRequest({
+      action: 'airtable-get-records-by-field-value',
+      extra: {
+        tableId,
+        fieldNames: formulaArray?.map(({ fieldName }) => fieldName),
+      },
+      request: async ({ getAirtableRecordsByFieldValue }) => ({
+        records: await getAirtableRecordsByFieldValue({
+          tableId,
+          formulaArray,
+        }),
+      }),
+    });
+  }
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
@@ -82,6 +136,15 @@ export async function getRecord({
   fieldValue,
   endpoint = '/get-record',
 }) {
+  if (isServer()) {
+    return runServerAirtableRequest({
+      action: 'airtable-get-record',
+      extra: { tableId, field },
+      request: async ({ getAirtableRecord }) => ({
+        record: await getAirtableRecord({ tableId, field, fieldValue }),
+      }),
+    });
+  }
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
@@ -115,6 +178,15 @@ export async function getRecordById({
     });
     return { record: null };
   }
+  if (isServer()) {
+    return runServerAirtableRequest({
+      action: 'airtable-get-record-by-id',
+      extra: { tableId, recordId },
+      request: async ({ getAirtableRecordById }) => ({
+        record: await getAirtableRecordById({ tableId, recordId }),
+      }),
+    });
+  }
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
@@ -139,6 +211,15 @@ export const updateRecord = async ({
   newFields,
   endpoint = '/update-record',
 }) => {
+  if (isServer()) {
+    return runServerAirtableRequest({
+      action: 'airtable-update-record',
+      extra: { tableId, recordId },
+      request: async ({ updateAirtableRecord }) => ({
+        record: await updateAirtableRecord({ tableId, recordId, newFields }),
+      }),
+    });
+  }
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_ENV_URL}/api/airtable${endpoint}`,
