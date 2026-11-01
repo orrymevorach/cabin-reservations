@@ -8,6 +8,7 @@ export const ROUTES = {
   CABIN_SELECTION: '/cabin-selection',
   RESERVE: '/reserve',
   SUMMARY: '/summary',
+  DIETARY_INTAKE: '/dietary-intake',
   CREATE_ACCOUNT: '/create-account',
 };
 
@@ -32,6 +33,6 @@ export const AIRTABLE_BASES = {
 };
 
 export const FEATURE_FLAGS = {
-  ENABLE_RESERVATIONS: false,
-  ENABLE_COUNTDOWN: true,
+  ENABLE_RESERVATIONS: true,
+  ENABLE_COUNTDOWN: false,
 };

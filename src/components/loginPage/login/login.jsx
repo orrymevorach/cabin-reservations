@@ -86,7 +86,12 @@ export default function Login({ handleSuccess }) {
         setIsLoading(false);
         router.push({
           pathname: ROUTES.CREATE_ACCOUNT,
-          query: { email },
+          query: {
+            email,
+            ...(router.query.returnTo === ROUTES.DIETARY_INTAKE
+              ? { returnTo: ROUTES.DIETARY_INTAKE }
+              : {}),
+          },
         });
         return;
       }

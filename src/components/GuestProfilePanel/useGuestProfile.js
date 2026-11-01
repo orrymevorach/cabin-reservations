@@ -9,7 +9,9 @@ const firebaseSessionErrorCodes = [
   'auth/user-disabled',
 ];
 
-export default function useGuestProfile() {
+export default function useGuestProfile({
+  shouldLoadDietaryOnly = false,
+} = {}) {
   const [information, setInformation] = useState(null);
   const [dietaryRequirements, setDietaryRequirements] = useState([]);
   const [dietaryNotes, setDietaryNotes] = useState('');
@@ -36,7 +38,10 @@ export default function useGuestProfile() {
       setIsLoading(true);
       try {
         const idToken = await account.getIdToken();
-        const response = await fetch('/api/platform/guest-profile', {
+        const endpoint = shouldLoadDietaryOnly
+          ? '/api/platform/dietary-intake'
+          : '/api/platform/guest-profile';
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idToken }),
@@ -51,9 +56,12 @@ export default function useGuestProfile() {
           setShouldSignIn(response.status === 401);
           return;
         }
-        setInformation(result);
-        setDietaryRequirements(result.guest.dietaryRequirements);
-        setDietaryNotes(result.guest.dietaryNotes);
+        const loadedInformation = shouldLoadDietaryOnly
+          ? { guest: result }
+          : result;
+        setInformation(loadedInformation);
+        setDietaryRequirements(loadedInformation.guest.dietaryRequirements);
+        setDietaryNotes(loadedInformation.guest.dietaryNotes);
       } catch (error) {
         if (shouldIgnoreResults || currentRequestNumber !== requestNumber)
           return;
@@ -78,7 +86,7 @@ export default function useGuestProfile() {
       shouldIgnoreResults = true;
       unsubscribe();
     };
-  }, []);
+  }, [shouldLoadDietaryOnly]);
 
   function changeRequirement(option, isSelected) {
     setSaveMessage('');
@@ -107,7 +115,7 @@ export default function useGuestProfile() {
   }
 
   async function saveDietaryInformation(requirements, notes) {
-    if (isSaving) return;
+    if (isSaving) return false;
     const account = auth.currentUser;
     setErrorMessage('');
     setSaveMessage('');
@@ -116,7 +124,7 @@ export default function useGuestProfile() {
       setErrorMessage(
         'Please sign in again before saving your dietary information.',
       );
-      return;
+      return false;
     }
     setIsSaving(true);
     try {
@@ -131,13 +139,13 @@ export default function useGuestProfile() {
         }),
       });
       const result = await response.json();
-      if (auth.currentUser?.uid !== account.uid) return;
+      if (auth.currentUser?.uid !== account.uid) return false;
       if (!response.ok) {
         setErrorMessage(
           result.message || 'Unable to save your dietary information.',
         );
         setShouldSignIn(response.status === 401);
-        return;
+        return false;
       }
       setDietaryRequirements(result.dietaryRequirements);
       setDietaryNotes(result.dietaryNotes);
@@ -154,13 +162,14 @@ export default function useGuestProfile() {
           : currentInformation,
       );
       setSaveMessage('Your dietary information has been saved.');
+      return true;
     } catch (error) {
       if (firebaseSessionErrorCodes.includes(error.code)) {
         setShouldSignIn(true);
         setErrorMessage(
           'Please sign in again before saving your dietary information.',
         );
-        return;
+        return false;
       }
       logSentryError(error, {
         action: 'request-save-guest-dietary-information',
@@ -171,6 +180,7 @@ export default function useGuestProfile() {
     } finally {
       setIsSaving(false);
     }
+    return false;
   }
 
   return {

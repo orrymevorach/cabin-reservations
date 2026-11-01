@@ -9,6 +9,10 @@ import CreateAccountButton from './create-account-button/create-account-button';
 export default function LoginPageContainer() {
   const router = useRouter();
   const handleSuccess = ({ user }) => {
+    if (router.query.returnTo === ROUTES.DIETARY_INTAKE) {
+      router.push(ROUTES.DIETARY_INTAKE);
+      return;
+    }
     const hasCabin = user?.cabin;
     if (hasCabin) router.push(ROUTES.SUMMARY);
     else router.push(ROUTES.CABIN_SELECTION);

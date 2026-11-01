@@ -24,11 +24,24 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 
 ## Guest Arrival and Dietary Information
 
-Signed-in guests land on their **My Highlands profile** dashboard at `/summary`.
+Successful dietary saves close the editor and display the saved response.
+Failed saves keep the editor open with the guest's unsaved selections and notes.
+
+The standalone `/dietary-intake` page reuses the dietary form and can be linked
+from emails using the reservation app's domain. It requires the
+guest's Firebase ticket account, not a ticket ID in the URL, and works without a
+cabin reservation. Signed-out guests are sent to login and returned to the
+dietary page afterward. Only this known return destination is accepted.
+The page loads dietary data directly, without depending on Contentful or showing
+check-in content. Opening it shows the editable form, including saved answers;
+saving shows the response summary. No email sending is added.
+
+Signed-in guests with a cabin land on their **My Highlands profile** dashboard at `/summary`.
 It combines check-in status, dietary information, and their existing cabin and
-guest-management controls. Guests without a cabin can still use the dashboard,
-with a cabin-selection link while reservations are open. **My Profile** in the
-navigation returns to this dashboard. Arrival and dietary information are
+guest-management controls. Guests without a cabin are directed to cabin selection;
+the dashboard still requires a cabin. They can submit dietary information on
+`/dietary-intake` without selecting a cabin. **My Profile** in the
+navigation returns cabin guests to the dashboard. Arrival and dietary information are
 available directly on the summary page, without a separate navigation link.
 The standalone `/guest-information` page has been removed. The countdown does
 not link to the profile because guests must select a cabin before accessing it.

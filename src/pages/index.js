@@ -21,7 +21,10 @@ export async function getServerSideProps(context) {
   if (uid) {
     return {
       redirect: {
-        destination: ROUTES.SUMMARY,
+        destination:
+          context.query.returnTo === ROUTES.DIETARY_INTAKE
+            ? ROUTES.DIETARY_INTAKE
+            : ROUTES.SUMMARY,
         permanent: false,
       },
     };

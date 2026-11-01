@@ -1,0 +1,23 @@
+@use '@/styles/variables.module.scss' as variables;
+
+.container {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 16px 20px 40px;
+}
+
+.heading {
+  font-size: 26px;
+  color: variables.$darkGreen;
+  margin-bottom: 16px;
+}
+
+.description {
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.error {
+  color: #9c2929;
+  margin-bottom: 16px;
+}

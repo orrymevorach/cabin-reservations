@@ -176,6 +176,15 @@ test('browser dietary prompts, save, reload, None, validation and failed-save re
       (await readGuest(guest)).fields['Dietary Notes'],
       'Separate utensils',
     );
+    assert.equal(
+      await page
+        .getByRole('button', { name: 'Save dietary information', exact: true })
+        .count(),
+      0,
+    );
+    await page
+      .getByRole('button', { name: 'Update dietary information' })
+      .waitFor();
     await page.reload();
     await page
       .getByRole('button', { name: 'Update dietary information' })
@@ -209,6 +218,9 @@ test('browser dietary prompts, save, reload, None, validation and failed-save re
       .filter({ hasText: 'has been saved' })
       .waitFor();
     assert.equal((await readGuest(guest)).fields['Dietary Notes'].length, 5000);
+    await page
+      .getByRole('button', { name: 'Update dietary information' })
+      .click();
     await notesInput.fill('Separate utensils');
     await page
       .getByRole('button', { name: 'Save dietary information', exact: true })
@@ -218,6 +230,9 @@ test('browser dietary prompts, save, reload, None, validation and failed-save re
       .filter({ hasText: 'has been saved' })
       .waitFor();
 
+    await page
+      .getByRole('button', { name: 'Update dietary information' })
+      .click();
     await page.route('**/api/platform/dietary-intake', async route => {
       await route.fulfill({
         status: 500,
@@ -269,6 +284,15 @@ test('browser dietary prompts, save, reload, None, validation and failed-save re
     assert.equal(saved.fields['Dietary Notes'], 'None');
     assert.equal(saved.fields['Dietary Restrictions'], true);
     assert.deepEqual(saved.fields['Dietary Requirements'] || [], []);
+    await page
+      .getByText('You have no dietary restrictions.', { exact: true })
+      .waitFor();
+    assert.equal(
+      await page
+        .getByRole('button', { name: 'Save dietary information', exact: true })
+        .count(),
+      0,
+    );
     await page.reload();
     await page
       .getByText('You have no dietary restrictions.', { exact: true })
@@ -291,6 +315,67 @@ test('browser dietary prompts, save, reload, None, validation and failed-save re
     assert.equal(saved.fields['Dietary Restrictions'] || false, false);
     await page.reload();
     await prompt.waitFor();
+    await airtableRequest({
+      method: 'PATCH',
+      table: 'Ticket Purchases',
+      recordId: guest.ticket.id,
+      body: { fields: { Cabin: [] } },
+    });
+    await page.getByRole('button', { name: 'Log Out', exact: true }).click();
+    await page.waitForURL(`${appUrl}/`);
+    await page.goto(`${appUrl}/dietary-intake`);
+    await page
+      .getByRole('link', { name: 'sign in with your ticket account' })
+      .click();
+    await page.waitForURL('**/?returnTo=*');
+    await page.waitForFunction(() => window.next?.router?.isReady);
+    assert.equal(
+      new URL(page.url()).searchParams.get('returnTo'),
+      '/dietary-intake',
+    );
+    assert.equal(
+      await page
+        .getByRole('link', { name: 'Create an account.' })
+        .getAttribute('href'),
+      '/create-account?returnTo=%2Fdietary-intake',
+    );
+    await page.getByLabel('Email', { exact: true }).fill(guest.email);
+    await page.getByLabel('Password', { exact: true }).fill('test-password');
+    await page.getByRole('button', { name: 'Log in', exact: true }).click();
+    await page.waitForURL('**/dietary-intake');
+    await page.getByLabel('Vegetarian', { exact: true }).check();
+    await page
+      .getByLabel('Other dietary needs or additional comments')
+      .fill('Email page response');
+    await page
+      .getByRole('button', { name: 'Save dietary information', exact: true })
+      .click();
+    await page
+      .getByRole('status')
+      .filter({ hasText: 'has been saved' })
+      .waitFor();
+    assert.equal(
+      await page
+        .getByRole('button', { name: 'Save dietary information', exact: true })
+        .count(),
+      0,
+    );
+    saved = await readGuest(guest);
+    assert.deepEqual(saved.fields['Dietary Requirements'], ['Vegetarian']);
+    assert.equal(saved.fields['Dietary Notes'], 'Email page response');
+    assert.equal(saved.fields['Dietary Restrictions'], true);
+    assert.equal(
+      await page
+        .getByRole('heading', { name: 'Check In', exact: true })
+        .count(),
+      0,
+    );
+    await page.reload();
+    await page.getByLabel('Vegetarian', { exact: true }).waitFor();
+    assert.equal(
+      await page.getByLabel('Vegetarian', { exact: true }).isChecked(),
+      true,
+    );
     await context.close();
   } finally {
     await browser.close();

@@ -3,8 +3,13 @@ import { hasProvidedDietaryInformation } from '@/components/GuestProfilePanel/ut
 import DietaryIntakeForm from '@/components/GuestProfilePanel/DietaryIntakeForm/DietaryIntakeForm';
 import styles from './DietaryIntakeCard.module.scss';
 
-export default function DietaryIntakeCard({ guestInformation }) {
-  const [isEditingDietary, setIsEditingDietary] = useState(false);
+export default function DietaryIntakeCard({
+  guestInformation,
+  shouldOpenFormInitially = false,
+}) {
+  const [isEditingDietary, setIsEditingDietary] = useState(
+    shouldOpenFormInitially,
+  );
   const {
     information: { guest },
     isSaving,
@@ -12,11 +17,22 @@ export default function DietaryIntakeCard({ guestInformation }) {
     errorMessage,
     saveMessage,
     saveNoDietaryRestrictions,
+    saveDietary,
   } = guestInformation;
   const hasDietaryResponse = hasProvidedDietaryInformation(
     guest.dietaryRequirements,
     guest.dietaryNotes,
   );
+
+  async function submitDietary(event) {
+    const isSaved = await saveDietary(event);
+    if (isSaved) setIsEditingDietary(false);
+  }
+
+  async function submitNoDietaryRestrictions() {
+    const isSaved = await saveNoDietaryRestrictions();
+    if (isSaved) setIsEditingDietary(false);
+  }
 
   return (
     <section className={styles.card} aria-labelledby='dietary-title'>
@@ -31,7 +47,13 @@ export default function DietaryIntakeCard({ guestInformation }) {
         </p>
       )}
       {isEditingDietary ? (
-        <DietaryIntakeForm guestInformation={guestInformation} />
+        <DietaryIntakeForm
+          guestInformation={{
+            ...guestInformation,
+            saveDietary: submitDietary,
+            saveNoDietaryRestrictions: submitNoDietaryRestrictions,
+          }}
+        />
       ) : (
         <>
           {hasDietaryResponse && (
@@ -67,7 +89,7 @@ export default function DietaryIntakeCard({ guestInformation }) {
                 className={styles.secondaryButton}
                 type='button'
                 disabled={isSaving || shouldSignIn}
-                onClick={saveNoDietaryRestrictions}
+                onClick={submitNoDietaryRestrictions}
               >
                 {isSaving ? 'Saving...' : "I don't have dietary restrictions"}
               </button>

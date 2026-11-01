@@ -65,7 +65,10 @@ export default function UpdatePasswordTakeover({ user, handleClose }) {
       });
       Cookies.set(COOKIES.USER_RECORD, user.id, { expires: 7 });
       setIsLoading(false);
-      router.push(ROUTES.CABIN_SELECTION);
+      const destination = router.query.returnTo === ROUTES.DIETARY_INTAKE
+        ? ROUTES.DIETARY_INTAKE
+        : ROUTES.CABIN_SELECTION;
+      router.push(destination);
     } catch (error) {
       const errorMessage =
         errors[error.error]?.message || errors.GENERIC.message;
