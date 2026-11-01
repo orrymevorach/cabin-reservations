@@ -3,7 +3,7 @@ import {
   isObjectEmpty,
   toCamelCase,
 } from '@/utils/string-utils';
-import { BEDS, AIRTABLE_BASES, COOKIES } from '@/utils/constants';
+import { BEDS, AIRTABLE_BASES, COOKIES, ROUTES } from '@/utils/constants';
 import Cookies from 'cookies';
 import { logSentryError } from '@/utils/sentry-utils';
 import { throwIfReservationTicketIsInvalid, isInactiveTicketStatus } from '@/utils/ticket-utils';
@@ -591,19 +591,31 @@ export const createUser = async ({ email, name, cabinId }) => {
 };
 
 export async function getPageLoadData({ req, res }) {
-  const cookies = new Cookies(req, res);
-  const userRecId = cookies.get(COOKIES.USER_RECORD);
-  if (!userRecId) return { user: null, hasClearedStaleUserCookie: false };
-  const user = await getUserByRecordId({ id: userRecId });
-  const hasUser = !isObjectEmpty(user);
-  // The login cookie points to a ticket that is not active in the current
-  // Airtable base (for example, an ID from a previous year's base), so delete
-  // it and let the page send the guest back to the login screen.
-  if (!hasUser) cookies.set(COOKIES.USER_RECORD, null, { httpOnly: false });
-  // const hasMembership = hasUser ? user.hasMembership === 'True' : false;
-  return {
-    hasClearedStaleUserCookie: !hasUser,
-    user: hasUser ? user : null,
-    // hasMembership,
-  };
+  try {
+    const cookies = new Cookies(req, res);
+    const userRecId = cookies.get(COOKIES.USER_RECORD);
+    if (!userRecId) return { user: null, redirect: null };
+    const user = await getUserByRecordId({ id: userRecId });
+    const hasUser = !isObjectEmpty(user);
+    // The login cookie points to a ticket that is not active in the current
+    // Airtable base (for example, an ID from a previous year's base). Delete the
+    // cookie and return a redirect so pages send the guest back to the login
+    // page instead of showing the error takeover.
+    if (!hasUser) {
+      cookies.set(COOKIES.USER_RECORD, null, { httpOnly: false });
+      return {
+        user: null,
+        redirect: { destination: ROUTES.HOME, permanent: false },
+      };
+    }
+    // const hasMembership = user.hasMembership === 'True';
+    return {
+      user,
+      redirect: null,
+      // hasMembership,
+    };
+  } catch (error) {
+    console.error('No user data found:', error);
+    return { user: null, redirect: null };
+  }
 }

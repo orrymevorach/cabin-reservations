@@ -9,7 +9,6 @@ import { getUserReservationData } from '@/lib/platform-utils';
 import ProfileDashboard from '@/components/ProfileDashboard/ProfileDashboard';
 import SelectCabinTakeover from '@/components/reservePage/selectCabinTakeover/selectCabinTakeover';
 import NoUserTakeover from '@/components/shared/noUserTakeover/noUserTakeover';
-import { ROUTES } from '@/utils/constants';
 
 export default function Summary({
   cabinAndUnitData,
@@ -42,18 +41,8 @@ export default function Summary({
 }
 
 export async function getServerSideProps(context) {
-  let user;
-  try {
-    const pageLoadResponse = await getPageLoadData(context);
-    user = pageLoadResponse.user;
-    // Send guests with a stale login cookie back to the login page instead of the error takeover.
-    if (pageLoadResponse.hasClearedStaleUserCookie) {
-      return { redirect: { destination: ROUTES.HOME, permanent: false } };
-    }
-  } catch (error) {
-    console.error('No user data found:', error);
-    user = null;
-  }
+  const { user, redirect } = await getPageLoadData(context);
+  if (redirect) return { redirect };
   if (!user) {
     return {
       props: { user: null },

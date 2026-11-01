@@ -65,18 +65,8 @@ export default function Reserve({
 export async function getServerSideProps(context) {
   const cabinQuery = context.query.cabin || null;
   if (!cabinQuery) return { props: { hasCabinQuery: false } };
-  let user;
-  try {
-    const pageLoadResponse = await getPageLoadData(context);
-    user = pageLoadResponse.user;
-    // Send guests with a stale login cookie back to the login page instead of the error takeover.
-    if (pageLoadResponse.hasClearedStaleUserCookie) {
-      return { redirect: { destination: ROUTES.HOME, permanent: false } };
-    }
-  } catch (error) {
-    console.error('No user data found:', error);
-    user = null;
-  }
+  const { user, redirect } = await getPageLoadData(context);
+  if (redirect) return { redirect };
   if (!user) {
     return {
       props: { user: null, hasCabinQuery: true },
