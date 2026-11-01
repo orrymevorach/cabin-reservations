@@ -69,6 +69,10 @@ export async function getServerSideProps(context) {
   try {
     const pageLoadResponse = await getPageLoadData(context);
     user = pageLoadResponse.user;
+    // Send guests with a stale login cookie back to the login page instead of the error takeover.
+    if (pageLoadResponse.hasClearedStaleUserCookie) {
+      return { redirect: { destination: ROUTES.HOME, permanent: false } };
+    }
   } catch (error) {
     console.error('No user data found:', error);
     user = null;

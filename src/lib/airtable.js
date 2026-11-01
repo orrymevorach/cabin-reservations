@@ -593,10 +593,16 @@ export const createUser = async ({ email, name, cabinId }) => {
 export async function getPageLoadData({ req, res }) {
   const cookies = new Cookies(req, res);
   const userRecId = cookies.get(COOKIES.USER_RECORD);
+  if (!userRecId) return { user: null, hasClearedStaleUserCookie: false };
   const user = await getUserByRecordId({ id: userRecId });
   const hasUser = !isObjectEmpty(user);
+  // The login cookie points to a ticket that is not active in the current
+  // Airtable base (for example, an ID from a previous year's base), so delete
+  // it and let the page send the guest back to the login screen.
+  if (!hasUser) cookies.set(COOKIES.USER_RECORD, null, { httpOnly: false });
   // const hasMembership = hasUser ? user.hasMembership === 'True' : false;
   return {
+    hasClearedStaleUserCookie: !hasUser,
     user: hasUser ? user : null,
     // hasMembership,
   };
