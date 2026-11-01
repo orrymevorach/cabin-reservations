@@ -11,14 +11,7 @@ import ReservationSummary from '../shared/reservationSummary/reservationSummary'
 import VerifiedUsers from '../shared/verifiedUsers/verifiedUsers';
 import AddGuestsTakeover from './addGuestsTakeover/addGuestsTakeover';
 import ConfirmationTakeover from './confirmationTakeover/confirmationTakeover';
-
-const FREE_TICKET_ALLOWANCES = {
-  'Cabin Purchased': 14,
-  '5 Ticket GA Bundle': 4,
-  '6 Ticket GA Bundle': 5,
-  '7 Ticket GA Bundle': 6,
-  Yurt: 1,
-};
+import { hasIncludedGuestTicketRemaining } from '@/utils/ticket-utils';
 
 export default function SummaryPage() {
   const { user, isLoading: isUserDataLoading } = useUser();
@@ -49,14 +42,11 @@ export default function SummaryPage() {
   // If a cabin is purchased, we allow users to add guests with free tickets
   // Once a cabin is half full, users can no longer add guests with free tickets, but they can add guests with purchased tickets
 
-  const freeTicketAllowance = FREE_TICKET_ALLOWANCES[user?.status];
-  const numberOfAddedGuests = Math.max(
-    (groupData?.members?.length || 1) - 1,
-    0,
-  );
   const canCreateGuestWithinIncludedTicketAllowance =
-    freeTicketAllowance !== undefined &&
-    numberOfAddedGuests < freeTicketAllowance;
+    hasIncludedGuestTicketRemaining({
+      status: user?.status,
+      groupMemberCount: groupData?.members?.length,
+    });
   return (
     <div className={styles.container}>
       {currentStage === CABIN_SELECTION_STAGES.ADD_GUESTS && (

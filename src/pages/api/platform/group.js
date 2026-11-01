@@ -20,10 +20,18 @@ import {
 import { sendSlackNotification } from '@/lib/slack';
 import Cookies from 'cookies';
 import { COOKIES } from '@/utils/constants';
-import { throwIfReservationTicketIsInvalid } from '@/utils/ticket-utils';
+import {
+  hasIncludedGuestTicketRemaining,
+  throwIfReservationTicketIsInvalid,
+} from '@/utils/ticket-utils';
 
-function verifyGuest({ guest, existingMemberEmails }) {
+function verifyGuest({ guest, hostUserId, existingMemberEmails }) {
   if (!guest?.id) return 'No user found with this email.';
+  // A host without a group isn't in the member list yet, so check their own ticket separately
+  // before Airtable rejects a group that lists them twice.
+  if (guest.id === hostUserId) {
+    return 'This is your own ticket. Please enter your guest’s email.';
+  }
   if (existingMemberEmails.includes(guest.emailAddress)) {
     return 'This guest is already in your group. Please enter a new email.';
   }
@@ -64,7 +72,7 @@ async function addMember({
     ({ emailAddress }) => emailAddress,
   );
 
-  const error = verifyGuest({ guest, existingMemberEmails });
+  const error = verifyGuest({ guest, hostUserId, existingMemberEmails });
   if (error) return { error };
 
   const host = await getUserByRecordId({ id: hostUserId });
@@ -115,6 +123,22 @@ async function createCabinGuest({
   const host = await getUserByRecordId({ id: hostUserId });
   if (!host?.id || host.cabin?.[0] !== cabinId) {
     return { error: 'Unable to verify your cabin reservation.' };
+  }
+
+  // Count guests from the host's saved group, not the browser's member list, so free cabin and yurt guests stop at the allowance.
+  const hostGroupId = host.group?.[0];
+  const storedGroup = hostGroupId
+    ? await getGroup({ groupId: hostGroupId })
+    : null;
+  const canCreateGuest = hasIncludedGuestTicketRemaining({
+    status: host.status,
+    groupMemberCount: storedGroup?.members?.length,
+  });
+  if (!canCreateGuest) {
+    return {
+      error:
+        'You have added all of the guests included with your reservation. Please contact Highlands to add more.',
+    };
   }
 
   const cabin = await getCabinById({ cabinId });
