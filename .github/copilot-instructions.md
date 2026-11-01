@@ -9,6 +9,10 @@
 - Preserve the local styling pattern when editing existing components, including CSS modules and MUI/Emotion. Do not convert existing styles solely to enforce SCSS.
 - Use explicit, descriptive classes for component styling instead of universal selectors such as `> *` or tag-based selectors. When a parent needs to style a child component, pass a class to the intended element rather than targeting all children.
 - Name custom component props for passing CSS classes `classNames`, not `className`, and combine them with local classes using `clsx`. Keep React's native `className` attribute on DOM elements and preserve prop names required by third-party components.
+- Add styling props to shared components only for a concrete caller requirement. Apply the override to the intended element and preserve other callers' appearance.
+- Use existing theme typography and button styles for new actions; do not rely on inherited body fonts for buttons.
+- Preserve familiar primary content placement when extending screens. Keep existing workflows prominent and avoid duplicate headings, excessive padding, and unnecessary scrolling.
+- Respect existing access prerequisites and feature flags when adding navigation or actions. Do not link guests to screens they cannot use yet.
 - Prefer explicit media queries over CSS `clamp()` for responsive sizing. Define size changes and bounds at readable breakpoints.
 - Use the shared screen-size variables from `src/app/variables.module.scss` for responsive width breakpoints instead of hardcoded pixel values.
 - Use explicit spacing values instead of CSS safe-area expressions such as `env(safe-area-inset-top)` or `env(safe-area-inset-bottom)`.
@@ -35,6 +39,10 @@
 - API routes should own their request handling. Do not create routes that merely re-export or import another route's handler. Extract a shared server function only when multiple operations genuinely reuse it; otherwise keep the logic in its owning route.
 - Reuse records already loaded within a trusted server operation rather than fetching them again. Do not replace server-side identity or eligibility validation with browser-provided data; combine related work server-side when that removes duplicate reads safely.
 - Name functions and endpoints after their actual responsibilities, and make throwing behavior explicit with names such as `throwIfReservationTicketIsInvalid`. Name variables after the objects they contain and the user's actual role, such as `reservingAttendeeId` rather than `hostUserId` when the attendee is not necessarily a host.
+- Name components, hooks, folders, and CSS classes after their actual responsibilities. Remove obsolete page-oriented names when functionality moves into a dashboard, and name logo styling after its appearance rather than suggesting it is a guest photo.
+- Separate feature-specific writes from dashboard reads. A profile endpoint may aggregate data, but dietary saves and check-in operations belong to their respective feature endpoints. Share server-side authentication and ownership checks rather than duplicating them.
+- Use Contentful's REST Delivery API, not GraphQL.
+- When an approved workflow move makes a page or navigation obsolete, remove its page-only components, styles, imports, links, and unused options. Preserve APIs and shared functionality that still have callers, and update remaining links to the current destination.
 - When renaming API fields or changing feature endpoints, update every caller, rewrite, and directly related existing test in scope. Do not add tests unless requested.
 - Validate group selections before side effects when partial completion would surprise the user. Validation messages should identify the affected guest or selection, state whether any changes were made, and explain how to recover; do not claim that no changes occurred after writes have started.
 - Keep user-facing errors concrete and nontechnical. Distinguish staff approval from email verification, and show recovery actions only when they apply. Financial labels must distinguish full purchase value, recorded collections, and verified payment-provider totals.
@@ -48,5 +56,6 @@
 - Add a concise comment immediately above every `useEffect` explaining when it runs and the user-facing behavior or state/side effect it coordinates. Use concrete language rather than restating the hook's syntax.
 - Before adding a function, hook, or component, search for existing code that can be reused or extended. Extract shared behavior when appropriate instead of duplicating it.
 - Keep related responsibilities together in cohesive modules. Avoid large components that contain unrelated logic, but do not split code into unnecessary abstractions.
+- Split components by responsibility, not line count. Extract independent cards and substantial forms into their own component directories with colocated styles; keep loading and save coordination in hooks without adding duplicate API requests.
 - Colocate component files and styles in their component directories, following the existing project conventions.
 - Keep architectural changes scoped to the requested work. Do not reorganize unrelated code or perform broad refactoring without explicit approval.

@@ -115,17 +115,54 @@ a record in Airtable does not restore its former reservation assignments.
 
 ## Automated Reservations Tests
 
+### Isolated Dietary Tests
+
+The dietary intake API regression tests run as part of `npm run test`. They use
+Node's existing test runner with VM modules to load the actual source and alias
+imports, without adding a test framework. The VM module flag is experimental
+and Node may print a warning.
+
+Firebase verification, Airtable, and error reporting are mocked. These tests
+do not load environment files, make network requests, reset fixtures, or write
+to production or the duplicate test base. They cover dietary reads, multiple
+selections, notes, explicit `None`, clearing responses, the exact notes-length
+limit, input validation, ticket ownership and eligibility, and service failures.
+They do not validate browser interactions or live Airtable permissions.
+
 The automated reservation tests use the [duplicated Airtable test base](https://airtable.com/appFe9v1pu6BLVxeD).
 
-The test suite and supporting scripts are in [scripts/tests/](./scripts/tests). Run them with `npm run test:automated-reservations`.
+The test suite and supporting scripts are in [scripts/tests/](./scripts/tests).
+Run all tests with `npm run test`. The runner recursively discovers
+`*.test.cjs` files in that directory and runs them sequentially against the
+isolated server, so new test files do not require another package script or
+a hardcoded runner entry.
+This also runs live dietary API and Chromium browser tests. Install the browser
+once with `npx playwright install chromium` after installing dependencies.
 
-### Optional Tests Before Pushing
+Dietary tests create automation-prefixed ticket fixtures in the approved test
+base and verify the stored selections, notes, and checkbox after API and browser
+saves. Browser coverage includes the unanswered prompt, editing, reload,
+explicit `None`, clearing, and failed-save recovery. Firebase identities are
+stubbed only in the isolated server and browser; no real Firebase accounts,
+emails, or guest-intake submissions are created. Test tokens are signed with an
+ephemeral runner secret and accepted only with the approved test-base override.
+The normal app has no test-authentication bypass.
 
-Run `npm run hooks:install` once per clone to enable the [pre-push hook](./.githooks/pre-push). Command-line pushes will ask whether to run the automated reservation tests first.
+The runner cleans up its fixtures, restores cabin bed selections, and verifies
+the baseline before exiting. A lock prevents concurrent runs from resetting
+each other's fixtures. Do not run other fixture-reset tools at the same time.
+Both dietary fields and all dietary select options must exist on the test base.
 
-- Answer `y` to run the suite. A failed run cancels the push.
-- Answer `n` or press Enter to push without running the suite.
-- Pushes without an interactive terminal skip the prompt and print a notice.
+### Tests Before Pushing
+
+Run `npm run hooks:install` once per clone to enable the
+[pre-push hook](./.githooks/pre-push). Interactive pushes prompt whether to run
+all tests. Answering Yes runs `npm run test`: the isolated dietary tests
+followed by the full reservation, live dietary, and browser integration suite.
+Missing credentials, browser installation, test failures, or baseline cleanup
+failures block the push when tests are selected. No or Enter skips the tests;
+noninteractive pushes retain the existing behavior of skipping the prompt.
+Run `npm run test` manually to run everything without pushing.
 
 ## Learn More
 

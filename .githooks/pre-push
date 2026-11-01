@@ -6,7 +6,7 @@ if ! ( : < /dev/tty ) 2>/dev/null; then
 fi
 
 while :; do
-  printf '%s' 'Run the automated reservations tests before pushing? [y/N] ' > /dev/tty
+  printf '%s' 'Run tests before pushing? [y/N] ' > /dev/tty
   if ! IFS= read -r answer < /dev/tty; then
     printf '\n%s\n' 'Could not read your answer; push cancelled.' >&2
     exit 1
@@ -16,7 +16,7 @@ while :; do
     y|Y|yes|YES|Yes)
       project_root=$(git rev-parse --show-toplevel) || exit 1
       cd "$project_root" || exit 1
-      if npm run test:automated-reservations < /dev/tty; then
+      if npm run test < /dev/tty; then
         exit 0
       fi
       printf '%s\n' 'Automated reservations tests failed; push cancelled.' >&2

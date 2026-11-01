@@ -1,5 +1,7 @@
 const { spawn } = require('node:child_process');
 const path = require('node:path');
+const { randomBytes } = require('node:crypto');
+const fs = require('node:fs');
 const {
   captureTestBaseBaseline,
   compareTestBaseBaselines,
@@ -11,10 +13,13 @@ const {
 
 const testPort = 3171;
 const appUrl = `http://127.0.0.1:${testPort}`;
-const nextCliPath = path.join(projectRoot, 'node_modules', 'next', 'dist', 'bin', 'next');
-const testFilePath = path.join(
-  __dirname,
-  'automated-reservation-flows.test.cjs',
+const nextCliPath = path.join(
+  projectRoot,
+  'node_modules',
+  'next',
+  'dist',
+  'bin',
+  'next',
 );
 const stubFilePath = path.join(__dirname, 'automated-test-stubs.cjs');
 
@@ -42,7 +47,9 @@ async function waitForApp(serverProcess) {
 
   while (Date.now() < deadline) {
     if (serverProcess.exitCode !== null) {
-      throw new Error('The automated reservations server exited before starting.');
+      throw new Error(
+        'The automated reservations server exited before starting.',
+      );
     }
 
     try {
@@ -80,11 +87,14 @@ async function run() {
     AIRTABLE_PERSONAL_ACCESS_TOKEN: personalAccessToken,
     NEXT_PUBLIC_ENV_URL: appUrl,
     AUTOMATED_TEST_RESET_APPLIED: 'true',
+    AUTOMATED_TEST_IDENTITY_SECRET: randomBytes(32).toString('hex'),
   };
 
   let serverProcess;
   let baseline;
   let testFailure;
+  const lockPath = path.join(projectRoot, '.automated-reservations-test.lock');
+  const lockDescriptor = fs.openSync(lockPath, 'wx');
 
   try {
     const resetCounts = await resetAutomatedReservationFixtures();
@@ -100,10 +110,7 @@ async function run() {
         cwd: projectRoot,
         env: {
           ...testEnvironment,
-          NODE_OPTIONS: [
-            process.env.NODE_OPTIONS,
-            `--require=${stubFilePath}`,
-          ]
+          NODE_OPTIONS: [process.env.NODE_OPTIONS, `--require=${stubFilePath}`]
             .filter(Boolean)
             .join(' '),
         },
@@ -112,13 +119,17 @@ async function run() {
     );
     await waitForApp(serverProcess);
 
+    const testFiles = fs.readdirSync(__dirname, { recursive: true })
+      .filter(filename => filename.endsWith('.test.cjs'))
+      .sort()
+      .map(filename => path.join(__dirname, filename));
+    if (!testFiles.length) {
+      throw new Error('No test files were discovered in scripts/tests.');
+    }
     await runCommand(
       process.execPath,
-      ['--test', testFilePath],
-      {
-        ...testEnvironment,
-        AUTOMATED_TEST_BASE_URL: appUrl,
-      },
+      ['--experimental-vm-modules', '--test', '--test-concurrency=1', ...testFiles],
+      { ...testEnvironment, AUTOMATED_TEST_BASE_URL: appUrl },
     );
   } catch (error) {
     testFailure = error;
@@ -154,6 +165,8 @@ async function run() {
         'Automated reservation tests failed or the test base could not be restored.',
       );
     }
+    fs.closeSync(lockDescriptor);
+    fs.unlinkSync(lockPath);
   }
 
   if (testFailure) {

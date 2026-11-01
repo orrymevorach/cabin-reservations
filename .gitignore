@@ -7,6 +7,7 @@
 
 # testing
 /coverage
+/.automated-reservations-test.lock
 
 # next.js
 /.next/
