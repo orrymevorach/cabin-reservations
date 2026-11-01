@@ -33,6 +33,7 @@ export default function SummaryPage() {
   } = useReservation();
 
   const stageQuery = router.query.stage;
+  // Open the reservation editor requested by the profile page's stage query parameter.
   useEffect(() => {
     if (stageQuery) {
       dispatch({ type: actions.SET_SELECTION_STAGE, currentStage: stageQuery });
@@ -73,12 +74,13 @@ export default function SummaryPage() {
         <ConfirmationTakeover />
       )}
 
-      <div>
-        <div className={styles.titleContainer}>
-          <p className={styles.title}>Summary</p>
-        </div>
-        <ReservationSummary cabinData={cabinData} showBedSelection />
-        <VerifiedUsers hideRemoveButton />
+      <div className={styles.details}>
+        <ReservationSummary
+          cabinData={cabinData}
+          showBedSelection
+          classNames={styles.cabinDetails}
+        />
+        <VerifiedUsers hideRemoveButton classNames={styles.guestList} />
       </div>
       <ModifyReservationButtons />
     </div>

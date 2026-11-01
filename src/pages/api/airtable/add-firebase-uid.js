@@ -2,6 +2,7 @@ import Airtable from 'airtable';
 import { transformFields } from '@/lib/airtable';
 import { isInactiveTicketStatus } from '@/utils/ticket-utils';
 import { logSentryError } from '@/utils/sentry-utils';
+import { getFirebaseIdentity } from '@/lib/firebase-identity';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -15,9 +16,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
     if (
-      !apiKey ||
       !process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN ||
       !process.env.AIRTABLE_BASE
     ) {
@@ -25,38 +24,13 @@ export default async function handler(req, res) {
         'Firebase and Airtable account-linking configuration is missing.',
       );
     }
-    const identityResponse = await fetch(
-      `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken }),
-        signal: AbortSignal.timeout(15000),
-      },
-    );
-    const identityResult = await identityResponse.json();
-    if (!identityResponse.ok) {
-      const expectedErrors = [
-        'INVALID_ID_TOKEN',
-        'TOKEN_EXPIRED',
-        'USER_DISABLED',
-        'USER_NOT_FOUND',
-      ];
-      if (expectedErrors.includes(identityResult.error?.message)) {
-        return res.status(401).json({ message: 'Please sign in again.' });
-      }
-      throw new Error(
-        `Firebase account verification failed (${identityResponse.status}).`,
-      );
+    const identityResult = await getFirebaseIdentity(idToken);
+    if (identityResult.status) {
+      return res.status(identityResult.status).json({
+        message: identityResult.message,
+      });
     }
-    const identity = identityResult.users?.[0];
-    if (!identity?.localId || !identity.email || identity.disabled) {
-      return res
-        .status(401)
-        .json({
-          message: 'A Firebase account with an email address is required.',
-        });
-    }
+    const { identity } = identityResult;
 
     const email = identity.email.trim().toLowerCase();
     const escapedEmail = email.replace(/\\/g, '\\\\').replace(/"/g, '\\"');

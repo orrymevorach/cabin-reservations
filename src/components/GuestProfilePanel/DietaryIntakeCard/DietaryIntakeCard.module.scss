@@ -1,0 +1,41 @@
+@use '@/styles/variables.module.scss' as variables;
+
+.card {
+  composes: card from '../GuestProfilePanel.module.scss';
+}
+
+.heading {
+  composes: heading from '../GuestProfilePanel.module.scss';
+}
+
+.description {
+  composes: description from '../GuestProfilePanel.module.scss';
+}
+
+.error {
+  composes: error from '../GuestProfilePanel.module.scss';
+}
+
+.button {
+  composes: button from '../DietaryIntakeForm/DietaryIntakeForm.module.scss';
+}
+
+.secondaryButton {
+  composes: secondaryButton from '../DietaryIntakeForm/DietaryIntakeForm.module.scss';
+}
+
+.actions {
+  composes: actions from '../DietaryIntakeForm/DietaryIntakeForm.module.scss';
+}
+
+.notesSummary {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.saved {
+  color: variables.$darkGreen;
+  margin-top: 16px;
+}

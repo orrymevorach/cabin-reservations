@@ -3,10 +3,12 @@ import styles from './reservationSummary.module.scss';
 import { useReservation } from '@/context/reservation-context';
 import { replaceCamelCaseWithSpaces } from '@/utils/string-utils';
 import Pill from '../pill/pill';
+import clsx from 'clsx';
 
 export default function ReservationSummary({
   cabinData,
   showBedSelection = false,
+  classNames,
 }) {
   const { user } = useUser();
   const { cabin } = cabinData;
@@ -22,7 +24,7 @@ export default function ReservationSummary({
     additionalInformation && additionalInformation.length > 0;
 
   return (
-    <div className={styles.summaryContainer}>
+    <div className={clsx(styles.summaryContainer, classNames)}>
       <p>
         <span className={styles.left}>Cabin:</span>
         <span className={styles.right}>{name}</span>

@@ -66,14 +66,14 @@ const VerifiedUser = ({ currentUser, index, hideRemoveButton }) => {
   );
 };
 
-export default function VerifiedUsers({ hideRemoveButton }) {
+export default function VerifiedUsers({ hideRemoveButton, classNames }) {
   const { groupData } = useReservation();
   const { user } = useUser();
 
   const members = groupData?.members?.length ? groupData.members : [user];
 
   return (
-    <div className={styles.container}>
+    <div className={clsx(styles.container, classNames)}>
       <p className={styles.title}>Names on Reservation</p>
       {members
         // add current user to top of list

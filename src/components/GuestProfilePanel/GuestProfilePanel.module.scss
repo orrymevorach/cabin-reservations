@@ -1,0 +1,32 @@
+@use '@/styles/variables.module.scss' as variables;
+
+.card {
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  border: 1px solid variables.$darkBeige;
+  border-radius: 12px;
+  background: variables.$white;
+}
+
+.heading {
+  color: variables.$darkGreen;
+  font-size: 20px;
+  margin: 0 0 10px;
+}
+
+.description {
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+
+.error {
+  color: #9c2929;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+@media (max-width: variables.$mobile) {
+  .card {
+    padding: 16px;
+  }
+}

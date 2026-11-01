@@ -6,6 +6,7 @@ import { UserProvider } from '@/context/user-context';
 import getCabinAndUnitData from '@/lib/platform-api';
 import { getPageLoadData } from '@/lib/airtable';
 import { getUserReservationData } from '@/lib/platform-utils';
+import ProfileDashboard from '@/components/ProfileDashboard/ProfileDashboard';
 import SelectCabinTakeover from '@/components/reservePage/selectCabinTakeover/selectCabinTakeover';
 import NoUserTakeover from '@/components/shared/noUserTakeover/noUserTakeover';
 
@@ -18,6 +19,7 @@ export default function Summary({
 }) {
   if (!user) return <NoUserTakeover />;
   if (!hasCabin) return <SelectCabinTakeover />;
+
   return (
     <CabinAndUnitDataProvider cabinAndUnitData={cabinAndUnitData}>
       <UserProvider user={user}>
@@ -28,7 +30,9 @@ export default function Summary({
           selectedBeds={selectedBeds}
         >
           <Layout>
-            <SummaryPage />
+            <ProfileDashboard>
+              <SummaryPage />
+            </ProfileDashboard>
           </Layout>
         </ReservationProvider>
       </UserProvider>
@@ -55,6 +59,7 @@ export async function getServerSideProps(context) {
   if (!cabin) {
     return {
       props: {
+        user,
         hasCabin: false,
       },
     };

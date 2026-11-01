@@ -12,7 +12,22 @@
   margin: 0 auto;
 }
 
+.error {
+  color: #9c2929;
+  text-align: center;
+  margin: 20px;
+}
+
+.image.compactLogo {
+  width: 260px;
+  padding: 20px 0 8px;
+}
+
 @media screen and (max-width: variables.$mobile) {
+  .image.compactLogo {
+    width: 220px;
+    padding: 68px 0 8px;
+  }
   .image {
     width: 350px;
     padding-top: 100px;

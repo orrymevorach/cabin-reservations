@@ -1,0 +1,88 @@
+@use '@/styles/variables.module.scss' as variables;
+@use '@mixins' as mixins;
+
+.description {
+  composes: description from '../GuestProfilePanel.module.scss';
+}
+
+.fieldset {
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.legend {
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 24px;
+  margin-bottom: 24px;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.checkbox {
+  margin-top: 4px;
+  flex-shrink: 0;
+  accent-color: variables.$darkGreen;
+}
+
+.notesLabel {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.notes {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid variables.$darkBeige;
+  border-radius: 5px;
+  font: inherit;
+  margin-bottom: 16px;
+  resize: vertical;
+}
+
+.button {
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 5px;
+  background: variables.$darkGreen;
+  color: variables.$white;
+  @include mixins.fontPrimaryBold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.secondaryButton {
+  padding: 12px 20px;
+  border: 1px solid variables.$darkGreen;
+  border-radius: 5px;
+  background: variables.$white;
+  color: variables.$darkGreen;
+  @include mixins.fontPrimaryBold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: variables.$mobile) {
+  .options {
+    grid-template-columns: 1fr;
+  }
+}

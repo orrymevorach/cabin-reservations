@@ -1,7 +1,7 @@
 import LoginPage from '@/components/loginPage/loginPage';
 import Layout from '@/components/shared/layout/layout';
 import { UserProvider } from '@/context/user-context';
-import { COOKIES } from '@/utils/constants';
+import { COOKIES, ROUTES } from '@/utils/constants';
 import Cookies from 'cookies';
 
 export default function Home() {
@@ -21,7 +21,7 @@ export async function getServerSideProps(context) {
   if (uid) {
     return {
       redirect: {
-        destination: '/cabin-selection',
+        destination: ROUTES.SUMMARY,
         permanent: false,
       },
     };

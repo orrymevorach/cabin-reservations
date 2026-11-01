@@ -1,0 +1,73 @@
+@use '@/styles/variables.module.scss' as variables;
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 24px 40px;
+}
+
+.heading {
+  font-size: 26px;
+  color: variables.$darkGreen;
+  margin-bottom: 6px;
+}
+
+.greeting {
+  margin-bottom: 16px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 20px;
+}
+
+.guestInformation {
+  min-width: 0;
+}
+
+.reservation {
+  min-width: 0;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  border: 1px solid variables.$darkBeige;
+  border-radius: 12px;
+  background: variables.$white;
+}
+
+.sectionHeading {
+  font-size: 20px;
+  color: variables.$darkGreen;
+  margin-bottom: 12px;
+}
+
+.description {
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.link {
+  color: variables.$darkGreen;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: variables.$mobile) {
+  .columns {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .container {
+    padding: 12px 16px 32px;
+  }
+
+  .heading {
+    font-size: 24px;
+  }
+
+  .reservation {
+    padding: 16px;
+  }
+}

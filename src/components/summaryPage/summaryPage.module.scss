@@ -1,22 +1,29 @@
 @use '@variables' as variables;
-@use '@mixins' as mixins;
 
 .container {
-  display: flex;
-  justify-content: center;
-  margin: 50px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  margin: 0;
 }
 
-.title {
-  font-size: 28px;
-  @include mixins.fontSecondary;
-  color: variables.$darkGreen;
-  margin-bottom: 20px;
+.details {
+  min-width: 0;
+}
+
+.details .cabinDetails {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+}
+
+.details .guestList {
+  margin-bottom: 0;
+  overflow-y: auto;
 }
 
 @media screen and (max-width: variables.$mobile) {
   .container {
-    flex-direction: column;
-    padding: 0 20px;
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 }

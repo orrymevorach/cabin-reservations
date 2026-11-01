@@ -1,0 +1,28 @@
+@use '@/styles/variables.module.scss' as variables;
+
+.card {
+  composes: card from '../GuestProfilePanel.module.scss';
+}
+
+.heading {
+  composes: heading from '../GuestProfilePanel.module.scss';
+}
+
+.description {
+  composes: description from '../GuestProfilePanel.module.scss';
+}
+
+.error {
+  composes: error from '../GuestProfilePanel.module.scss';
+}
+
+.status {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.link {
+  color: variables.$darkGreen;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
