@@ -304,6 +304,35 @@ export const reserveSpotInCabin = async ({ cabinId = '', attendeeId }) => {
   return record;
 };
 
+// A cabin with reserved spots can no longer be sold whole, so its Product Inventory product is set to
+// Reserved, which shows it as sold out on the festival site's buy-tickets page and blocks its checkout
+// link. Reserved (not Sold) keeps these cabins distinguishable from cabins that were bought outright.
+// Only whole-cabin products are changed: some cabins are linked to the General Admission product, which
+// must stay on sale. The guest's reservation is already saved, so a failed update is reported to Sentry
+// by the Airtable helpers and does not fail the reservation.
+export const markCabinProductsReserved = async ({ cabin }) => {
+  const productIds = cabin?.productInventory || [];
+  await Promise.all(
+    productIds.map(async productId => {
+      const { record: product } = await getRecordById({
+        tableId: 'Product Inventory',
+        recordId: productId,
+        endpoint: '/get-record-by-id',
+      });
+      const isWholeCabinProduct = Boolean(product?.category?.includes('Cabin'));
+      const isAlreadyOffSale = ['Sold', 'Reserved'].includes(product?.status);
+      if (!isWholeCabinProduct || isAlreadyOffSale) return;
+
+      await updateRecord({
+        tableId: 'Product Inventory',
+        recordId: productId,
+        newFields: { Status: 'Reserved' },
+        endpoint: '/update-record',
+      });
+    }),
+  );
+};
+
 export const getUserByEmail = async ({ email }) => {
   const response = await getRecordsByFieldValue({
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,

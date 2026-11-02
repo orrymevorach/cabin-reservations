@@ -8,6 +8,7 @@ const {
   getTestConfiguration,
   projectRoot,
   restoreCabinBedSelections,
+  restoreProductInventoryStatuses,
   resetAutomatedReservationFixtures,
 } = require('./automated-reservations-test-utils.cjs');
 
@@ -140,6 +141,7 @@ async function run() {
       console.log('Automated test-base cleanup complete:', resetCounts);
       if (baseline) {
         await restoreCabinBedSelections({ originalBaseline: baseline });
+        await restoreProductInventoryStatuses({ originalBaseline: baseline });
         let differences = [];
         for (let attempt = 0; attempt < 10; attempt += 1) {
           const currentBaseline = await captureTestBaseBaseline();

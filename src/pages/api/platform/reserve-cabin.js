@@ -4,6 +4,7 @@ import {
   clearCurrentBedSelection,
   getCabinById,
   getUserByRecordId,
+  markCabinProductsReserved,
   reserveSpotInCabin,
 } from '@/lib/airtable';
 import { sendConfirmationEmail } from '@/lib/emails';
@@ -96,6 +97,8 @@ export default async function handler(req, res) {
         });
       }
     }
+
+    await markCabinProductsReserved({ cabin });
 
     res.status(200).json({ cabin });
   } catch (err) {

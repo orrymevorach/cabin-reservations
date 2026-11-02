@@ -656,6 +656,13 @@ test('reserves an open cabin, selects a bed, submits check-in, and accepts the w
   assert.equal(reserveResponse.status, 200);
   assert.deepEqual((await getTicketRecord(host.id)).fields.Cabin, [testCabin.id]);
   assert.deepEqual((await getTicketRecord(guest.id)).fields.Cabin, [testCabin.id]);
+  for (const productId of testCabin.fields['Product Inventory'] || []) {
+    const cabinProduct = await airtableRequest({
+      table: 'Product Inventory',
+      recordId: productId,
+    });
+    assert.equal(cabinProduct.fields.Status, 'Reserved');
+  }
 
   const bedResponse = await postJson('/api/platform/reserve-bed', {
     cabinId: testCabin.id,

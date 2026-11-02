@@ -200,7 +200,13 @@ async function resetAutomatedReservationFixtures() {
 }
 
 async function captureTestBaseBaseline() {
-  const tables = ['Ticket Purchases', 'Cabins', 'Groups', 'Check In'];
+  const tables = [
+    'Ticket Purchases',
+    'Cabins',
+    'Groups',
+    'Check In',
+    'Product Inventory',
+  ];
   const tableRecords = await Promise.all(
     tables.map(async table => {
       const records = await listAirtableRecords(table);
@@ -298,6 +304,26 @@ async function restoreCabinBedSelections({ originalBaseline }) {
   }
 }
 
+// Reserving a test cabin sets its Product Inventory product to Reserved, so put each product back to the
+// Status it had before the test run.
+async function restoreProductInventoryStatuses({ originalBaseline }) {
+  const originalProducts = originalBaseline.get('Product Inventory');
+  const currentProducts = await listAirtableRecords('Product Inventory');
+
+  for (const productRecord of currentProducts) {
+    const originalFields = originalProducts.get(productRecord.id);
+    if (!originalFields) continue;
+    if (originalFields.Status === productRecord.fields.Status) continue;
+
+    await airtableRequest({
+      method: 'PATCH',
+      table: 'Product Inventory',
+      recordId: productRecord.id,
+      body: { fields: { Status: originalFields.Status || null } },
+    });
+  }
+}
+
 module.exports = {
   airtableRequest,
   captureTestBaseBaseline,
@@ -306,6 +332,7 @@ module.exports = {
   getTestConfiguration,
   listAirtableRecords,
   restoreCabinBedSelections,
+  restoreProductInventoryStatuses,
   projectRoot,
   resetAutomatedReservationFixtures,
   testEmailPrefix,
