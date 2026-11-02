@@ -59,15 +59,26 @@ async function addToGroup({
   return { id: groupResponse.id, members };
 }
 
-async function addMember({
-  groupId,
-  hostUserId,
-  memberIds,
-  email,
-  cabinId = null,
-}) {
+// Read the host's group from Airtable instead of the browser. A stale page or a request without the member list
+// would otherwise create a second group or replace the saved members with only the new guest.
+async function getSavedHostGroup({ host }) {
+  const savedGroupId = host.group?.[0] || null;
+  if (!savedGroupId) return { groupId: null, memberIds: [] };
+
+  const savedGroup = await getGroup({ groupId: savedGroupId });
+  if (!savedGroup?.id) throw new Error('Unable to load the host group.');
+  return { groupId: savedGroup.id, memberIds: savedGroup.members || [] };
+}
+
+async function addMember({ hostUserId, email, cabinId = null }) {
+  const host = await getUserByRecordId({ id: hostUserId });
+  throwIfReservationTicketIsInvalid(host);
+  const savedGroup = await getSavedHostGroup({ host });
+
   const guest = await getUserByEmail({ email });
-  const existingMembers = await resolveGroupMembers({ memberIds });
+  const existingMembers = await resolveGroupMembers({
+    memberIds: savedGroup.memberIds,
+  });
   const existingMemberEmails = existingMembers.map(
     ({ emailAddress }) => emailAddress,
   );
@@ -75,12 +86,10 @@ async function addMember({
   const error = verifyGuest({ guest, hostUserId, existingMemberEmails });
   if (error) return { error };
 
-  const host = await getUserByRecordId({ id: hostUserId });
-  throwIfReservationTicketIsInvalid(host);
   const group = await addToGroup({
-    groupId,
+    groupId: savedGroup.groupId,
     hostUserId,
-    memberIds,
+    memberIds: savedGroup.memberIds,
     newMemberId: guest.id,
     groupName: host.name,
   });
@@ -104,9 +113,7 @@ async function addMember({
 }
 
 async function createCabinGuest({
-  groupId,
   hostUserId,
-  memberIds,
   email,
   firstName,
   lastName,
@@ -126,13 +133,12 @@ async function createCabinGuest({
   }
 
   // Count guests from the host's saved group, not the browser's member list, so free cabin and yurt guests stop at the allowance.
-  const hostGroupId = host.group?.[0];
-  const storedGroup = hostGroupId
-    ? await getGroup({ groupId: hostGroupId })
-    : null;
+  const savedGroup = await getSavedHostGroup({ host });
   const canCreateGuest = hasIncludedGuestTicketRemaining({
     status: host.status,
-    groupMemberCount: storedGroup?.members?.length,
+    groupMemberCount: savedGroup.groupId
+      ? savedGroup.memberIds.length
+      : undefined,
   });
   if (!canCreateGuest) {
     return {
@@ -164,9 +170,9 @@ async function createCabinGuest({
   });
 
   const group = await addToGroup({
-    groupId,
+    groupId: savedGroup.groupId,
     hostUserId,
-    memberIds,
+    memberIds: savedGroup.memberIds,
     newMemberId: newGuest.id,
     groupName: host.name,
   });
@@ -365,17 +371,13 @@ export default async function handler(req, res) {
     let result;
     if (action === 'add-existing-ticket-holder') {
       result = await addMember({
-        groupId,
         hostUserId,
-        memberIds,
         email,
         cabinId,
       });
     } else if (action === 'create-cabin-guest') {
       result = await createCabinGuest({
-        groupId,
         hostUserId,
-        memberIds,
         email,
         firstName,
         lastName,

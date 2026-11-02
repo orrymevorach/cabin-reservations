@@ -690,6 +690,61 @@ test('reserves an open cabin, selects a bed, submits check-in, and accepts the w
   assert.equal(waiverResponse.body.record.waiverAccepted, true);
 });
 
+test('keeps one saved group when the reserve page omits members or a stale page sends no group', async () => {
+  const host = await createHost({
+    label: 'saved-group-host',
+    status: 'Cabin Purchased',
+    shouldCreateGroup: false,
+  });
+  const [firstGuest, secondGuest, thirdGuest] = await Promise.all(
+    ['saved-group-guest-1', 'saved-group-guest-2', 'saved-group-guest-3'].map(
+      label =>
+        createAssignedTicket({ host, label, status: 'Ticket Purchased' }),
+    ),
+  );
+
+  const firstResponse = await postJson('/api/platform/group', {
+    action: 'add-existing-ticket-holder',
+    groupId: null,
+    hostUserId: host.id,
+    email: firstGuest.emailAddress,
+  });
+  assert.equal(firstResponse.status, 200, JSON.stringify(firstResponse.body));
+  const savedGroupId = firstResponse.body.group.id;
+
+  // The reserve page sends the group without its member list; this used to replace the saved members with only the new guest.
+  const secondResponse = await postJson('/api/platform/group', {
+    action: 'add-existing-ticket-holder',
+    groupId: savedGroupId,
+    hostUserId: host.id,
+    email: secondGuest.emailAddress,
+  });
+  assert.equal(secondResponse.status, 200, JSON.stringify(secondResponse.body));
+
+  // A page loaded before the group existed still sends no group; this used to create a second group for the host.
+  const staleResponse = await postJson('/api/platform/group', {
+    action: 'add-existing-ticket-holder',
+    groupId: null,
+    hostUserId: host.id,
+    memberIds: [],
+    email: thirdGuest.emailAddress,
+  });
+  assert.equal(staleResponse.status, 200, JSON.stringify(staleResponse.body));
+  assert.equal(staleResponse.body.group.id, savedGroupId);
+
+  const savedMemberIds = await getGroupMemberIds({
+    ...host,
+    groupId: savedGroupId,
+  });
+  assert.deepEqual(
+    [...savedMemberIds].sort(),
+    [host.id, firstGuest.id, secondGuest.id, thirdGuest.id].sort(),
+  );
+  assert.deepEqual((await getTicketRecord(host.id)).fields.Group, [
+    savedGroupId,
+  ]);
+});
+
 test('removes a group member without deleting their purchased ticket', async () => {
   const host = await createHost({
     label: 'group-removal-host',

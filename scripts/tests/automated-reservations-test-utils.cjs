@@ -143,10 +143,17 @@ async function resetAutomatedReservationFixtures() {
       ),
     )
     .map(({ id }) => id);
+  // Groups created through the API are named after the test host, so also remove groups made up only of test tickets.
+  const isTestGroup = ({ fields = {} }) => {
+    const memberIds = fields.Members || [];
+    return (
+      String(fields['Group Name'] || '').startsWith(testGroupPrefix) ||
+      (memberIds.length > 0 &&
+        memberIds.every(memberId => testTicketRecordIds.has(memberId)))
+    );
+  };
   const testGroupRecordIds = groupRecords
-    .filter(({ fields = {} }) =>
-      String(fields['Group Name'] || '').startsWith(testGroupPrefix),
-    )
+    .filter(isTestGroup)
     .map(({ id }) => id);
 
   await deleteAirtableRecords('Check In', testCheckInRecordIds);
@@ -174,8 +181,11 @@ async function resetAutomatedReservationFixtures() {
       testTicketRecordIds.has(attendeeId),
     ),
   );
-  const hasRemainingTestGroup = remainingGroups.some(({ fields = {} }) =>
-    String(fields['Group Name'] || '').startsWith(testGroupPrefix),
+  const testGroupRecordIdSet = new Set(testGroupRecordIds);
+  const hasRemainingTestGroup = remainingGroups.some(
+    group =>
+      testGroupRecordIdSet.has(group.id) ||
+      String(group.fields?.['Group Name'] || '').startsWith(testGroupPrefix),
   );
 
   if (hasRemainingTestTicket || hasRemainingTestCheckIn || hasRemainingTestGroup) {
