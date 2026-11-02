@@ -4,10 +4,13 @@ import styles from './modifyReservationButtons.module.scss';
 import { useRouter } from 'next/router';
 import useAllowBedSelection from '@/hooks/useAllowBedSelection';
 import { useUser } from '@/context/user-context';
+import { FEATURE_FLAGS, ROUTES } from '@/utils/constants';
 
 export default function ModifyReservationButtons() {
   const router = useRouter();
   const { user } = useUser();
+  const canSelectCabin =
+    FEATURE_FLAGS.ENABLE_RESERVATIONS && !FEATURE_FLAGS.ENABLE_COUNTDOWN;
 
   const handleRoute = ({ pathname, stage }) => {
     const query = stage ? { stage } : null;
@@ -26,6 +29,11 @@ export default function ModifyReservationButtons() {
     <div className={styles.modifyContainer}>
       <p className={styles.title}>Modify Your Reservation</p>
       <div className={styles.buttons}>
+        {canSelectCabin && (
+          <Button classNames={styles.button} href={ROUTES.CABIN_SELECTION}>
+            Back to cabin selection
+          </Button>
+        )}
         <Button
           classNames={styles.button}
           handleClick={() =>
