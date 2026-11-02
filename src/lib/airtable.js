@@ -333,6 +333,20 @@ export const markCabinProductsReserved = async ({ cabin }) => {
   );
 };
 
+// Yurts have no per-yurt product to mark Reserved, so the yurt itself goes Private: it disappears from
+// the listings for other yurt purchasers, while the people in it can still add their guests.
+export const markYurtPrivate = async ({ cabinId, cabin }) => {
+  const isYurt = cabin?.unit?.[0] === 'Yurtlands';
+  if (!isYurt || cabin.availability !== 'Open') return;
+
+  await updateRecord({
+    tableId: 'Cabins',
+    recordId: cabinId,
+    newFields: { Availability: 'Private' },
+    endpoint: '/update-record',
+  });
+};
+
 export const getUserByEmail = async ({ email }) => {
   const response = await getRecordsByFieldValue({
     tableId: AIRTABLE_BASES.TICKET_PURCHASES,

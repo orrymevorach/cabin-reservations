@@ -5,6 +5,7 @@ import {
   getCabinById,
   getUserByRecordId,
   markCabinProductsReserved,
+  markYurtPrivate,
   reserveSpotInCabin,
 } from '@/lib/airtable';
 import { sendConfirmationEmail } from '@/lib/emails';
@@ -98,7 +99,10 @@ export default async function handler(req, res) {
       }
     }
 
-    await markCabinProductsReserved({ cabin });
+    await Promise.all([
+      markCabinProductsReserved({ cabin }),
+      markYurtPrivate({ cabinId, cabin }),
+    ]);
 
     res.status(200).json({ cabin });
   } catch (err) {
