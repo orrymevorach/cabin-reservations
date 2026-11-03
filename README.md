@@ -104,7 +104,11 @@ Firebase ID token. The server verifies it through Firebase Authentication,
 queries Ticket Purchases once using the verified email, and attaches the verified
 UID only if the active ticket has no UID. A different existing UID is rejected.
 The operation uses the existing Firebase web API key and Airtable server credentials.
-Failed Firebase sign-in retains the ticket lookup/create-account guidance.
+Failed Firebase sign-in retains the ticket lookup and displays an error on the
+login page. A missing UID on this year's ticket does not mean the attendee has
+no existing Firebase account. Credential errors direct returning attendees to
+Forgot Password and first-time users to the existing Create an account link,
+without automatically redirecting either group to account creation.
 The `/api/airtable/add-firebase-uid` route owns ticket lookup and UID assignment
 directly and requires an ID token; arbitrary record-ID/UID writes through that
 route are no longer supported.

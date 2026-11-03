@@ -5,9 +5,8 @@ import styles from './login.module.scss';
 import Button from '../../shared/button/button';
 import Input from '@/components/shared/input/input';
 import Cookies from 'js-cookie';
-import { COOKIES, ROUTES } from '@/utils/constants';
+import { COOKIES } from '@/utils/constants';
 import { signInWithFirebaseEmailAndPassword } from './firebase-utils';
-import { useRouter } from 'next/router';
 import { errors as firebaseErrors } from './firebase-utils';
 import { isObjectEmpty } from '@/utils/string-utils';
 
@@ -18,6 +17,8 @@ export const errors = {
     "We're sorry, an unknown error has occured. Please contact info@highlandsmusicfestival.ca.",
   PASSWORD_DOES_NOT_MATCH:
     'This password does not match the one that was sent to your email. Please check your email and try again.',
+  SIGN_IN_FAILED:
+    'We could not sign you in with that email and password. Are you a first time user? Select Create an account below. Are you a returning attendee? Use Forgot Password below if needed.',
 };
 
 export default function Login({ handleSuccess }) {
@@ -25,7 +26,6 @@ export default function Login({ handleSuccess }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -62,49 +62,26 @@ export default function Login({ handleSuccess }) {
       return;
     }
 
-    const isFirebaseLoginSuccessful = firebaseResponse.user?.uid;
-    const hasFirebaseAccount = firebaseResponse.user?.uid || user?.firebaseUID;
+    const isFirebaseLoginSuccessful = Boolean(firebaseResponse.user?.uid);
 
     // Step 1a: If firebase login is successful, handle success
     if (isFirebaseLoginSuccessful) {
       Cookies.set(COOKIES.USER_RECORD, user.id, { expires: 7 });
       handleSuccess({ email, user });
     }
-    // Step 1ab: If login attempt was unsuccessful but user has firebase account, show error (likely incorrect password)
-    else if (
-      !isFirebaseLoginSuccessful &&
-      firebaseResponse.error &&
-      hasFirebaseAccount
-    ) {
-      setIsLoading(false);
-      const firebaseError =
-        firebaseErrors[firebaseResponse.error.code]?.message || errors.GENERIC;
-      setError(firebaseError);
-      return;
-    }
-    // Step 1c: If user does not have a firebase account, check to see if they have a ticket
+    // A new ticket can lack a UID for an existing account, so failed sign-ins must not redirect to account creation.
     else {
-      const userHasTicket = user?.id;
-      // Step 2a: If user has ticket, redirect them to create account page
-      if (userHasTicket) {
-        setIsLoading(false);
-        router.push({
-          pathname: ROUTES.CREATE_ACCOUNT,
-          query: {
-            email,
-            ...(router.query.returnTo === ROUTES.DIETARY_INTAKE
-              ? { returnTo: ROUTES.DIETARY_INTAKE }
-              : {}),
-          },
-        });
-        return;
-      }
-      // Step 2b: If user does not have a ticket, show error message that they should buy a ticket
-      else {
-        setError(errors.USER_NOT_FOUND);
-        setIsLoading(false);
-        return;
-      }
+      const errorCode = firebaseResponse.error?.code;
+      const isCredentialError = [
+        'auth/invalid-credential',
+        'auth/wrong-password',
+        'auth/user-not-found',
+      ].includes(errorCode);
+      const errorMessage = isCredentialError
+        ? errors.SIGN_IN_FAILED
+        : firebaseErrors[errorCode]?.message || errors.GENERIC;
+      setError(errorMessage);
+      setIsLoading(false);
     }
   };
 
@@ -120,24 +97,24 @@ export default function Login({ handleSuccess }) {
 
   return (
     <form
-      action="#"
+      action='#'
       onSubmit={e => handleSubmit(e)}
       className={styles.container}
     >
       <Input
-        type="email"
-        id="email"
+        type='email'
+        id='email'
         handleChange={e => handleChangeEmail(e)}
         classNames={styles.emailInput}
-        label="Email"
+        label='Email'
         error={error}
         value={email}
       />
       <Input
-        type="password"
-        id="password"
+        type='password'
+        id='password'
         handleChange={e => handleChangePassword(e)}
-        label="Password"
+        label='Password'
         value={password}
       />
       <Button isLoading={isLoading} classNames={styles.submit} isSmall>
