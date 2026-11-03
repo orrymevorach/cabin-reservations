@@ -18,7 +18,7 @@ export const errors = {
   PASSWORD_DOES_NOT_MATCH:
     'This password does not match the one that was sent to your email. Please check your email and try again.',
   SIGN_IN_FAILED:
-    'We could not sign you in with that email and password. Are you a first time user? Select Create an account below. Are you a returning attendee? Use Forgot Password below if needed.',
+    'We could not sign you in with that email and password. Are you a first time user? Select Create an account below. Do you already have an account? Select Forgot Password below.',
 };
 
 export default function Login({ handleSuccess }) {

@@ -22,7 +22,7 @@
 - Any component that renders jsx should follow React naming and rendering conventions. For example, component names should be PascalCase, and files should be named accordingly.
 - Extract reusable JSX into PascalCase React components and render them with JSX, such as `<Links />`. Do not use `render*` helper functions, such as `renderLinks()`, inside components to produce JSX. Define extracted components outside their parent component in their own component files.
 - Use aliases defined in `jsconfig.json`, such as `@/*`, `components/*`, `lib/*`, `utils/*`, and `context/*`, instead of parent-relative imports. For example, use `import Icon from 'components/shared/Icon/Icon';` or `import useExample from '@/hooks/useExample';`. Same-directory imports such as `./Heading.module.scss` are fine.
-- Do not write tests for this project. Skip any test creation.
+- Create or update automated tests when the user explicitly requests them. Use existing test tooling and isolated fixtures or mocks; do not use real guest credentials or modify production guest records.
 - Do not update README for every change. Update it only when usage or setup changes significantly.
 - Do not perform unrelated refactoring without explicit permission. Keep changes focused on the requested task.
 - Do not add new functionality without explicit permission.

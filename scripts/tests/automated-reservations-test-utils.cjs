@@ -276,7 +276,7 @@ function compareTestBaseBaselines({ originalBaseline, currentBaseline }) {
   return differences;
 }
 
-async function restoreCabinBedSelections({ originalBaseline }) {
+async function restoreCabinReservationFields({ originalBaseline }) {
   const originalCabins = originalBaseline.get('Cabins');
   const currentCabins = await listAirtableRecords('Cabins');
 
@@ -285,6 +285,10 @@ async function restoreCabinBedSelections({ originalBaseline }) {
     if (!originalFields) continue;
 
     const fieldsToRestore = {};
+    // Yurt reservations make the cabin Private, so restore its original visibility as well as its beds.
+    if (originalFields.Availability !== cabinRecord.fields.Availability) {
+      fieldsToRestore.Availability = originalFields.Availability ?? null;
+    }
     for (const fieldName of cabinBedFields) {
       const originalValue = originalFields[fieldName] || [];
       const currentValue = cabinRecord.fields[fieldName] || [];
@@ -331,7 +335,7 @@ module.exports = {
   expectedBaseId,
   getTestConfiguration,
   listAirtableRecords,
-  restoreCabinBedSelections,
+  restoreCabinReservationFields,
   restoreProductInventoryStatuses,
   projectRoot,
   resetAutomatedReservationFixtures,
