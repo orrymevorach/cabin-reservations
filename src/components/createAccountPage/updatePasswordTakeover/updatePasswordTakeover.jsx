@@ -3,18 +3,21 @@ import styles from '../createUser/createUser.module.scss';
 import { useState } from 'react';
 import Button from '@/components/shared/button/button';
 import { useRouter } from 'next/router';
-import { AIRTABLE_BASES, COOKIES, ROUTES } from '@/utils/constants';
-import Cookies from 'js-cookie';
+import { ROUTES } from '@/utils/constants';
 import Takeover from '@/components/shared/takeover/takeover';
 import { errors as loginErrors } from '@/components/loginPage/login/login';
 import {
   createFirebaseUser,
   errors,
 } from '@/components/loginPage/login/firebase-utils';
-import { updateRecord } from '@/lib/airtable';
+import { getAttendeeAndAssignFirebaseUid } from '@/lib/platform-api';
 import { logSentryError } from '@/utils/sentry-utils';
 
-export default function UpdatePasswordTakeover({ user, handleClose }) {
+export default function UpdatePasswordTakeover({
+  user,
+  temporaryPassword,
+  handleClose,
+}) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -57,14 +60,10 @@ export default function UpdatePasswordTakeover({ user, handleClose }) {
         return;
       }
 
-      await updateRecord({
-        tableId: AIRTABLE_BASES.TICKET_PURCHASES,
-        recordId: user.id,
-        newFields: {
-          'Firebase UID': response.user.uid,
-        },
-      });
-      Cookies.set(COOKIES.USER_RECORD, user.id, { expires: 7 });
+      // Link the new account to the ticket on the server, proving ownership with the temporary
+      // password from the ticket email. The server also sets the signed session cookie.
+      const idToken = await response.user.getIdToken();
+      await getAttendeeAndAssignFirebaseUid({ idToken, temporaryPassword });
       setIsLoading(false);
       const destination = router.query.returnTo === ROUTES.DIETARY_INTAKE
         ? ROUTES.DIETARY_INTAKE

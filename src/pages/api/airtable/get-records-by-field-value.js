@@ -1,58 +1,31 @@
-import { logSentryApiError } from '@/utils/sentry-utils';
-import { transformFields } from '../../../lib/airtable';
-const Airtable = require('airtable');
+import { getAirtableRecordsByFieldValue } from '@/lib/airtable-server';
+import { requireSignedInUser } from '@/lib/user-session-server';
 
-// Airtable Config
-const airtableBase = new Airtable({
-  apiKey: process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN,
-}).base(process.env.AIRTABLE_BASE);
-
+// Browser access: a signed-in user looks up another ticket holder by email (for example to add them
+// to a group). Only the ticket ID, name, and status are returned. Server code reads Airtable directly.
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const { tableId, formulaArray } = req.body;
-    const formula = formulaArray
-      .map(({ fieldName, fieldValue }) => {
-        const escapedFieldValue = String(fieldValue ?? '')
-          .replace(/\\/g, '\\\\')
-          .replace(/"/g, '\\"');
-        return `{${fieldName}} = "${escapedFieldValue}"`;
-      })
-      .join(', ');
-
-    try {
-      const records = [];
-      await airtableBase(tableId)
-        .select({
-          filterByFormula: `AND(${formula})`,
-        })
-        .eachPage((pageRecords, fetchNextPage) => {
-          records.push(...pageRecords);
-          fetchNextPage();
-        });
-
-      const recordsWithIds = records.map(record => {
-        const fields = transformFields({ record });
-        return {
-          id: record.getId(),
-          ...fields,
-        };
-      });
-
-      res.status(200).json({ records: recordsWithIds });
-    } catch (err) {
-      await logSentryApiError({
-        error: err,
-        req,
-        action: 'airtable-get-records-by-field-value',
-        extra: {
-          tableId,
-          fieldNames: formulaArray.map(({ fieldName }) => fieldName),
-        },
-      });
-      res.status(err.statusCode || 500).json(err.message);
-    }
-  } else {
+  if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    res.status(405).end('Method Not Allowed');
+    return res.status(405).end('Method Not Allowed');
   }
+  const signedInUser = await requireSignedInUser(req, res);
+  if (!signedInUser) return;
+  const { tableId, formulaArray } = req.body || {};
+  const isEmailLookup =
+    tableId === 'Ticket Purchases' &&
+    Array.isArray(formulaArray) &&
+    formulaArray.length === 1 &&
+    formulaArray[0]?.fieldName === 'Email Address' &&
+    typeof formulaArray[0]?.fieldValue === 'string';
+  if (!isEmailLookup) {
+    return res.status(403).json({ message: 'This lookup is not allowed.' });
+  }
+  const records = await getAirtableRecordsByFieldValue({ tableId, formulaArray });
+  return res.status(200).json({
+    records: records.map(record => ({
+      id: record.id,
+      name: record.name,
+      status: record.status,
+    })),
+  });
 }

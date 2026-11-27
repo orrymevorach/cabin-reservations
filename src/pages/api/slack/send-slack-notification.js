@@ -1,4 +1,5 @@
 import { logSentryApiError } from '@/utils/sentry-utils';
+import { isInternalRequest } from '@/utils/internal-request-server';
 const { WebClient } = require('@slack/web-api');
 
 require('dotenv').config({ path: '.env.local' });
@@ -6,7 +7,11 @@ require('dotenv').config({ path: '.env.local' });
 // Slack Config
 const web = new WebClient(process.env.SLACK_OAUTH_TOKEN);
 
+// Called only by this site's group route. Public requests are refused so Slack cannot be spammed.
 export default async function handler(req, res) {
+  if (!isInternalRequest(req)) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
   const { originalGuestName, newGuestName, email, cabin } = req.body;
   try {
     const channel =

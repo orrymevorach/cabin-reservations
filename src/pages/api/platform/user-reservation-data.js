@@ -1,8 +1,8 @@
 import { logSentryApiError } from '@/utils/sentry-utils';
 import getCabinAndUnitData from '@/lib/platform-api';
-import { getPageLoadData, getUserByRecordId } from '@/lib/airtable';
 import { getUserReservationData } from '@/lib/platform-utils';
 import { isObjectEmpty } from '@/utils/string-utils';
+import { requireSignedInUser } from '@/lib/user-session-server';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -11,16 +11,16 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Reservation details belong to the signed-in user; a userId naming anyone else is refused.
+    const signedInUser = await requireSignedInUser(req, res);
+    if (!signedInUser) return;
     const { userId: queryUserId = null } = req.query;
-
-    let user = null;
-    if (queryUserId) {
-      const candidate = await getUserByRecordId({ id: queryUserId });
-      user = isObjectEmpty(candidate) ? null : candidate;
-    } else {
-      const pageLoadResponse = await getPageLoadData({ req, res });
-      user = pageLoadResponse.user;
+    if (queryUserId && queryUserId !== signedInUser.id) {
+      return res
+        .status(403)
+        .json({ message: 'You can only view your own reservation.' });
     }
+    const user = isObjectEmpty(signedInUser) ? null : signedInUser;
 
     if (!user) return res.status(200).json({ user: null });
 

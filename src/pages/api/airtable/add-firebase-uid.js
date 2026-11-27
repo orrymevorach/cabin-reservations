@@ -3,6 +3,7 @@ import { transformFields } from '@/lib/airtable';
 import { isInactiveTicketStatus } from '@/utils/ticket-utils';
 import { logSentryError } from '@/utils/sentry-utils';
 import { getFirebaseIdentity } from '@/lib/firebase-identity';
+import { setUserSession } from '@/lib/user-session-server';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -11,6 +12,7 @@ export default async function handler(req, res) {
   }
 
   const idToken = req.body?.idToken;
+  const temporaryPassword = req.body?.temporaryPassword;
   if (typeof idToken !== 'string' || !idToken) {
     return res.status(401).json({ message: 'Please sign in again.' });
   }
@@ -61,6 +63,24 @@ export default async function handler(req, res) {
       });
     }
 
+    // Linking an unclaimed ticket needs proof that the signer-in owns the ticket's email: the
+    // temporary password emailed with the ticket, or a Firebase account whose email is verified.
+    // Firebase does not verify emails at sign-up, so the email alone could be anyone's.
+    if (!existingUid) {
+      const ticketTemporaryPassword = ticket.fields['Temporary Password'];
+      const hasTemporaryPassword =
+        typeof temporaryPassword === 'string' &&
+        Boolean(ticketTemporaryPassword) &&
+        temporaryPassword === ticketTemporaryPassword;
+      if (!hasTemporaryPassword && !identity.emailVerified) {
+        return res.status(403).json({
+          code: 'EMAIL_VERIFICATION_REQUIRED',
+          message:
+            'Please verify your email address. We sent a verification link to your inbox; open it, then log in again.',
+        });
+      }
+    }
+
     // Link only an unclaimed active ticket; never overwrite another account's identity.
     const linkedTicket = existingUid
       ? ticket
@@ -69,7 +89,10 @@ export default async function handler(req, res) {
             { id: ticket.id, fields: { 'Firebase UID': identity.localId } },
           ])
         )[0];
-    const user = transformFields({ record: linkedTicket });
+    setUserSession(res, { recordId: linkedTicket.id, firebaseUid: identity.localId });
+    // The temporary password has done its job once the account is linked, so it is not sent back.
+    const user = { ...transformFields({ record: linkedTicket }), id: linkedTicket.id };
+    delete user.temporaryPassword;
     return res.status(200).json({ user });
   } catch (error) {
     logSentryError(error, { action: 'link-reservation-account' });

@@ -11,6 +11,7 @@ import { resolveGroupMembers } from '@/lib/platform-utils';
 import { sendConfirmationEmail } from '@/lib/emails';
 import { BEDS } from '@/utils/constants';
 import { isInactiveTicketStatus } from '@/utils/ticket-utils';
+import { requireSignedInUser } from '@/lib/user-session-server';
 
 // mirrors bedSelection.jsx's confirm-selection flow, but resolves group
 // members by id (not name) and only allows reserving beds for the host's own group
@@ -21,7 +22,15 @@ export default async function handler(req, res) {
   }
 
   try {
+    const signedInUser = await requireSignedInUser(req, res);
+    if (!signedInUser) return;
     const { cabinId, reservingAttendeeId, beds } = req.body;
+    // Bed choices are made by the signed-in user for themselves and their own group.
+    if (reservingAttendeeId !== signedInUser.id) {
+      return res
+        .status(403)
+        .json({ message: 'You can only reserve beds for your own group.' });
+    }
 
     if (!cabinId || !reservingAttendeeId || !Array.isArray(beds) || !beds.length) {
       return res

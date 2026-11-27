@@ -328,7 +328,24 @@ async function restoreProductInventoryStatuses({ originalBaseline }) {
   }
 }
 
+// A signed user session cookie for a test ticket, made the same way as
+// src/lib/user-session-server.js so requests sign in as that user.
+function createUserSessionCookie({ recordId, firebaseUid }) {
+  const secret =
+    process.env.USER_SESSION_SECRET || readLocalEnvironment().USER_SESSION_SECRET;
+  if (!secret) throw new Error('USER_SESSION_SECRET is required for the automated tests.');
+  const payload = Buffer.from(
+    JSON.stringify({ recordId, firebaseUid, expiresAt: Date.now() + 60 * 60 * 1000 }),
+  ).toString('base64url');
+  const signature = require('node:crypto')
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('base64url');
+  return `highlands_user_session=${payload}.${signature}`;
+}
+
 module.exports = {
+  createUserSessionCookie,
   airtableRequest,
   captureTestBaseBaseline,
   compareTestBaseBaselines,

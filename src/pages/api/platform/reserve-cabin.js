@@ -10,6 +10,7 @@ import {
 } from '@/lib/airtable';
 import { sendConfirmationEmail } from '@/lib/emails';
 import { throwIfReservationTicketIsInvalid } from '@/utils/ticket-utils';
+import { requireSignedInUser } from '@/lib/user-session-server';
 
 // mirrors the confirm-reservation logic from reserveButton.jsx, but enforces
 // the yurt/head-staff/capacity rules server-side instead of trusting the client
@@ -20,12 +21,20 @@ export default async function handler(req, res) {
   }
 
   try {
+    const signedInUser = await requireSignedInUser(req, res);
+    if (!signedInUser) return;
     const {
       cabinId,
       groupMemberIds,
       hostUserId,
       selectedBeds = [],
     } = req.body;
+    // Only the signed-in user can reserve a cabin as host.
+    if (hostUserId !== signedInUser.id) {
+      return res
+        .status(403)
+        .json({ message: 'You can only reserve a cabin for your own ticket.' });
+    }
 
     if (!cabinId || !Array.isArray(groupMemberIds) || !groupMemberIds.length) {
       return res

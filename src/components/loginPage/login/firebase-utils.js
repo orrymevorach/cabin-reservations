@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
+  sendEmailVerification,
 } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -51,6 +52,13 @@ export const createFirebaseUser = ({ email, password }) => {
       };
     });
 };
+
+// Email the signed-in Firebase user a link that verifies their address. Linking a ticket requires a
+// verified email (or the ticket's temporary password), so the address cannot belong to someone else.
+export const sendFirebaseEmailVerification = firebaseUser =>
+  sendEmailVerification(firebaseUser)
+    .then(() => ({}))
+    .catch(error => ({ error }));
 
 export const signOutOfFirebase = () => {
   const app = initializeApp(firebaseConfig);

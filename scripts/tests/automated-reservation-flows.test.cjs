@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const { after, before, test } = require('node:test');
 const {
   airtableRequest,
+  createUserSessionCookie,
   getTestConfiguration,
   listAirtableRecords,
   resetAutomatedReservationFixtures,
@@ -32,6 +33,11 @@ function nextFixtureIdentity(label) {
   };
 }
 
+// Each test ticket gets its own Firebase UID so requests can sign in as it with a user session.
+const fixtureFirebaseUids = new Map();
+const userSessionCookie = recordId =>
+  createUserSessionCookie({ recordId, firebaseUid: fixtureFirebaseUids.get(recordId) });
+
 async function createTicket({
   name,
   emailAddress,
@@ -46,17 +52,20 @@ async function createTicket({
     'Email Address': emailAddress,
     'Temporary Password': temporaryPassword,
     Status: status,
+    'Firebase UID': `automated-test-uid-${runId}-${fixtureFirebaseUids.size}`,
   };
   if (quantity !== undefined) fields.Quantity = quantity;
   if (purchaser) fields.Purchaser = purchaser;
   if (cabinId) fields.Cabin = [cabinId];
   if (discountCode) fields.discountCode = discountCode;
 
-  return airtableRequest({
+  const ticket = await airtableRequest({
     method: 'POST',
     table: 'Ticket Purchases',
     body: { fields, typecast: true },
   });
+  fixtureFirebaseUids.set(ticket.id, fields['Firebase UID']);
+  return ticket;
 }
 
 async function createHost({
@@ -174,12 +183,19 @@ async function createIncludedCabinGuest({ host, label, cabinId }) {
   return { guest, response };
 }
 
-async function postJson(pathname, body, { cookie } = {}) {
+// Requests sign in as the user acting in them: the host, the user choosing beds, or the user
+// checking in, unless a test names the acting user itself.
+async function postJson(pathname, body, { actingUserId } = {}) {
+  const signedInUserId =
+    actingUserId ||
+    body.hostUserId ||
+    body.reservingAttendeeId ||
+    body.newFields?.Attendee?.[0];
   const response = await fetch(`${appUrl}${pathname}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...(cookie && { Cookie: cookie }),
+      ...(signedInUserId && { Cookie: userSessionCookie(signedInUserId) }),
     },
     body: JSON.stringify(body),
   });
@@ -211,7 +227,7 @@ async function assignPurchasedTicket({ host, label, cabinId }) {
       lastName: label,
       ...(cabinId && { cabinId }),
     },
-    { cookie: `user_record_id=${host.id}` },
+    { actingUserId: host.id },
   );
   return { guest, response };
 }
@@ -219,6 +235,7 @@ async function assignPurchasedTicket({ host, label, cabinId }) {
 async function getReservationData(hostId) {
   const response = await fetch(
     `${appUrl}/api/platform/user-reservation-data?userId=${encodeURIComponent(hostId)}`,
+    { headers: { Cookie: userSessionCookie(hostId) } },
   );
   const body = await response.json();
   assert.equal(response.status, 200);
@@ -685,14 +702,18 @@ test('reserves an open cabin, selects a bed, submits check-in, and accepts the w
   assert.equal(checkInResponse.status, 200);
   assert.ok(checkInResponse.body.record.id);
 
-  const waiverResponse = await postJson('/api/airtable/update-record', {
-    tableId: 'Check In',
-    recordId: checkInResponse.body.record.id,
-    newFields: {
-      'Waiver Accepted': true,
-      'Waiver Accepted Date': new Date().toISOString(),
+  const waiverResponse = await postJson(
+    '/api/airtable/update-record',
+    {
+      tableId: 'Check In',
+      recordId: checkInResponse.body.record.id,
+      newFields: {
+        'Waiver Accepted': true,
+        'Waiver Accepted Date': new Date().toISOString(),
+      },
     },
-  });
+    { actingUserId: guest.id },
+  );
   assert.equal(waiverResponse.status, 200);
   assert.equal(waiverResponse.body.record.waiverAccepted, true);
 });
@@ -765,12 +786,16 @@ test('removes a group member without deleting their purchased ticket', async () 
   const addResponse = await addExistingTicketHolder({ host, guest });
   assert.equal(addResponse.status, 200);
 
-  const removeResponse = await postJson('/api/platform/group', {
-    action: 'remove-group-member',
-    groupId: host.groupId,
-    memberIds: [host.id, guest.id],
-    removeUserId: guest.id,
-  });
+  const removeResponse = await postJson(
+    '/api/platform/group',
+    {
+      action: 'remove-group-member',
+      groupId: host.groupId,
+      memberIds: [host.id, guest.id],
+      removeUserId: guest.id,
+    },
+    { actingUserId: host.id },
+  );
 
   assert.equal(removeResponse.status, 200);
   assert.deepEqual(await getGroupMemberIds(host), [host.id]);
@@ -911,7 +936,7 @@ test('loads the summary page for a signed-in purchaser and sends an archived tic
     cabinId: testCabin.id,
   });
   const summaryResponse = await fetch(`${appUrl}/summary`, {
-    headers: { Cookie: `user_record_id=${host.id}` },
+    headers: { Cookie: userSessionCookie(host.id) },
     redirect: 'manual',
   });
   assert.equal(summaryResponse.status, 200);
@@ -923,13 +948,13 @@ test('loads the summary page for a signed-in purchaser and sends an archived tic
     shouldCreateGroup: false,
   });
   const archivedResponse = await fetch(`${appUrl}/summary`, {
-    headers: { Cookie: `user_record_id=${archivedHost.id}` },
+    headers: { Cookie: userSessionCookie(archivedHost.id) },
     redirect: 'manual',
   });
   assert.equal(archivedResponse.status, 307);
   assert.equal(archivedResponse.headers.get('location'), '/');
   assert.match(
     archivedResponse.headers.get('set-cookie') || '',
-    /user_record_id=;/,
+    /highlands_user_session=;/,
   );
 });

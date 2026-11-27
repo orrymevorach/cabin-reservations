@@ -11,6 +11,9 @@ export async function sendSlackNotification({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        // The Slack route only accepts this site's server, identified by the shared secret.
+        'x-app-api-key':
+          process.env.EMAIL_APP_SECRET || process.env.EMAIL_API_SECRET || '',
       },
       body: JSON.stringify({ originalGuestName, newGuestName, email, cabin }),
     },

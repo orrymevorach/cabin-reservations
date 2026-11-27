@@ -1,8 +1,14 @@
 import { logSentryApiError } from '@/utils/sentry-utils';
 import { replaceCamelCaseWithSpaces } from '@/utils/string-utils';
 import { sendEmail } from '@/lib/emails';
+import { isInternalRequest } from '@/utils/internal-request-server';
 
+// Called only by this site's reservation routes after a booking. Public requests are refused so the
+// route cannot be used to send reservation emails to arbitrary addresses.
 export default async function handler(req, res) {
+  if (!isInternalRequest(req)) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
   try {
     const { groupMember, cabin, selectedBeds = [], host } = req.body;
 

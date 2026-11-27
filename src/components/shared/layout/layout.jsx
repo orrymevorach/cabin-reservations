@@ -10,6 +10,7 @@ import Nav from '../nav/nav';
 import { useState } from 'react';
 import { signOutOfFirebase } from '@/components/loginPage/login/firebase-utils';
 import { logSentryError } from '@/utils/sentry-utils';
+import { signOutUser } from '@/lib/platform-api';
 
 export const Logo = ({ classNames = ' ' }) => {
   return <Image src={logo} className={clsx(styles.image, classNames)} alt='' />;
@@ -43,6 +44,8 @@ export default function Layout({ children }) {
     try {
       const response = await signOutOfFirebase();
       if (response?.error) throw response.error;
+      // The signed session cookie is httpOnly, so the server clears it.
+      await signOutUser();
       Cookies.remove(COOKIES.USER_RECORD, { path: '/' });
       Cookies.remove(COOKIES.UID, { path: '/' });
       dispatch({ type: 'LOG_OUT' });

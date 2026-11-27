@@ -1,12 +1,12 @@
-import { getUserByEmail } from '@/lib/airtable';
 import { getAttendeeAndAssignFirebaseUid } from '@/lib/platform-api';
 import { useState } from 'react';
 import styles from './login.module.scss';
 import Button from '../../shared/button/button';
 import Input from '@/components/shared/input/input';
-import Cookies from 'js-cookie';
-import { COOKIES } from '@/utils/constants';
-import { signInWithFirebaseEmailAndPassword } from './firebase-utils';
+import {
+  sendFirebaseEmailVerification,
+  signInWithFirebaseEmailAndPassword,
+} from './firebase-utils';
 import { errors as firebaseErrors } from './firebase-utils';
 import { isObjectEmpty } from '@/utils/string-utils';
 
@@ -37,40 +37,9 @@ export default function Login({ handleSuccess }) {
       password,
     });
 
-    let user = null;
-    try {
-      if (firebaseResponse.user) {
-        const idToken = await firebaseResponse.user.getIdToken();
-        user = await getAttendeeAndAssignFirebaseUid({ idToken });
-      } else {
-        user = await getUserByEmail({ email });
-      }
-      const hasUser = !isObjectEmpty(user);
-      // Firebase account exists but user does not have a ticket. This scenario occurs if someone purchased a ticket in a previous year, but has not purchased a ticket this year.
-      if (!hasUser) {
-        setError(errors.USER_NOT_FOUND);
-        setIsLoading(false);
-        return;
-      }
-    } catch (error) {
-      // Firebase errors carry a code and a technical message, so map them to the login error copy.
-      const errorMessage = error.code
-        ? firebaseErrors[error.code]?.message || errors.GENERIC
-        : error.message || errors.GENERIC;
-      setError(errorMessage);
-      setIsLoading(false);
-      return;
-    }
-
-    const isFirebaseLoginSuccessful = Boolean(firebaseResponse.user?.uid);
-
-    // Step 1a: If firebase login is successful, handle success
-    if (isFirebaseLoginSuccessful) {
-      Cookies.set(COOKIES.USER_RECORD, user.id, { expires: 7 });
-      handleSuccess({ email, user });
-    }
-    // A new ticket can lack a UID for an existing account, so failed sign-ins must not redirect to account creation.
-    else {
+    // Step 1a: Firebase sign-in failed. Show the sign-in error without looking the email up, so the
+    // form does not reveal which emails hold tickets.
+    if (!firebaseResponse.user?.uid) {
       const errorCode = firebaseResponse.error?.code;
       const isCredentialError = [
         'auth/invalid-credential',
@@ -82,7 +51,40 @@ export default function Login({ handleSuccess }) {
         : firebaseErrors[errorCode]?.message || errors.GENERIC;
       setError(errorMessage);
       setIsLoading(false);
+      return;
     }
+
+    // Step 2: Link the Firebase account to its ticket. The server checks the Firebase token and sets
+    // the signed session cookie that identifies the user on every page.
+    let user = null;
+    try {
+      const idToken = await firebaseResponse.user.getIdToken();
+      user = await getAttendeeAndAssignFirebaseUid({ idToken });
+    } catch (error) {
+      // A returning user's new ticket links only after they verify their email, so send the
+      // verification link and ask them to log in again once they have opened it.
+      if (error.linkErrorCode === 'EMAIL_VERIFICATION_REQUIRED') {
+        await sendFirebaseEmailVerification(firebaseResponse.user);
+        setError(error.message);
+        setIsLoading(false);
+        return;
+      }
+      // Firebase errors carry a code and a technical message, so map them to the login error copy.
+      const errorMessage = error.code
+        ? firebaseErrors[error.code]?.message || errors.GENERIC
+        : error.message || errors.GENERIC;
+      setError(errorMessage);
+      setIsLoading(false);
+      return;
+    }
+
+    // Firebase account exists but user does not have a ticket. This scenario occurs if someone purchased a ticket in a previous year, but has not purchased a ticket this year.
+    if (isObjectEmpty(user)) {
+      setError(errors.USER_NOT_FOUND);
+      setIsLoading(false);
+      return;
+    }
+    handleSuccess({ email, user });
   };
 
   const handleChangeEmail = e => {

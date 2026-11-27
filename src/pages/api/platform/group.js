@@ -18,8 +18,7 @@ import {
   sendTemporaryPasswordEmail,
 } from '@/lib/emails';
 import { sendSlackNotification } from '@/lib/slack';
-import Cookies from 'cookies';
-import { COOKIES } from '@/utils/constants';
+import { requireSignedInUser } from '@/lib/user-session-server';
 import {
   hasIncludedGuestTicketRemaining,
   throwIfReservationTicketIsInvalid,
@@ -334,8 +333,15 @@ async function assignPurchasedTicketToGuest({
   return { group, cabin, remainingPurchasedTicketCount };
 }
 
-async function removeMember({ groupId, memberIds, removeUserId }) {
-  const remainingMemberIds = memberIds.filter(id => id !== removeUserId);
+// Remove a member using the group as saved in Airtable. Only a member of that group can change it,
+// and the browser's member list is ignored so it cannot rewrite the group.
+async function removeMember({ groupId, removeUserId, signedInUserId }) {
+  const savedGroup = groupId ? await getGroup({ groupId }) : null;
+  const savedMemberIds = savedGroup?.members || [];
+  if (!savedGroup?.id || !savedMemberIds.includes(signedInUserId)) {
+    return { error: 'You can only change your own group.' };
+  }
+  const remainingMemberIds = savedMemberIds.filter(id => id !== removeUserId);
   const groupResponse = await updateGroup({
     groupId,
     members: remainingMemberIds,
@@ -356,17 +362,31 @@ export default async function handler(req, res) {
   // 'assign-purchased-ticket',
   // 'remove-group-member'.
   try {
+    const signedInUser = await requireSignedInUser(req, res);
+    if (!signedInUser) return;
     const {
       action,
       groupId = null,
       hostUserId,
-      memberIds = [],
       email,
       firstName,
       lastName,
       cabinId = null,
       removeUserId,
     } = req.body;
+
+    // Adding guests and spending paid slots act on the host's ticket, so the host must be the
+    // signed-in user rather than whoever the browser names.
+    const isHostAction = [
+      'add-existing-ticket-holder',
+      'create-cabin-signedInUser',
+      'assign-purchased-ticket',
+    ].includes(action);
+    if (isHostAction && hostUserId !== signedInUser.id) {
+      return res.status(403).json({
+        message: 'You must be signed in as the ticket purchaser.',
+      });
+    }
 
     let result;
     if (action === 'add-existing-ticket-holder') {
@@ -385,14 +405,6 @@ export default async function handler(req, res) {
       });
       // Spend a paid slot, claim or create its ticket record, and email the guest.
     } else if (action === 'assign-purchased-ticket') {
-      const cookies = new Cookies(req, res);
-      const authenticatedUserId = cookies.get(COOKIES.USER_RECORD);
-      if (authenticatedUserId !== hostUserId) {
-        return res.status(403).json({
-          message: 'You must be signed in as the ticket purchaser.',
-        });
-      }
-
       result = await assignPurchasedTicketToGuest({
         groupId,
         hostUserId,
@@ -402,7 +414,11 @@ export default async function handler(req, res) {
         cabinId,
       });
     } else if (action === 'remove-group-member') {
-      result = await removeMember({ groupId, memberIds, removeUserId });
+      result = await removeMember({
+        groupId,
+        removeUserId,
+        signedInUserId: signedInUser.id,
+      });
     } else {
       return res.status(400).json({ message: 'Unsupported action.' });
     }

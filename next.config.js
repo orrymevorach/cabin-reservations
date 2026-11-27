@@ -18,18 +18,6 @@ const nextConfig = {
         destination: '/api/platform/create-check-in',
       },
       {
-        source: '/api/airtable/get-cabin',
-        destination: '/api/airtable/get-record',
-      },
-      {
-        source: '/api/airtable/get-cabins',
-        destination: '/api/airtable/get-records',
-      },
-      {
-        source: '/api/airtable/get-units',
-        destination: '/api/airtable/get-records',
-      },
-      {
         source: '/api/airtable/reserve-spot-in-cabin',
         destination: '/api/airtable/update-record',
       },
@@ -50,10 +38,6 @@ const nextConfig = {
         destination: '/api/airtable/update-record',
       },
       {
-        source: '/api/airtable/create-group',
-        destination: '/api/airtable/create-record',
-      },
-      {
         source: '/api/airtable/update-group',
         destination: '/api/airtable/update-record',
       },
@@ -68,14 +52,6 @@ const nextConfig = {
       {
         source: '/api/airtable/get-group',
         destination: '/api/airtable/get-record-by-id',
-      },
-      {
-        source: '/api/airtable/get-cabin-categories',
-        destination: '/api/airtable/get-records',
-      },
-      {
-        source: '/api/airtable/get-user-by-uid',
-        destination: '/api/airtable/get-record',
       },
     ];
   },

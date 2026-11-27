@@ -12,7 +12,8 @@ function getSecret() {
   return process.env.AUTOMATED_TEST_IDENTITY_SECRET;
 }
 
-function createTestIdToken({ email, uid }) {
+// Test accounts have verified emails unless a test says otherwise, matching the browser stub.
+function createTestIdToken({ email, uid, emailVerified = true }) {
   const now = Math.floor(Date.now() / 1000);
   const header = Buffer.from(
     JSON.stringify({ alg: 'HS256', typ: 'JWT' }),
@@ -20,6 +21,7 @@ function createTestIdToken({ email, uid }) {
   const payload = Buffer.from(
     JSON.stringify({
       email,
+      email_verified: emailVerified,
       user_id: uid,
       sub: uid,
       iat: now,
@@ -55,7 +57,11 @@ function verifyTestIdToken(token) {
     !payload.sub?.startsWith('dietary-test-')
   )
     return null;
-  return { localId: payload.sub, email: payload.email };
+  return {
+    localId: payload.sub,
+    email: payload.email,
+    emailVerified: payload.email_verified === true,
+  };
 }
 
 module.exports = { createTestIdToken, verifyTestIdToken };

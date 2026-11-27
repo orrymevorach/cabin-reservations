@@ -3,8 +3,7 @@ import {
   isObjectEmpty,
   toCamelCase,
 } from '@/utils/string-utils';
-import { BEDS, AIRTABLE_BASES, COOKIES, ROUTES } from '@/utils/constants';
-import Cookies from 'cookies';
+import { BEDS, AIRTABLE_BASES, ROUTES } from '@/utils/constants';
 import { logSentryApiError, logSentryError } from '@/utils/sentry-utils';
 import { ticketLookupErrorMessage } from '@/utils/api-error-utils';
 import { throwIfReservationTicketIsInvalid, isInactiveTicketStatus } from '@/utils/ticket-utils';
@@ -738,17 +737,20 @@ export const createUser = async ({ email, name, cabinId, discountCode }) => {
 
 export async function getPageLoadData({ req, res }) {
   try {
-    const cookies = new Cookies(req, res);
-    const userRecId = cookies.get(COOKIES.USER_RECORD);
-    if (!userRecId) return { user: null, redirect: null };
-    const user = await getUserByRecordId({ id: userRecId });
-    const hasUser = !isObjectEmpty(user);
-    // The login cookie points to a ticket that is not active in the current
-    // Airtable base (for example, an ID from a previous year's base). Delete the
-    // cookie and return a redirect so pages send the guest back to the login
-    // page instead of showing the error takeover.
-    if (!hasUser) {
-      cookies.set(COOKIES.USER_RECORD, null, { httpOnly: false });
+    // The signed-in user comes from the server-signed session cookie set at login, never from a
+    // record ID the browser could change.
+    // The inline typeof check lets browser bundles leave out the server-only session module.
+    const userSessionServer =
+      typeof window === 'undefined' ? await import('@/lib/user-session-server') : null;
+    if (!userSessionServer) return { user: null, redirect: null };
+    const { readUserSession, getSignedInUser, clearUserSession } = userSessionServer;
+    if (!readUserSession(req)) return { user: null, redirect: null };
+    const { user } = await getSignedInUser(req);
+    // The session's ticket is no longer active or linked to this account (for example, an ID from a
+    // previous year's base). Clear the session and send the user back to the login page instead
+    // of showing the error takeover.
+    if (!user || isObjectEmpty(user)) {
+      clearUserSession(res);
       return {
         user: null,
         redirect: { destination: ROUTES.HOME, permanent: false },

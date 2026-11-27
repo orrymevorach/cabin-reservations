@@ -3,7 +3,7 @@ import styles from './createUser.module.scss';
 import { useEffect, useState } from 'react';
 import Button from '@/components/shared/button/button';
 import { useRouter } from 'next/router';
-import { getUserByEmail } from '@/lib/airtable';
+import { verifyTemporaryPassword } from '@/lib/platform-api';
 import UpdatePasswordTakeover from '../updatePasswordTakeover/updatePasswordTakeover';
 import { errors } from '@/components/loginPage/login/login';
 import { sendTemporaryPasswordEmail } from '@/lib/emails';
@@ -41,11 +41,15 @@ export default function CreateUser() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const userData = await getUserByEmail({ email: emailInput });
-      if (!userData.id) {
+      // The server compares the temporary password; the browser never receives the ticket's password.
+      const { user: userData, errorCode } = await verifyTemporaryPassword({
+        email: emailInput,
+        temporaryPassword: password,
+      });
+      if (errorCode === 'USER_NOT_FOUND') {
         setError(errors.USER_NOT_FOUND);
         return;
-      } else if (password !== userData.temporaryPassword) {
+      } else if (errorCode) {
         setError(errors.PASSWORD_DOES_NOT_MATCH);
         return;
       }
@@ -89,6 +93,7 @@ export default function CreateUser() {
     <>
       {showTakeover ? (
         <UpdatePasswordTakeover
+          temporaryPassword={password}
           handleClose={() => setShowTakeover(false)}
           user={user}
         />

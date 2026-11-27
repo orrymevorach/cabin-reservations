@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { COOKIES, ROUTES } from '@/utils/constants';
 import { signOutOfFirebase } from '@/components/loginPage/login/firebase-utils';
+import { signOutUser } from '@/lib/platform-api';
 
 // Signs the guest out of Firebase and removes every cookie before returning to the login page,
 // so a stale user_record_id cookie cannot redirect them straight back to the page that failed.
@@ -23,6 +24,8 @@ export default function useLogInAgain() {
     } catch (error) {
       console.error('Unable to sign out of Firebase:', error);
     } finally {
+      // The signed session cookie is httpOnly, so the server clears it.
+      await signOutUser();
       const cookieNames = Object.keys(Cookies.get());
       cookieNames.forEach(cookieName => {
         Cookies.remove(cookieName, { path: '/' });

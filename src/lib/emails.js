@@ -10,6 +10,9 @@ export const sendConfirmationEmail = async ({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        // The confirmation route only accepts this site's server, identified by the shared secret.
+        'x-app-api-key':
+          process.env.EMAIL_APP_SECRET || process.env.EMAIL_API_SECRET || '',
       },
       body: JSON.stringify({
         groupMember,
@@ -52,6 +55,8 @@ export const sendQRCode = async ({ email, recordId }) => {
   ).then(res => res.json());
 };
 
+// Server-only: the festival's send-email route requires the shared email secret, which only exists
+// in server environment variables.
 export const sendEmail = async ({ emailAddress, subject, html }) => {
   const baseUrl = 'https://highlandsmusicfestival.ca';
   const endpoint = `${baseUrl}/api/mailchimp/send-email`;
@@ -61,7 +66,8 @@ export const sendEmail = async ({ emailAddress, subject, html }) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Origin: baseUrl,
+        'x-app-api-key':
+          process.env.EMAIL_APP_SECRET || process.env.EMAIL_API_SECRET || '',
       },
       body: JSON.stringify({ emailAddress, subject, html }),
     });

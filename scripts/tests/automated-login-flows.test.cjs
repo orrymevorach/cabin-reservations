@@ -223,8 +223,10 @@ test('email login reports rejected credentials and missing ticket records', asyn
     await unknownPage
       .getByRole('button', { name: 'Log in', exact: true })
       .click();
+    // A failed sign-in no longer looks the email up, so an unknown email gets the same message as
+    // a wrong password and the form does not reveal which emails hold tickets.
     await unknownPage.getByText(
-      /We do not have a record of this email/,
+      /We could not sign you in with that email and password/,
     ).waitFor();
 
     const firebaseIdentity = nextIdentity('no-active-ticket');

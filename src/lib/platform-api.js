@@ -1,14 +1,16 @@
 import { logSentryError } from '@/utils/sentry-utils';
 import { ticketLookupErrorMessage } from '@/utils/api-error-utils';
 
-export async function getAttendeeAndAssignFirebaseUid({ idToken }) {
+// Link the signed-in Firebase account to its ticket and start the server session. A ticket that is not
+// linked yet needs the temporary password from the ticket email, or a verified Firebase email.
+export async function getAttendeeAndAssignFirebaseUid({ idToken, temporaryPassword }) {
   let response;
   let result;
   try {
     response = await fetch('/api/airtable/add-firebase-uid', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken }),
+      body: JSON.stringify({ idToken, temporaryPassword }),
     });
     result = await response.json();
   } catch (error) {
@@ -18,9 +20,35 @@ export async function getAttendeeAndAssignFirebaseUid({ idToken }) {
     throw new Error(ticketLookupErrorMessage);
   }
   if (!response.ok) {
-    throw new Error(result.message || 'Unable to link your ticket to your account.');
+    throw Object.assign(
+      new Error(result.message || 'Unable to link your ticket to your account.'),
+      { linkErrorCode: result.code || '' },
+    );
   }
   return result.user;
+}
+
+// Account creation: check the temporary password from the ticket email on the server. Returns
+// { user } when it matches, or { errorCode } (USER_NOT_FOUND or PASSWORD_DOES_NOT_MATCH).
+export async function verifyTemporaryPassword({ email, temporaryPassword }) {
+  const response = await fetch('/api/auth/verify-temporary-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, temporaryPassword }),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (response.ok) return { user: result.user };
+  if (result.code) return { errorCode: result.code };
+  throw new Error(result.message || ticketLookupErrorMessage);
+}
+
+// Clear the server session cookie. Browser code cannot remove it because it is httpOnly.
+export async function signOutUser() {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+  } catch (error) {
+    logSentryError(error, { action: 'sign-out-user' });
+  }
 }
 
 export default async function getCabinAndUnitData() {

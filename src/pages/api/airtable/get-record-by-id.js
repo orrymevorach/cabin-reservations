@@ -1,37 +1,20 @@
-import { logSentryApiError } from '@/utils/sentry-utils';
-import { transformFields } from '../../../lib/airtable';
-const Airtable = require('airtable');
+import { getAirtableRecordById } from '@/lib/airtable-server';
+import { requireSignedInUser } from '@/lib/user-session-server';
 
-// Airtable Config
-var airtableBase = new Airtable({
-  apiKey: process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN,
-}).base(process.env.AIRTABLE_BASE);
-
+// Browser and app access to one record: the signed-in user's own ticket only. Server code reads
+// Airtable directly through lib/airtable-server.
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const { tableId, recordId } = req.body;
-    if (!recordId || typeof recordId !== 'string') {
-      return res.status(400).json('A valid Airtable record ID is required.');
-    }
-    try {
-      let recordObj = {};
-      const response = await airtableBase(tableId).find(recordId);
-      const fields = transformFields({ record: response });
-      recordObj = fields;
-      recordObj.id = response.getId();
-
-      res.status(200).json({ record: recordObj });
-    } catch (err) {
-      await logSentryApiError({
-        error: err,
-        req,
-        action: 'airtable-get-record-by-id',
-        extra: { tableId, recordId },
-      });
-      res.status(err.statusCode || 500).json(err.message);
-    }
-  } else {
+  if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    res.status(405).end('Method Not Allowed');
+    return res.status(405).end('Method Not Allowed');
   }
+  const signedInUser = await requireSignedInUser(req, res);
+  if (!signedInUser) return;
+  const { tableId, recordId } = req.body || {};
+  if (tableId !== 'Ticket Purchases' || recordId !== signedInUser.id) {
+    return res.status(403).json({ message: 'You can only view your own ticket.' });
+  }
+  const record = await getAirtableRecordById({ tableId, recordId: signedInUser.id });
+  delete record.temporaryPassword;
+  return res.status(200).json({ record });
 }

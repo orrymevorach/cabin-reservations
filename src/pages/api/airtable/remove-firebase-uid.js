@@ -1,51 +1,38 @@
 import { logSentryApiError } from '@/utils/sentry-utils';
-import { transformFields } from '../../../lib/airtable';
-const Airtable = require('airtable');
+import { updateAirtableRecord } from '@/lib/airtable-server';
+import {
+  clearUserSession,
+  requireSignedInUser,
+} from '@/lib/user-session-server';
 
-// Airtable Config
-var airtableBase = new Airtable({
-  apiKey: process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN,
-}).base(process.env.AIRTABLE_BASE);
-
+// Unlink the signed-in user's own ticket from their login (used when they delete their account in
+// the mobile app) and sign them out. A user can never unlink someone else's ticket.
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const { tableId, recordId, newFields = {} } = req.body;
-
-    if (!recordId || typeof recordId !== 'string') {
-      return res
-        .status(400)
-        .json({ message: 'A valid Airtable record ID is required.' });
-    }
-
-    try {
-      const response = await airtableBase(tableId).update([
-        {
-          id: recordId,
-          fields: { ...newFields, 'Firebase UID': '' },
-        },
-      ]);
-
-      const record = response[0];
-      const fields = transformFields({ record });
-      const transformedRecord = {
-        ...fields,
-        id: record.id,
-      };
-
-      res.status(200).json({ record: transformedRecord });
-    } catch (err) {
-      await logSentryApiError({
-        error: err,
-        req,
-        action: 'airtable-remove-firebase-uid',
-        extra: { tableId, recordId },
-      });
-      res
-        .status(err.statusCode || 500)
-        .json({ message: err.message || 'Unable to update Airtable record.' });
-    }
-  } else {
+  if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    res.status(405).end('Method Not Allowed');
+    return res.status(405).end('Method Not Allowed');
+  }
+  const signedInUser = await requireSignedInUser(req, res);
+  if (!signedInUser) return;
+  const { recordId } = req.body || {};
+  if (recordId && recordId !== signedInUser.id) {
+    return res.status(403).json({ message: 'You can only unlink your own account.' });
+  }
+  try {
+    const record = await updateAirtableRecord({
+      tableId: 'Ticket Purchases',
+      recordId: signedInUser.id,
+      newFields: { 'Firebase UID': '' },
+    });
+    clearUserSession(res);
+    return res.status(200).json({ record: { id: record.id } });
+  } catch (err) {
+    await logSentryApiError({
+      error: err,
+      req,
+      action: 'airtable-remove-firebase-uid',
+      extra: { recordId: signedInUser.id },
+    });
+    return res.status(500).json({ message: 'Unable to unlink your account.' });
   }
 }
