@@ -89,6 +89,8 @@ async function run() {
     NEXT_PUBLIC_ENV_URL: appUrl,
     AUTOMATED_TEST_RESET_APPLIED: 'true',
     AUTOMATED_TEST_IDENTITY_SECRET: randomBytes(32).toString('hex'),
+    // Tests deliberately trigger failures; keep them out of the production Sentry project.
+    NEXT_PUBLIC_DISABLE_SENTRY: 'true',
   };
 
   let serverProcess;

@@ -5,6 +5,8 @@
 import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
+  // Automated test builds set NEXT_PUBLIC_DISABLE_SENTRY so deliberate test failures are not reported.
+  enabled: process.env.NEXT_PUBLIC_DISABLE_SENTRY !== 'true',
   dsn: "https://303d0a97efa3fab2ec43c5bf8147617f@o4506745899778048.ingest.us.sentry.io/4507880313585664",
 
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
